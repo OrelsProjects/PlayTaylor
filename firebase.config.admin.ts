@@ -17,16 +17,16 @@ const serviceAccount = {
 
 try {
   if (!admin.apps.length) {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount as ServiceAccount),
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    });
+    // admin.initializeApp({
+    //   credential: admin.credential.cert(serviceAccount as ServiceAccount),
+    //   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    // });
   }
 } catch (e) {
   
 }
 
-const storage = admin.storage();
-const messaging = admin.messaging();
+// const storage = admin.storage();
+// const messaging = admin.messaging();
 
-export { storage, messaging };
+// export { storage, messaging };
