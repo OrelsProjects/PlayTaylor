@@ -1,9 +1,9 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "@/authOptions";
 import AppUser from "@/models/appUser";
 import Logger from "@/loggerServer";
 import prisma from "../../_db/db";
+import { authOptions } from "../../../../auth/authOptions";
 
 export async function POST(req: NextRequest): Promise<any> {}
 
