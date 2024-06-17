@@ -26,14 +26,14 @@ if (typeof window !== "undefined") {
 if (app) {
   if (canUseNotifications()) {
     if (Notification.permission === "granted") {
-      messaging = getMessaging(app);
+      // messaging = getMessaging(app);
     }
   }
 }
 
 const initMessaging = () => {
   if (!app || messaging) return;
-  messaging = getMessaging(app);
+  // messaging = getMessaging(app);
 };
 
 const getUserToken = async () => {
