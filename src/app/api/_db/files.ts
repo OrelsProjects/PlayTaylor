@@ -5,6 +5,7 @@ import admin from "firebase-admin";
 // Assuming admin is already initialized elsewhere if this file isn't the first entry
 export const storage = admin.storage();
 
+
 /**
  * Deletes a file from the specified bucket
  * @param bucketName The name of the bucket to delete the file from
