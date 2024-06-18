@@ -27,7 +27,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         const newTheme = value === "battery-save" ? "dark" : "light";
         setTheme(newTheme);
       }}
-      className="flex flex-col gap-0"
+      className="flex flex-col gap-0 text-secondary-foreground"
     >
       <div className="flex items-center py-[18px] space-x-[14px]">
         <RadioGroupItem value="battery-save" id="battery-save" />

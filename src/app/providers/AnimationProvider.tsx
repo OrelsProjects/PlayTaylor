@@ -35,6 +35,7 @@ const AnimationProvider: React.FC<ProviderProps> = ({ children }) => {
           opacity: 0,
         },
       }}
+      className="w-full h-full"
     >
       {children}
     </motion.div>

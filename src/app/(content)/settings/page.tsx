@@ -103,7 +103,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
 
   const SectionTitle = ({ value }: { value: string }) => (
     <div className="px-4 py-[18px]">
-      <span className="text-base font-medium leading-5 tracking-[0.1px]">
+      <span className="text-base font-medium leading-5 tracking-[0.1px] text-secondary-foreground">
         {value}
       </span>
     </div>
@@ -116,7 +116,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
   return (
     <div className="flex flex-col gap-7 mt-3">
       <div>
-        <span className="text-[2.5rem] leading-[50px] font-bold">Settings</span>
+        <span className="title-main">Settings</span>
       </div>
       {/* {canUseNotifications() && (
         <div className="flex flex-col gap-2">
