@@ -34,7 +34,7 @@ const InstructionsPage: React.FC = () => {
       </div>
       <h2 className="w-full text-center">Difficulty level</h2>
       <Button asChild className="w-fit self-center mt-auto">
-        <Link href="/games/trivia">I am ready for it!</Link>
+        <Link href="/games">I am ready for it!</Link>
       </Button>
     </div>
   );
