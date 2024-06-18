@@ -47,6 +47,9 @@
   .title-tertiary {
     @apply font-bold text-[24px] leading-[24px] tracking-[0.5px];
   }
+  .card {
+    @apply h-[480px] w-[300px] rounded-lg bg-card border-[1px] border-foreground;
+  }
 }
 
 @layer base {

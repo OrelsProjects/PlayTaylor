@@ -9,7 +9,7 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ children, className }) => (
   <div
     className={cn(
-      "h-[480px] w-[300px] rounded-lg bg-card border-[1px] border-foreground justify-center items-center",
+      "card justify-center items-center",
       className,
     )}
   >

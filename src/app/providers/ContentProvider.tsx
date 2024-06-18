@@ -54,7 +54,7 @@ const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
             pauseOnHover={false}
           />
         </div>
-        <div className="w-full h-full flex flex-col gap-4 relative z-10 overflow-auto scrollbar-hide md:scrollbar-visible md:px-4">
+        <div className="w-full h-full flex flex-col gap-4 relative z-10 overflow-visible scrollbar-hide md:scrollbar-visible md:px-4">
           <NavIconContainer />
           {children}
         </div>

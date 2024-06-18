@@ -3,17 +3,17 @@
 import React, { useState } from "react";
 import Card from "../card";
 import Interactable from "./interactable";
-import { Question, SwipeDirection } from "./model";
-import TinderCardContent from "./tinderCardContent";
+import { TrueFalseQuestion as TrueFalseQuestion, SwipeDirection } from "../model";
+import TrueFalseContent from "./trueFalseContent";
 import { cn } from "../../../lib/utils";
 
-interface QuestionsProps {
-  questions: Question[];
+interface TrueFalseQuestionsProps {
+  questions: TrueFalseQuestion[];
 }
 
 type AnswerResponse = "correct" | "incorrect" | "none";
 
-const Questions: React.FC<QuestionsProps> = ({ questions }) => {
+const TrueFalseQuestions: React.FC<TrueFalseQuestionsProps> = ({ questions }) => {
   const [index, setIndex] = useState(0);
   const [answeredCorrectly, setAnsweredCorrectly] =
     useState<AnswerResponse>("none");
@@ -45,11 +45,11 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
         >
           <Card
             className={cn("transition-colors duration-300", {
-              "bg-green-200": answeredCorrectly === "correct",
-              "bg-red-200": answeredCorrectly === "incorrect",
+              "bg-green-400/60": answeredCorrectly === "correct",
+              "bg-red-400/40": answeredCorrectly === "incorrect",
             })}
           >
-            <TinderCardContent question={question} />
+            <TrueFalseContent question={question} />
           </Card>
         </Interactable>
       </div>
@@ -57,4 +57,4 @@ const Questions: React.FC<QuestionsProps> = ({ questions }) => {
   );
 };
 
-export default Questions;
+export default TrueFalseQuestions;

@@ -20,17 +20,18 @@ const NavIconContainer: React.FC<NavIconContainerProps> = () => {
 
   useEffect(() => {
     if (pathname.includes("settings")) {
-      setIcon(<Icons.Home className="h-5 w-5" />);
-      setPath("/home");
-    } else if (pathname.includes("instructions")) {
       setIcon(<Icons.Return className="h-5 w-5" />);
+      setPath("");
       setOnClick(() => () => {
         router.back();
       });
-      setPath("");
+    } else if (pathname.includes("games")) {
+      setIcon(<Icons.Home className="h-5 w-5" />);
+      setPath("/home");
     } else {
       setIcon(<Icons.Settings className="h-5 w-5" />);
       setPath("/settings");
+      setOnClick(() => () => {});
     }
   }, [pathname]);
 

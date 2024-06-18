@@ -1,8 +1,8 @@
 import React from "react";
-import Questions from "../../../../components/games/tinder-card/questions";
-import { Question } from "../../../../components/games/tinder-card/model";
+import TrueFalseQuestions from "../../../../components/games/true-false/trueFalseQuestions";
+import { TrueFalseQuestion } from "../../../../components/games/model";
 
-const quesitons: Question[] = [
+const quesitons: TrueFalseQuestion[] = [
   {
     text: "Fearless album came out in 2014",
     swipeLeftAnswer: "False god",
@@ -826,7 +826,7 @@ const quesitons: Question[] = [
   },
 ];
 const SwipeGamePage: React.FC = () => {
-  return <Questions {...{ questions: quesitons }} />;
+  return <TrueFalseQuestions {...{ questions: quesitons }} />;
 };
 
 export default SwipeGamePage;

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { PanInfo } from "framer-motion";
-import { SwipeDirection } from "./model";
+import { SwipeDirection } from "../model";
 
 interface SnapPoint {
   x: number;

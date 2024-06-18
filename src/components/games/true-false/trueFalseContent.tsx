@@ -1,11 +1,11 @@
 import React from "react";
 import Image from "next/image";
-import { Question } from "./model";
+import { TrueFalseQuestion } from "../model";
 import OptimizedImage from "../../ui/OptimizedImage";
 import { Icons } from "../../ui/icons";
 
-interface TinerCardContentProps {
-  question: Question;
+interface TrueFalseContentProps {
+  question: TrueFalseQuestion;
 }
 
 const SwipeItem = ({
@@ -23,7 +23,7 @@ const SwipeItem = ({
   </div>
 );
 
-const TinerCardContent: React.FC<TinerCardContentProps> = ({ question }) => {
+const TrueFalseContent: React.FC<TrueFalseContentProps> = ({ question }) => {
   return (
     <div className="h-full w-full flex flex-col items-center justify-start p-4 gap-24">
       <OptimizedImage
@@ -50,4 +50,4 @@ const TinerCardContent: React.FC<TinerCardContentProps> = ({ question }) => {
   );
 };
 
-export default TinerCardContent;
+export default TrueFalseContent;
