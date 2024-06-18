@@ -19,8 +19,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        montserrat: ["Montserrat", "Hauora", "sans-serif"],
-        hauora: ["Hauora", "Montserrat", "sans-serif"],
+        PlusJakartaSans: ["PlusJakartaSans", "Hauora", "sans-serif"],
+        hauora: ["Hauora", "PlusJakartaSans", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

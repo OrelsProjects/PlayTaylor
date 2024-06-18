@@ -9,10 +9,10 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import TopLoaderProvider from "./providers/TopLoaderProvider";
 
-const APP_NAME = "Saas template";
-const APP_DEFAULT_TITLE = "Saas template";
-const APP_TITLE_TEMPLATE = "%s - Saas template";
-const APP_DESCRIPTION = "Build your SaaS easily!";
+const APP_NAME = "Play Taylor";
+const APP_DEFAULT_TITLE = "Play Taylor";
+const APP_TITLE_TEMPLATE = "%s - Play Taylor";
+const APP_DESCRIPTION = "Play Taylor!";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" className="font-montserrat">
+    <html lang="en" className="font-PlusJakartaSans">
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

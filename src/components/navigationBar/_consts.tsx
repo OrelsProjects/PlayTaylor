@@ -4,7 +4,7 @@ import { GoHomeFill as HomeActive, GoHome as Home } from "react-icons/go";
 export interface NavigationBarItem {
   icon: ElementType;
   iconActive: ElementType;
-  label: "Home";
+  label: "Home (Will be removed soon)";
   href: string;
 }
 
@@ -15,7 +15,7 @@ export const BottomBarItems: NavigationBarItem[] = [
   {
     icon: () => <Home className={className} />,
     iconActive: () => <HomeActive className={classNameActive} />,
-    label: "Home",
+    label: "Home (Will be removed soon)",
     href: "/home",
   },
 ];

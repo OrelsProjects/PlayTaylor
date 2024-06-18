@@ -13,6 +13,7 @@ import useNotification from "../../../lib/hooks/useNotification";
 import { updateUserSettings } from "../../../lib/features/auth/authSlice";
 import { ThemeToggle } from "../../../components/themeToggle";
 import Divider from "../../../components/ui/divider";
+import { cn } from "../../../lib/utils";
 
 interface SettingsProps {}
 
@@ -66,8 +67,6 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
   };
 
   const handleDeleteUserRequest = async () => {
-    // Show alert that asks the user to insert their email. If email correct, delete user.
-    // If email incorrect, show error message.
     EventTracker.track("delete_user_request");
     const email = prompt(
       `Please enter your email (${user?.email}) to confirm deletion`,
@@ -94,48 +93,67 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
     });
   };
 
+  const Section = ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <div className={cn("p-3", className)}>{children}</div>;
+
+  const SectionTitle = ({ value }: { value: string }) => (
+    <div className="px-4 py-[18px]">
+      <span className="text-base font-medium leading-5 tracking-[0.1px]">
+        {value}
+      </span>
+    </div>
+  );
+
+  const SectionContent = ({ children }: { children: React.ReactNode }) => (
+    <div className="px-4">{children}</div>
+  );
+
   return (
-    <div className="flex flex-col gap-4 mt-3">
-      <div className="flex flex-row justify-between items-center">
-        <span className="text-xl font-semibold">{user?.email}</span>
+    <div className="flex flex-col gap-7 mt-3">
+      <div>
+        <span className="text-[2.5rem] leading-[50px] font-bold">Settings</span>
       </div>
-      <Divider />
-      <div className="flex flex-col gap-4">
+      {/* {canUseNotifications() && (
         <div className="flex flex-col gap-2">
-          <span className="text-lg font-semibold">Appearance</span>
+          <span className="text-lg font-semibold">Notifications</span>
           <div className="pl-2">
-            <ThemeToggle />
+            {isNotificationsGranted ? (
+              <Switch
+                className="w-10"
+                onCheckedChange={updateNotificationSettings}
+                checked={settings.showNotifications}
+              />
+            ) : (
+              <Button
+                variant="default"
+                className="w-fit px-2"
+                onClick={() => {
+                  requestNotificationsPermission().then(granted => {
+                    if (granted) {
+                      updateNotificationSettings(true);
+                    }
+                  });
+                }}
+              >
+                Enable notifications
+              </Button>
+            )}
           </div>
         </div>
-        {canUseNotifications() && (
-          <div className="flex flex-col gap-2">
-            <span className="text-lg font-semibold">Notifications</span>
-            <div className="pl-2">
-              {isNotificationsGranted ? (
-                <Switch
-                  className="w-10"
-                  onCheckedChange={updateNotificationSettings}
-                  checked={settings.showNotifications}
-                />
-              ) : (
-                <Button
-                  variant="default"
-                  className="w-fit px-2"
-                  onClick={() => {
-                    requestNotificationsPermission().then(granted => {
-                      if (granted) {
-                        updateNotificationSettings(true);
-                      }
-                    });
-                  }}
-                >
-                  Enable notifications
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
-        <div className="flex flex-col gap-2 w-full justify-start">
+      )} */}
+      <div className="flex flex-col gap-4">
+        <Section className="flex flex-col gap-2">
+          <SectionTitle value="Theme" />
+          <SectionContent>
+            <ThemeToggle />
+          </SectionContent>
+        </Section>
+        {/* <div className="flex flex-col gap-2 w-full justify-start">
           <span className="text-lg font-semibold">Account</span>
           <div className="flex flex-col gap-1 pl-2">
             <Button
@@ -153,7 +171,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
               DELETE
             </Button>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
