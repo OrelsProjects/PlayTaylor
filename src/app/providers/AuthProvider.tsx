@@ -59,7 +59,6 @@ export default function AuthProvider({
     switch (status) {
       case "authenticated":
         setUser(session.user);
-
         break;
       case "loading":
         break;
@@ -77,21 +76,24 @@ export default function AuthProvider({
   }, [currentUser]);
 
   useEffect(() => {
-    if (status === "loading") return;
-    if (status === "authenticated") {
-      if (
-        pathname.includes("login") ||
-        pathname.includes("register") ||
-        pathname === "/" ||
-        pathname === "/home"
-      ) {
-        router.push("/home");
-      }
-    } else {
-      if (!pathname.includes("login") && !pathname.includes("register")) {
-        router.push("/");
-      }
+    if (pathname === "/") {
+      router.push("/home");
     }
+    // if (status === "loading") return;
+    // if (status === "authenticated") {
+    //   if (
+    //     pathname.includes("login") ||
+    //     pathname.includes("register") ||
+    //     pathname === "/" ||
+    //     pathname === "/home"
+    //   ) {
+    //     router.push("/home");
+    //   }
+    // } else {
+    //   if (!pathname.includes("login") && !pathname.includes("register")) {
+    //     router.push("/");
+    //   }
+    // }
   }, [status]);
   if (status === "loading") {
     return (
