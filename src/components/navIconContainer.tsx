@@ -22,15 +22,15 @@ const NavIconContainer: React.FC<NavIconContainerProps> = () => {
     if (pathname.includes("settings")) {
       setIcon(<Icons.Home className="h-5 w-5" />);
       setPath("/home");
-    } else if (pathname.includes("home")) {
-      setIcon(<Icons.Settings className="h-5 w-5" />);
-      setPath("/settings");
     } else if (pathname.includes("instructions")) {
       setIcon(<Icons.Return className="h-5 w-5" />);
       setOnClick(() => () => {
         router.back();
       });
       setPath("");
+    } else {
+      setIcon(<Icons.Settings className="h-5 w-5" />);
+      setPath("/settings");
     }
   }, [pathname]);
 

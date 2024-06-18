@@ -11,7 +11,7 @@
   :root {
     --background: 20 14.3% 4.1%;
     --foreground: 0 0% 95%;
-    --card: 24 9.8% 10%;
+    --card: 257 6% 22%;
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
@@ -28,6 +28,7 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 40 30.7% 15.9%;
+    --radius: 0.75rem;
   }
 
   .dark {
@@ -43,6 +44,9 @@
   .title-secondary {
     @apply font-bold text-[32px] leading-[40px];
   }
+  .title-tertiary {
+    @apply font-bold text-[24px] leading-[24px] tracking-[0.5px];
+  }
 }
 
 @layer base {
@@ -57,5 +61,9 @@
   }
   h2 {
     @apply title-secondary;
+  }
+
+  h3 {
+    @apply title-tertiary;
   }
 }
