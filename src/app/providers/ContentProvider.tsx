@@ -74,7 +74,7 @@ const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
             Migrate
           </Button> */}
           <div className="w-full h-full flex flex-col relative z-10 overflow-auto scrollbar-hide md:scrollbar-visible md:px-4">
-            {user && <SettingsComponent />}
+            <SettingsComponent />
             {children}
           </div>
         </ThemeProvider>
