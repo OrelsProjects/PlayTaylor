@@ -165,6 +165,7 @@ export const getSession = async ({
       });
     }
   }
+  session.user.role = userInDB?.role || "";
   return session;
 };
 

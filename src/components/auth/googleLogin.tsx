@@ -43,7 +43,7 @@ export default function GoogleLogin({
     >
       {loading && <Loading className="w-7 h-7" />}
       <FcGoogle className="w-7 h-7" />
-      <h1 className="uppercase">{signInTextPrefix} Google</h1>
+      <span className="uppercase">{signInTextPrefix} Google</span>
     </div>
   );
 }

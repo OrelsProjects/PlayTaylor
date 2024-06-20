@@ -21,7 +21,9 @@ model AppUser {
   displayName String?
   photoURL    String?
 
-  meta            AppUserMetadata?
+  role String?
+
+  meta     AppUserMetadata?
   settings AppUserSettings?
 
   @@map("appUser")
@@ -50,4 +52,21 @@ model AppUserSettings {
   appUser AppUser @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@map("appUserSettings")
+}
+
+model Question {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  title   String  @unique
+  content String
+  image   String?
+  answer  String
+  type    String // trivia / swipe
+}
+
+model TrueFalseQuestion {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  text              String
+  image             String?
+  correctAnswerText String
+  correctAnswer     Boolean
 }

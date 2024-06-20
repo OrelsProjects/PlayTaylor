@@ -50,12 +50,12 @@ export default function AppleLogin({
           initial={{ opacity: 0 }}
           exit={{ opacity: 0 }}
         >
-          <h1>We got your request :)</h1>
+          <span>We got your request :)</span>
         </motion.div>
       ) : (
         <>
           <FaApple className="w-7 h-7" />
-          <h1>Request apple sign up</h1>
+          <span>Request apple sign up</span>
         </>
       )}
     </div>

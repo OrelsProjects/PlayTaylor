@@ -1,12 +1,8 @@
-export type SwipeDirection = "left" | "right";
-
 export interface TrueFalseQuestion {
   text: string;
   image: string;
-  swipeLeftAnswer: string;
-  swipeRightAnswer: string;
   correctAnswerText: string;
-  correctAnswer: SwipeDirection;
+  correctAnswer: boolean;
 }
 
 export interface TriviaQuestion {

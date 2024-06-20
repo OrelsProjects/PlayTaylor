@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { PanInfo } from "framer-motion";
-import { SwipeDirection } from "../model";
 
 interface SnapPoint {
   x: number;
@@ -11,7 +10,7 @@ interface InteractableProps {
   children?: React.ReactNode;
   snapPoints: SnapPoint[];
   onSnap: (x: number) => void;
-  onSwipe?: (direction: SwipeDirection) => void;
+  onSwipe?: (response: boolean) => void;
   initialX?: number; // Optionally specify an initial x position
   style?: React.CSSProperties;
 }
@@ -62,9 +61,9 @@ const Interactable: React.FC<InteractableProps> = ({
         snapPoints.map(p => p.x),
       );
       if (nearestSnapPoint > 0) {
-        onSwipe?.("right");
+        onSwipe?.(true);
       } else {
-        onSwipe?.("left");
+        onSwipe?.(false);
       }
     }
 

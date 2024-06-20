@@ -37,12 +37,12 @@ const TrueFalseContent: React.FC<TrueFalseContentProps> = ({ question }) => {
       <div className="w-full flex flex-row justify-between">
         <SwipeItem
           Icon={Icons.SwipeLeft}
-          text={question.swipeLeftAnswer}
+          text={"False god"}
           className="-rotate-[15deg]"
         />
         <SwipeItem
           Icon={Icons.SwipeRight}
-          text={question.swipeRightAnswer}
+          text={"True love"}
           className="rotate-[15deg]"
         />
       </div>

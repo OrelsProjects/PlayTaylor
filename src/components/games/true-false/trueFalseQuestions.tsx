@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Card from "../card";
 import Interactable from "./interactable";
-import { TrueFalseQuestion as TrueFalseQuestion, SwipeDirection } from "../model";
+import { TrueFalseQuestion as TrueFalseQuestion } from "../model";
 import TrueFalseContent from "./trueFalseContent";
 import { cn } from "../../../lib/utils";
 
@@ -13,13 +13,15 @@ interface TrueFalseQuestionsProps {
 
 type AnswerResponse = "correct" | "incorrect" | "none";
 
-const TrueFalseQuestions: React.FC<TrueFalseQuestionsProps> = ({ questions }) => {
+const TrueFalseQuestions: React.FC<TrueFalseQuestionsProps> = ({
+  questions,
+}) => {
   const [index, setIndex] = useState(0);
   const [answeredCorrectly, setAnsweredCorrectly] =
     useState<AnswerResponse>("none");
 
-  const handleSwipe = (direction: SwipeDirection) => {
-    if (questions[index].correctAnswer === direction) {
+  const handleSwipe = (response: boolean) => {
+    if (questions[index].correctAnswer === response) {
       setAnsweredCorrectly("correct");
     } else {
       setAnsweredCorrectly("incorrect");
