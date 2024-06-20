@@ -19,7 +19,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        PlusJakartaSans: ["PlusJakartaSans", "Hauora", "sans-serif"],
+        plusJakartaSans: ["PlusJakartaSans", "Hauora", "sans-serif"],
+        roboto: ["Roboto", "Hauora", "sans-serif"],
         hauora: ["Hauora", "PlusJakartaSans", "sans-serif"],
       },
       colors: {
@@ -63,18 +64,42 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+        round: {
+          "100%": {
+            borderRadius: "9999px",
+          },
         },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+        "round-back": {
+          "100%": {
+            borderRadius: "28px",
+          },
+        },
+        "full-image": {
+          "0%": {
+            width: "3.5rem",
+            borderRadius: "9999px",
+          },
+          "100%": {
+            width: "100%",
+            borderRadius: "28px",
+          },
+        },
+        "full-image-back": {
+          "0%": {
+            width: "100%",
+            borderRadius: "28px",
+          },
+          "100%": {
+            width: "3.5rem",
+            borderRadius: "9999px",
+          },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        round: "round 0.3s ease-in-out forwards",
+        "round-back": "round-back 0.3s ease-in-out forwards",
+        "full-image": "full-image 0.3s ease-in-out forwards",
+        "full-image-back": "full-image-back 0.5s ease-in-out forwards",
       },
     },
   },

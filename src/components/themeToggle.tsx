@@ -2,11 +2,9 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
-import { Switch } from "./ui/switch";
-import { cn } from "../lib/utils";
-import { EventTracker } from "../eventTracker";
 import { RadioGroup, RadioGroupItem } from "./ui/radioGroup";
 import { Label } from "./ui/label";
+import { useAppSelector } from "../lib/hooks/redux";
 
 interface ThemeToggleProps {
   className?: string;
@@ -14,6 +12,7 @@ interface ThemeToggleProps {
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { setTheme, theme, systemTheme } = useTheme();
+  const { theme: currentTheme } = useAppSelector(state => state.theme);
 
   const isDark = React.useMemo(
     () => (theme === "system" ? systemTheme === "dark" : theme === "dark"),
@@ -24,8 +23,11 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     <RadioGroup
       defaultValue={isDark ? "battery-save" : "colourful"}
       onValueChange={value => {
-        const newTheme = value === "battery-save" ? "dark" : "light";
-        setTheme(newTheme);
+        if (value === "battery-save") {
+          setTheme("dark");
+        } else {
+          setTheme(currentTheme);
+        }
       }}
       className="flex flex-col gap-0 text-secondary-foreground"
     >

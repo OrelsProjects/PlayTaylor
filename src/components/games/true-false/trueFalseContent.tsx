@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { TrueFalseQuestion } from "../model";
-import OptimizedImage from "../../ui/OptimizedImage";
+import OptimizedImage from "../../ui/optimizedImage";
 import { Icons } from "../../ui/icons";
 
 interface TrueFalseContentProps {

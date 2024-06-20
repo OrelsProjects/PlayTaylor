@@ -1,19 +1,31 @@
 import React, { useState } from "react";
-import OptimizedImage from "../../ui/OptimizedImage";
+import OptimizedImage from "../../ui/optimizedImage";
 import { TriviaQuestion } from "../model";
 import { Button } from "../../ui/button";
 import { motion } from "framer-motion";
+import { cn } from "../../../lib/utils";
 
 interface TriviaContentProps {
   question: TriviaQuestion;
+  className?: string;
   onNext: () => void;
 }
 
-const TriviaContent: React.FC<TriviaContentProps> = ({ question, onNext }) => {
+const TriviaContent: React.FC<TriviaContentProps> = ({
+  question,
+  className,
+  onNext,
+}) => {
   const [showAnswer, setShowAnswer] = useState(false);
+  const [forceHideAnswer, setForceHideAnswer] = useState(false);
 
   return (
-    <div className="h-full w-full flex flex-col items-start justify-start p-4 gap-24">
+    <div
+      className={cn(
+        "h-full w-full flex flex-col items-start justify-start p-4 gap-24",
+        className,
+      )}
+    >
       <div className="w-full flex flex-row gap-2 items-center">
         <OptimizedImage
           src={question.image}
@@ -36,23 +48,35 @@ const TriviaContent: React.FC<TriviaContentProps> = ({ question, onNext }) => {
         >
           {question.content}
         </motion.span>
+        (
         <motion.span
           initial={{ opacity: 0 }}
           animate={{ opacity: showAnswer ? 1 : 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full text-[32px] tracking-[0.5px] font-bold text-center"
+          className="w-full text-[32px] tracking-[0.5px] font-bold text-center h-8"
         >
-          {question.answer}
+          {forceHideAnswer ? "" : question.answer}
         </motion.span>
+        )
         <div className="flex flex-row gap-2 self-end mt-auto">
           <Button
             variant="outline"
             className="w-fit bg-card border-foreground"
-            onClick={() => setShowAnswer(!showAnswer)}
+            onClick={() => {
+              setShowAnswer(!showAnswer);
+              setForceHideAnswer(false);
+            }}
           >
             Show
           </Button>
-          <Button className="w-fit" onClick={onNext}>
+          <Button
+            className="w-fit"
+            onClick={() => {
+              setForceHideAnswer(true);
+              setShowAnswer(false);
+              onNext();
+            }}
+          >
             Got it, next
           </Button>
         </div>

@@ -7,8 +7,10 @@ interface OptimizedImageProps {
   src: string;
   alt: string;
   fill?: boolean;
-  width: number;
-  height: number;
+  objectFit?: string;
+  width?: number;
+  height?: number;
+  layout?: string;
   className: string;
 }
 
@@ -17,7 +19,9 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   alt,
   fill,
   width,
+  layout,
   height,
+  objectFit,
   className,
 }) => {
   const { theme, systemTheme } = useTheme();
@@ -33,6 +37,8 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       src={src}
       alt={alt}
       fill
+      objectFit={objectFit}
+      layout={layout}
       className={cn(optimizedClassName, className)}
     />
   ) : (
@@ -41,6 +47,8 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       alt={alt}
       width={width}
       height={height}
+      objectFit={objectFit}
+      layout={layout}
       className={cn(optimizedClassName, className)}
     />
   );

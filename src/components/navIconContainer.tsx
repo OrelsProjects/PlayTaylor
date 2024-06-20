@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAppSelector } from "../lib/hooks/redux";
-import { UserAvatar } from "./ui/avatar";
 import { Icons } from "./ui/icons";
 import { usePathname, useRouter } from "next/navigation";
+import InstructionsContainer from "./instructionsContainer";
 
 interface NavIconContainerProps {}
 
@@ -16,7 +16,8 @@ const NavIconContainer: React.FC<NavIconContainerProps> = () => {
   );
   const [path, setPath] = useState<string>("");
   const [onClick, setOnClick] = useState<() => void>(() => {});
-  const { state } = useAppSelector(state => state.auth);
+
+  const [showInstructions, setShowInstructions] = useState(false);
 
   useEffect(() => {
     if (pathname.includes("settings")) {
@@ -26,27 +27,32 @@ const NavIconContainer: React.FC<NavIconContainerProps> = () => {
         router.back();
       });
     } else if (pathname.includes("games")) {
-      setIcon(<Icons.Home className="h-5 w-5" />);
+      setIcon(<Icons.Home className="h-5 w-5 fill-primary" />);
       setPath("/home");
     } else {
-      setIcon(<Icons.Settings className="h-5 w-5" />);
+      setIcon(<Icons.Settings className="h-5 w-5 fill-primary" />);
       setPath("/settings");
       setOnClick(() => () => {});
+    }
+
+    if (pathname.includes("/games/")) {
+      setShowInstructions(true);
+    } else {
+      setShowInstructions(false);
     }
   }, [pathname]);
 
   return (
-    state === "authenticated" && (
-      <div className="rounded-lg w-full flex flex-col items-end">
-        <Link
-          href={path}
-          className="w-fit h-fit p-1 rounded-full border-foreground border-[1px]"
-          onClick={onClick}
-        >
-          {icon}
-        </Link>
-      </div>
-    )
+    <div className="rounded-lg w-full flex flex-row items-center justify-end gap-2.5">
+      {showInstructions && <InstructionsContainer />}
+      <Link
+        href={path}
+        className="w-fit h-fit p-1 rounded-full border-primary border-[1px]"
+        onClick={onClick}
+      >
+        {icon}
+      </Link>
+    </div>
   );
 };
 

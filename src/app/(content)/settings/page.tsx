@@ -116,7 +116,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
   return (
     <div className="flex flex-col gap-7 mt-3">
       <div>
-        <span className="title-main">Settings</span>
+        <h1>Settings</h1>
       </div>
       {/* {canUseNotifications() && (
         <div className="flex flex-col gap-2">

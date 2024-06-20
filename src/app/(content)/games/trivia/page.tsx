@@ -2,7 +2,7 @@ import React from "react";
 import { TriviaQuestion } from "../../../../components/games/model";
 import TriviaQuestions from "../../../../components/games/trivia/triviaQuestions";
 
-const quesitons: TriviaQuestion[] = [
+const questions: TriviaQuestion[] = [
   {
     title: "What's the meaning of",
     content: "Condescending",
@@ -83,7 +83,7 @@ const quesitons: TriviaQuestion[] = [
   },
 ];
 const SwipeGamePage: React.FC = () => {
-  return <TriviaQuestions {...{ questions: quesitons }} />;
+  return <TriviaQuestions questions={questions} />;
 };
 
 export default SwipeGamePage;

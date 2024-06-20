@@ -11,6 +11,9 @@ const GamePage: React.FC = () => {
       <Button asChild className=" h-20 w-20 rounded-lg">
         <Link href="/games/swipe">Swipe</Link>
       </Button>
+      <Button asChild className=" h-20 w-20 rounded-lg">
+        <Link href="/games/sing-the-lyrics">Sing</Link>
+      </Button>
     </div>
   );
 };

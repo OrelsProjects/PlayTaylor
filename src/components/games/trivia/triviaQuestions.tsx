@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import Card from "../card";
 import { TriviaQuestion } from "../model";
 import TriviaContent from "./triviaContent";
+import { cn } from "../../../lib/utils";
 
 interface TriviaQuestionsProps {
   questions: TriviaQuestion[];
@@ -11,10 +12,13 @@ interface TriviaQuestionsProps {
 
 const TriviaQuestions: React.FC<TriviaQuestionsProps> = ({ questions }) => {
   const [index, setIndex] = useState(0);
+  const [nextIndex, setNextIndex] = useState(1);
+
   const question = questions[index];
 
   const handleNext = () => {
     setIndex(index + 1);
+    setNextIndex(nextIndex + 1);
   };
 
   const isMoreThanFourQuestions = useMemo(
@@ -28,11 +32,13 @@ const TriviaQuestions: React.FC<TriviaQuestionsProps> = ({ questions }) => {
         <Card className="w-full z-50">
           <TriviaContent question={question} onNext={handleNext} />
         </Card>
-        <div className="card w-full absolute z-40 bg-red-500 overflow-visible px-2">
-          <div className="card ml-8 z-40 rotate-[3.9deg] absolute" />
-          <div className="card z-40 ml-8 -rotate-[3deg] absolute" />
-          <div className="card z-40 -rotate-[5deg] absolute" />
-        </div>
+        {isMoreThanFourQuestions && (
+          <div className="card w-full absolute z-40 overflow-visible px-2">
+            <div className="card ml-8 z-40 rotate-[3.9deg] absolute" />
+            <div className="card z-40 ml-8 -rotate-[3deg] absolute" />
+            <div className="card z-40 -rotate-[5deg] absolute" />
+          </div>
+        )}
       </div>
     </div>
   );
