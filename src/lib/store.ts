@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/auth/authSlice";
-import themeReducer from "./features/theme/themeSlice";
+import gameReducer from "./features/game/gameSlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       auth: authReducer,
-      theme: themeReducer,
+      game: gameReducer,
     },
   });
 };

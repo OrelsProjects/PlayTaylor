@@ -1,16 +1,32 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import Link from "next/link";
 import Carousel from "../../../components/ui/carousel";
-import { useTheme } from "next-themes";
+import useGame from "../../../lib/hooks/useGame";
+import { Game } from "../../../lib/features/game/gameSlice";
+
+const carouselItems = [
+  { title: "Mastermind", value: "trivia", image: "/Mastermind.png" },
+  {
+    title: "The manuscript",
+    value: "sing-the-lyrics",
+    image: "/Manuscript.png",
+  },
+  { title: "Cassandra", value: "swipe", image: "/Cassandra.png" },
+];
 
 export default function Home() {
-  const { setTheme, resolvedTheme } = useTheme();
-  const [selectedGame, setSelectedGame] = React.useState<
-    "swipe" | "trivia" | "sing-the-lyrics"
-  >("swipe");
+  const { game, setGame } = useGame();
+  const [defaultSelected, setDefaultSelected] = useState(0);
+
+  useEffect(() => {
+    const selected = carouselItems.findIndex(item => item.value === game);
+    if (selected !== -1) {
+      setDefaultSelected(selected);
+    }
+  }, [game]);
 
   return (
     <div className="h-full w-full flex flex-col justify-center gap-6">
@@ -21,30 +37,14 @@ export default function Home() {
         <span className="text-primary">Choose a game:</span>
       </div>
       <Carousel
-        items={[
-          { value: "Mastermind", image: "/Mastermind.png" },
-          { value: "The manuscript", image: "/Manuscript.png" },
-          { value: "Cassandra", image: "/Cassandra.png" },
-        ]}
+        selected={defaultSelected}
+        items={carouselItems}
         onItemSelected={item => {
-          let newTheme = "light";
-          if (item.value === "Mastermind") {
-            newTheme = "sun";
-            setSelectedGame("swipe");
-          } else if (item.value === "The manuscript") {
-            newTheme = "blossom";
-            setSelectedGame("sing-the-lyrics");
-          } else if (item.value === "Cassandra") {
-            newTheme = "midnight";
-            setSelectedGame("trivia");
-          }
-          if (resolvedTheme !== "dark") {
-            setTheme(newTheme);
-          }
+          setGame(item.value as Game);
         }}
       />
       <Button asChild className="w-fit self-end mt-auto">
-        <Link href={`/games/${selectedGame}`}>Play</Link>
+        <Link href={`/instructions`}>Play</Link>
       </Button>
     </div>
   );

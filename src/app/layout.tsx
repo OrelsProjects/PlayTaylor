@@ -55,7 +55,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" className="font-roboto">
+    <html lang="en" className="font-plusJakartaSans">
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -69,9 +69,7 @@ export default function Layout({ children }: RootLayoutProps) {
       <body className="!overscroll-none">
         <StoreProvider>
           <SessionWrapper>
-            <ThemeProvider
-              themes={["light", "dark", "blossom", "midnight", "sun"]}
-            >
+            <ThemeProvider>
               <AuthProvider>
                 <TopLoaderProvider />
                 {children}

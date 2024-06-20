@@ -48,7 +48,6 @@ const TriviaContent: React.FC<TriviaContentProps> = ({
         >
           {question.content}
         </motion.span>
-        (
         <motion.span
           initial={{ opacity: 0 }}
           animate={{ opacity: showAnswer ? 1 : 0 }}
@@ -57,7 +56,6 @@ const TriviaContent: React.FC<TriviaContentProps> = ({
         >
           {forceHideAnswer ? "" : question.answer}
         </motion.span>
-        )
         <div className="flex flex-row gap-2 self-end mt-auto">
           <Button
             variant="outline"

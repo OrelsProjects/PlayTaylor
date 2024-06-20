@@ -2,11 +2,10 @@
 
 import React from "react";
 import { cn } from "../../lib/utils";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import OptimizedImage from "./optimizedImage";
 
 export interface CarouselItem {
+  title: string;
   value: string;
   image: string;
 }
@@ -14,6 +13,8 @@ export interface CarouselItem {
 interface CarouselProps {
   items: CarouselItem[];
   onItemSelected: (item: CarouselItem) => void;
+  defaultSelected?: number;
+  selected?: number;
 }
 
 const CarouselItemComponent = ({
@@ -27,8 +28,6 @@ const CarouselItemComponent = ({
 }) => {
   return (
     <div
-      //   layout
-      //   transition={{ duration: 0.3, ease: "easeInOut" }}
       onClick={onClick}
       className={cn("w-full h-[205px] z-20 relative min-w-14", {
         "animate-full-image": selected,
@@ -46,15 +45,20 @@ const CarouselItemComponent = ({
       />
       {selected && (
         <h3 className="w-full h-full absolute inset-0 flex justify-center items-center font-bold text-foreground">
-          {item.value}
+          {item.title}
         </h3>
       )}
     </div>
   );
 };
 
-const Carousel: React.FC<CarouselProps> = ({ items, onItemSelected }) => {
-  const [currentItem, setCurrentItem] = React.useState(0);
+const Carousel: React.FC<CarouselProps> = ({
+  items,
+  onItemSelected,
+  defaultSelected,
+  selected,
+}) => {
+  const [currentItem, setCurrentItem] = React.useState(defaultSelected || 0);
 
   if (items.length === 0) {
     return null;
@@ -64,9 +68,9 @@ const Carousel: React.FC<CarouselProps> = ({ items, onItemSelected }) => {
     <div className="w-full relative flex flex-row gap-2 h-[205px]">
       {items.map((item, index) => (
         <CarouselItemComponent
-          key={item.value}
+          key={item.title}
           item={item}
-          selected={index === currentItem}
+          selected={selected ? index === selected : index === currentItem}
           onClick={() => {
             setCurrentItem(index);
             onItemSelected(item);
