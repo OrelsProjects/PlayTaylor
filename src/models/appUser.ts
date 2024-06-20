@@ -12,5 +12,5 @@ export interface AppUserMetadata {
 }
 
 export interface AppUserSettings {
-  // showNotifications: boolean;
+  showNotifications?: boolean;
 }
