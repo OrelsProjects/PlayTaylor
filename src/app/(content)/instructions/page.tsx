@@ -33,7 +33,7 @@ const allDifficulties: Difficulty[] = ["debut", "midnights", "folklore"];
 
 const InstructionsPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { difficulty: selectedDifficulty } = useAppSelector(
+  const { difficulty: selectedDifficulty, game } = useAppSelector(
     state => state.game,
   );
 
@@ -68,7 +68,7 @@ const InstructionsPage: React.FC = () => {
         </div>
       </div>
       <Button asChild className="w-fit self-center mt-auto">
-        <Link href="/games">I am ready for it!</Link>
+        <Link href={"/games" + "/" + game}>I am ready for it!</Link>
       </Button>
     </div>
   );
