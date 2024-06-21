@@ -11,17 +11,25 @@ import {
   instructionItems,
 } from "../app/(content)/instructions/_consts";
 import { Icons } from "./ui/icons";
+import OptimizedImage from "./ui/optimizedImage";
 
-const InstructionsItem: React.FC<InstructionItem> = ({
+export const InstructionsItem: React.FC<InstructionItem> = ({
   title,
   description,
-  itemNumber,
+  index,
 }) => {
   return (
     <div className="w-full flex flex-row justify-start gap-4 py-3 px-4">
       <div className="w-10 h-10 flex justify-center items-center flex-shrink-0 rounded-full bg-foreground text-background ">
-        {itemNumber}
+        <OptimizedImage
+          src={`/numbers/flower-${index}.png`}
+          fill
+          className="!h-10 !w-10 !relative"
+          alt={"flower"}
+          srcForOptimization="/numbers/butterfly.png"
+        />
       </div>
+
       <div className="w-full flex flex-col">
         <h2 className="text-base font-bold">{title}</h2>
         <p className="text-sm">{description}</p>

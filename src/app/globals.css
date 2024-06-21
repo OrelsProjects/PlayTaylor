@@ -70,14 +70,14 @@
     @apply bg-background text-foreground;
   }
   h1 {
-    @apply title-main text-primary font-plusJakartaSans;
+    @apply title-main text-primary dark:text-background font-plusJakartaSans;
   }
   h2 {
-    @apply title-secondary text-primary font-plusJakartaSans;
+    @apply title-secondary text-primary dark:text-background font-plusJakartaSans;
   }
 
   h3 {
-    @apply title-tertiary text-primary  font-plusJakartaSans;
+    @apply title-tertiary text-primary font-plusJakartaSans;
   }
 
   .title-main {

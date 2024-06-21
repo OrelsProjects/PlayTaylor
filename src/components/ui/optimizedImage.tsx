@@ -12,6 +12,7 @@ interface OptimizedImageProps {
   height?: number;
   layout?: string;
   className: string;
+  srcForOptimization?: string;
 }
 
 const OptimizedImage: React.FC<OptimizedImageProps> = ({
@@ -23,18 +24,29 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   height,
   objectFit,
   className,
+  srcForOptimization,
 }) => {
-  const { theme, systemTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
-  const optimizedClassName = useMemo(() => {
-    const isDark =
-      theme === "system" ? systemTheme === "dark" : theme === "dark";
-    return isDark ? "grayscale" : "";
-  }, [theme]);
+  const shouldOptimize = useMemo(
+    () => resolvedTheme === "dark",
+    [resolvedTheme],
+  );
+
+  const optimizedClassName = useMemo(
+    () => (shouldOptimize ? "grayscale" : ""),
+    [shouldOptimize],
+  );
+
+  const imageSrc = useMemo(
+    () =>
+      shouldOptimize ? (srcForOptimization ? srcForOptimization : src) : src,
+    [shouldOptimize, src, srcForOptimization],
+  );
 
   return fill ? (
     <Image
-      src={src}
+      src={imageSrc}
       alt={alt}
       fill
       objectFit={objectFit}
@@ -43,7 +55,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     />
   ) : (
     <Image
-      src={src}
+      src={imageSrc}
       alt={alt}
       width={width}
       height={height}

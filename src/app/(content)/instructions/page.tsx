@@ -14,7 +14,7 @@ import { cn } from "../../../lib/utils";
 const InstructionsItem: React.FC<InstructionItem> = ({
   title,
   description,
-  itemNumber,
+  index: itemNumber,
 }) => {
   return (
     <div className="w-full flex flex-row justify-start gap-4 py-3 px-4">
