@@ -26,7 +26,6 @@ export const InstructionsItem: React.FC<InstructionItem> = ({
           fill
           className="!h-10 !w-10 !relative"
           alt={"flower"}
-          srcForOptimization="/numbers/butterfly.png"
         />
       </div>
 
