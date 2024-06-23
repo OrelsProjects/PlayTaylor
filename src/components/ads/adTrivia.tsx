@@ -10,7 +10,7 @@ const AdTrivia: React.FC<AdTriviaProps> = () => {
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
         {},
       );
-    } catch (e) {
+    } catch (e: any) {
       Logger.error("Failed to load ads", { error: e });
     }
   }, []);
