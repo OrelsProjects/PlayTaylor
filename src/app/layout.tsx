@@ -65,6 +65,12 @@ export default function Layout({ children }: RootLayoutProps) {
         <meta property="og:image:type" content="<generated>" />
         <meta property="og:image:width" content="<generated>" />
         <meta property="og:image:height" content="<generated>" />
+        <meta name="google-adsense-account" content="ca-pub-5564324340797928" />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5564324340797928"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body className="!overscroll-none">
         <StoreProvider>
