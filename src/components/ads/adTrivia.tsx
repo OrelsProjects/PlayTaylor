@@ -16,21 +16,28 @@ const AdTrivia: React.FC<AdTriviaProps> = () => {
   }, []);
 
   return (
-    <ins
-      className="adsbygoogle"
-      style={{
-        display: "block",
-        textAlign: "center",
-        width: "100%",
-        height: "100px",
-        backgroundColor: "rgba(0, 0, 0, 1)",
-      }}
-      data-ad-layout="in-article"
-      data-ad-format="fluid"
-      data-ad-client="ca-pub-5564324340797928"
-      data-ad-slot="2469269444"
-      data-full-width-responsive="true"
-    ></ins>
+    <>
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5564324340797928"
+        crossOrigin="anonymous"
+      ></Script>
+      <ins
+        className="adsbygoogle"
+        style={{
+          display: "block",
+          textAlign: "center",
+          width: "100%",
+          height: "100px",
+          backgroundColor: "rgba(0, 0, 0, 1)",
+        }}
+        data-ad-layout="in-article"
+        data-ad-format="fluid"
+        data-ad-client="ca-pub-5564324340797928"
+        data-ad-slot="2469269444"
+        data-full-width-responsive="true"
+      ></ins>
+    </>
   );
 };
 
