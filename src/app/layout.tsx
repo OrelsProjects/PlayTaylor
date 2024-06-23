@@ -8,6 +8,7 @@ import AuthProvider from "./providers/AuthProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import TopLoaderProvider from "./providers/TopLoaderProvider";
+import Script from "next/script";
 
 const APP_NAME = "Play Taylor";
 const APP_DEFAULT_TITLE = "Play Taylor";
@@ -66,11 +67,13 @@ export default function Layout({ children }: RootLayoutProps) {
         <meta property="og:image:width" content="<generated>" />
         <meta property="og:image:height" content="<generated>" />
         <meta name="google-adsense-account" content="ca-pub-5564324340797928" />
-        <script
+        <Script
+          data-adtest="on"
+          data-adbreak-test="on"
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5564324340797928"
           crossOrigin="anonymous"
-        ></script>
+        ></Script>
       </head>
       <body className="!overscroll-none">
         <StoreProvider>

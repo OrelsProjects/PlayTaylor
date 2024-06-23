@@ -13,11 +13,18 @@ interface TriviaQuestionsProps {
 const TriviaQuestions: React.FC<TriviaQuestionsProps> = ({ questions }) => {
   const [index, setIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(1);
+  const [showAd, setShowAd] = useState(false);
 
   const question = questions[index];
 
   const handleNext = () => {
     setIndex(index + 1);
+    if (index > 0 && index % 4 === 0) {
+      setShowAd(true);
+    } else {
+      setShowAd(false);
+    }
+
     setNextIndex(nextIndex + 1);
   };
 
@@ -30,7 +37,11 @@ const TriviaQuestions: React.FC<TriviaQuestionsProps> = ({ questions }) => {
     <div className="flex flex-col h-full justify-evenly">
       <div className="flex items-center justify-center relative">
         <Card className="w-full z-50">
-          <TriviaContent question={question} onNext={handleNext} />
+          <TriviaContent
+            question={question}
+            onNext={handleNext}
+            showAd={showAd}
+          />
         </Card>
         {isMoreThanFourQuestions && (
           <div className="card w-full absolute z-40 overflow-visible px-2">
