@@ -18,7 +18,7 @@ const InstructionsItem: React.FC<InstructionItem> = ({
 }) => {
   return (
     <div className="w-full flex flex-row justify-start gap-4 py-3 px-4">
-      <div className="w-10 h-10 flex justify-center items-center flex-shrink-0 rounded-full bg-foreground text-primary dark:text-background">
+      <div className="w-10 h-10 flex justify-center items-center flex-shrink-0 rounded-full border-[1px] border-primary dark:border-none bg-background dark:bg-foreground text-primary dark:text-background">
         {itemNumber}
       </div>
       <div className="w-full flex flex-col">
@@ -40,7 +40,9 @@ const InstructionsPage: React.FC = () => {
   return (
     <div className="h-full w-full flex flex-col gap-16">
       <div className="w-full flex flex-col gap-9">
-        <h1 className="w-full text-center">How to play</h1>
+        <h1 className="w-full text-center text-primary dark:text-foreground">
+          How to play
+        </h1>
         <div className="flex flex-col">
           {instructionItems.map(item => (
             <InstructionsItem key={item.title} {...item} />

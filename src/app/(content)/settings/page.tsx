@@ -103,7 +103,7 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
 
   const SectionTitle = ({ value }: { value: string }) => (
     <div className="px-4 py-[18px]">
-      <span className="text-base font-medium leading-5 tracking-[0.1px] text-secondary-foreground">
+      <span className="text-base font-medium leading-5 tracking-[0.1px] text-primary dark:text-secondary-foreground">
         {value}
       </span>
     </div>
@@ -153,25 +153,6 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
             <ThemeToggle />
           </SectionContent>
         </Section>
-        {/* <div className="flex flex-col gap-2 w-full justify-start">
-          <span className="text-lg font-semibold">Account</span>
-          <div className="flex flex-col gap-1 pl-2">
-            <Button
-              variant="ghost"
-              className="w-fit px-1 md:hover:bg-slate-400/40"
-              onClick={handleSignOut}
-            >
-              LOGOUT
-            </Button>
-            <Button
-              variant="link"
-              className="w-fit px-1 md:hover:bg-destructive/40 md:hover:text-destructive-foreground hover:no-underline text-destructive/60 text-sm"
-              onClick={handleDeleteUserRequest}
-            >
-              DELETE
-            </Button>
-          </div>
-        </div> */}
       </div>
     </div>
   );

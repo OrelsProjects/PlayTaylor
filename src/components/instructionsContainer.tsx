@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -12,6 +13,7 @@ import {
 } from "../app/(content)/instructions/_consts";
 import { Icons } from "./ui/icons";
 import OptimizedImage from "./ui/optimizedImage";
+import { IoClose } from "react-icons/io5";
 
 export const InstructionsItem: React.FC<InstructionItem> = ({
   title,
@@ -20,7 +22,7 @@ export const InstructionsItem: React.FC<InstructionItem> = ({
 }) => {
   return (
     <div className="w-full flex flex-row justify-start gap-4 py-3 px-4">
-      <div className="w-10 h-10 flex justify-center items-center flex-shrink-0 rounded-full bg-foreground text-background ">
+      <div className="w-10 h-10 flex justify-center items-center flex-shrink-0 rounded-full bg-foreground dark:bg-transparent text-background ">
         <OptimizedImage
           src={`/numbers/flower-${index}.png`}
           fill
@@ -31,7 +33,7 @@ export const InstructionsItem: React.FC<InstructionItem> = ({
 
       <div className="w-full flex flex-col">
         <h2 className="text-base font-bold">{title}</h2>
-        <p className="text-sm">{description}</p>
+        <p className="text-sm text-primary">{description}</p>
       </div>
     </div>
   );
@@ -47,8 +49,14 @@ const InstructionsContainer: React.FC = () => {
       </DialogTrigger>
       <DialogContent
         closeOnOutsideClick
-        className="bg-foreground text-background p-8 rounded-lg w-10/12"
+        className="bg-primary-foreground border-[2px] border-primary text-background p-8 rounded-lg w-10/12"
       >
+        <DialogClose
+          className="absolute top-4 right-4 z-50 text-primary fill-primary"
+          asChild
+        >
+          <IoClose className="h-6 w-6 text-primary" />
+        </DialogClose>
         <DialogTitle>
           <h2>How to play</h2>
         </DialogTitle>

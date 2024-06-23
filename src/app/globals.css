@@ -45,20 +45,26 @@
 
   .blossom {
     --primary: 282 41% 72%;
-    --primary-foreground: 282 33% 92%;
+    --primary-foreground:  0 0 98%;
     --background: 282 33% 92%;
+    --muted-foreground: 0 0% 58%;
+    --card: 0 0% 98%;
   }
 
   .sun {
     --primary: 40 65% 62%;
-    --primary-foreground: 40 100% 94%;
+    --primary-foreground: 0 0 98%;
     --background: 40 100% 94%;
+    --muted-foreground: 0 0% 58%;
+    --card: 0 0% 98%;
   }
 
   .midnight {
     --primary: 224 48% 15%;
-    --primary-foreground: 219 45% 68%;
+    --primary-foreground:  0 0 98%;
     --background: 219 45% 68%;
+    --muted-foreground: 0 0% 98%;
+    --card: 0 0% 98%;
   }
 }
 
@@ -70,10 +76,10 @@
     @apply bg-background text-foreground;
   }
   h1 {
-    @apply title-main text-primary dark:text-background font-plusJakartaSans;
+    @apply title-main text-primary font-plusJakartaSans;
   }
   h2 {
-    @apply title-secondary text-primary dark:text-background font-plusJakartaSans;
+    @apply title-secondary text-primary font-plusJakartaSans;
   }
 
   h3 {
@@ -90,6 +96,6 @@
     @apply font-bold text-[24px] leading-[24px] tracking-[0.5px];
   }
   .card {
-    @apply h-[480px] w-[300px] rounded-lg bg-card border-[1px] border-foreground;
+    @apply h-[480px] w-[300px] rounded-lg bg-card border-[1px] border-primary dark:border-foreground;
   }
 }

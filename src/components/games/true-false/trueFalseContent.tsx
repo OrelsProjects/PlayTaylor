@@ -17,7 +17,7 @@ const SwipeItem = ({
   text: string;
   className?: string;
 }) => (
-  <div className="flex flex-col gap-0 items-center">
+  <div className="flex flex-col gap-0 items-center text-primary">
     <Icon className={className} />
     <p className="text-sm font-extrabold text-center">{text}</p>
   </div>

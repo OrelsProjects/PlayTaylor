@@ -42,7 +42,7 @@ const SingTheLyricsContent: React.FC<SingTheLyricsContentProps> = ({
           height={40}
           className="rounded-full"
         />
-        <span className="font-medium">{question.title}</span>
+        <span className="font-medium text-primary">{question.title}</span>
       </div>
       <div className="w-full h-full flex flex-col gap-20">
         <div className="w-full h-full flex flex-col gap-5">
@@ -50,14 +50,14 @@ const SingTheLyricsContent: React.FC<SingTheLyricsContentProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: showAnswer ? 1 : 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full text-lg tracking-[0.5px] font-bold text-center h-8"
+            className="w-full text-lg tracking-[0.5px] font-bold text-center h-8 text-primary"
           >
             {forceHideAnswer ? "" : question.answer}
           </motion.span>
 
           <motion.span
             initial={{ opacity: 1 }}
-            className="w-full text-base font-normal italic text-center"
+            className="w-full text-base font-normal italic text-center text-primary"
           >
             <ContentText content={question.content} />
           </motion.span>
@@ -65,7 +65,7 @@ const SingTheLyricsContent: React.FC<SingTheLyricsContentProps> = ({
         <div className="flex flex-row gap-2 self-end mt-auto">
           <Button
             variant="outline"
-            className="w-fit bg-card border-foreground"
+            className="w-fit bg-card border-primary text-primary"
             disabled={showAnswer}
             onClick={() => {
               setShowAnswer(!showAnswer);
