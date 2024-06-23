@@ -16,7 +16,7 @@ const AdTrivia: React.FC<AdTriviaProps> = () => {
   }, []);
 
   return (
-    <>
+    <div className="max-h-[100px]">
       <Script
         async
         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5564324340797928"
@@ -24,15 +24,20 @@ const AdTrivia: React.FC<AdTriviaProps> = () => {
       ></Script>
       <ins
         className="adsbygoogle"
-        // @ts-ignore
-        style="display:block; text-align:center; width:100%; height:100px; background-color:rgba(0, 0, 0, 1);"
+        style={{
+          display: "block",
+          textAlign: "center",
+          width: "100%",
+          height: "100px",
+          backgroundColor: "rgba(0, 0, 0, 1)",
+        }}
         data-ad-layout="in-article"
         data-ad-format="fluid"
         data-ad-client="ca-pub-5564324340797928"
         data-ad-slot="2469269444"
         data-full-width-responsive="true"
       ></ins>
-    </>
+    </div>
   );
 };
 
