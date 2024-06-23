@@ -67,6 +67,13 @@ export default function Layout({ children }: RootLayoutProps) {
         <meta property="og:image:width" content="<generated>" />
         <meta property="og:image:height" content="<generated>" />
         <meta name="google-adsense-account" content="ca-pub-5564324340797928" />
+        <link
+          rel="preload"
+          href="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5564324340797928"
+          as="script"
+          crossOrigin="anonymous"
+        />
+
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5564324340797928"
