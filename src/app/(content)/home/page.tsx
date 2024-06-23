@@ -6,6 +6,7 @@ import Link from "next/link";
 import Carousel from "../../../components/ui/carousel";
 import useGame from "../../../lib/hooks/useGame";
 import { Game } from "../../../lib/features/game/gameSlice";
+import AdTrivia from "../../../components/ads/adTrivia";
 
 const carouselItems = [
   { title: "Mastermind", value: "trivia", image: "/Mastermind.png" },
@@ -43,6 +44,7 @@ export default function Home() {
           setGame(item.value as Game);
         }}
       />
+      <AdTrivia />
       <Button asChild className="w-fit self-end mt-auto">
         <Link href={`/instructions`}>Play</Link>
       </Button>
