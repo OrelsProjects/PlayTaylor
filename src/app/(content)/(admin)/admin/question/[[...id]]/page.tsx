@@ -67,7 +67,7 @@ export default function NewQuestionPage({
         <DropdownMenuTrigger>
           <Button
             variant="outline"
-            className="w-fit rounded-md text-start justify-start px-10 hover:bg-transparent bg-primary"
+            className="w-fit rounded-md text-start justify-start px-10 hover:bg-transparent bg-primary text-primary-foreground"
           >
             {formik.values.type.charAt(0).toUpperCase() +
               formik.values.type.slice(1)}
@@ -122,7 +122,9 @@ export default function NewQuestionPage({
         required
       />
 
-      <Button type="submit">{isEdit ? "Update" : "Create"}</Button>
+      <Button type="submit" className="text-primary-foreground">
+        {isEdit ? "Update" : "Create"}
+      </Button>
     </form>
   );
 }
