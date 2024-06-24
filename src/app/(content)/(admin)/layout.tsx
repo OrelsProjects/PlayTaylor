@@ -57,6 +57,7 @@ export default function AdminLayout({
   };
 
   useEffect(() => {
+    debugger;
     switch (status) {
       case "authenticated":
         setUser(session.user);

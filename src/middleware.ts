@@ -7,7 +7,11 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token }) => {
-        return token?.sub === "102926335316336979769";
+        return (
+          token?.sub === "102926335316336979769" ||
+          token?.sub === "110783970093134449990" ||
+          token?.sub === "111758644225543792927"
+        );
       },
     },
   },
