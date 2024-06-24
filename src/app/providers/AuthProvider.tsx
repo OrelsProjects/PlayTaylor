@@ -58,6 +58,7 @@ export default function AuthProvider({
   };
 
   useEffect(() => {
+    debugger;
     switch (status) {
       case "authenticated":
         setUser(session.user);

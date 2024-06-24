@@ -204,11 +204,12 @@ export const signIn = async (session: any) => {
       });
       additionalUserData = { ...newUser };
     }
-
-    return {
+    const userData = {
       ...session,
       ...additionalUserData,
+      user: { ...session.user, role: userInDB?.role || "" },
     };
+    return userData;
   } catch (e: any) {
     loggerServer.error("Error signing in", session.user.id, { error: e });
   }
