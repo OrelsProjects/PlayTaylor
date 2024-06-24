@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import OptimizedImage from "../../ui/optimizedImage";
-import { TriviaQuestion } from "../model";
+import { Question } from "../../../models/question";
 import { Button } from "../../ui/button";
 import { motion } from "framer-motion";
 
 interface SingTheLyricsContentProps {
-  question: TriviaQuestion;
+  question: Question;
   onNext: () => void;
 }
 

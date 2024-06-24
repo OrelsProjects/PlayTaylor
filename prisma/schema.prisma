@@ -55,18 +55,15 @@ model AppUserSettings {
 }
 
 model Question {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  title   String  @unique
-  content String
-  image   String?
-  answer  String
-  type    String // trivia / swipe
-}
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-model TrueFalseQuestion {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  text              String
-  image             String?
-  correctAnswerText String
-  correctAnswer     Boolean
+  title   String @unique
+  content String
+  image   String
+  answer  String
+  type    String // trivia / swipe / sing-the-lyrics
+
+  isDeleted Boolean @default(false)
+
+  @@map("question")
 }

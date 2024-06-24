@@ -2,12 +2,11 @@
 
 import React, { useMemo, useState } from "react";
 import Card from "../card";
-import { TriviaQuestion } from "../model";
+import { Question } from "../../../models/question";
 import TriviaContent from "./triviaContent";
-import { cn } from "../../../lib/utils";
 
 interface TriviaQuestionsProps {
-  questions: TriviaQuestion[];
+  questions: Question[];
 }
 
 const TriviaQuestions: React.FC<TriviaQuestionsProps> = ({ questions }) => {

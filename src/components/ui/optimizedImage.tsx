@@ -51,7 +51,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       fill
       objectFit={objectFit}
       layout={layout}
-      className={cn(optimizedClassName, className)}
+      className={cn("!relative", optimizedClassName, className)}
     />
   ) : (
     <Image

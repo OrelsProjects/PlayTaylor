@@ -1,11 +1,11 @@
 import React from "react";
 import Image from "next/image";
-import { TrueFalseQuestion } from "../model";
+import { Question } from "../../../models/question.js";
 import OptimizedImage from "../../ui/optimizedImage";
 import { Icons } from "../../ui/icons";
 
 interface TrueFalseContentProps {
-  question: TrueFalseQuestion;
+  question: Question;
 }
 
 const SwipeItem = ({
@@ -33,7 +33,7 @@ const TrueFalseContent: React.FC<TrueFalseContentProps> = ({ question }) => {
         height={40}
         className="rounded-full"
       />
-      <h3 className="text-center">{question.text}</h3>
+      <h3 className="text-center">{question.title}</h3>
       <div className="w-full flex flex-row justify-between">
         <SwipeItem
           Icon={Icons.SwipeLeft}

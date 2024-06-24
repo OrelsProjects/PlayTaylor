@@ -1,8 +1,8 @@
 import React from "react";
-import { TriviaQuestion } from "../../../../components/games/model";
+import { Question } from "../../../../models/question.js";
 import SingTheLyricsQuestions from "../../../../components/games/singTheLyrics/singTheLyricsQuestions";
 
-const questions: TriviaQuestion[] = [
+const questions: Question[] = [
   {
     title: "Sing the lyrics",
     content:

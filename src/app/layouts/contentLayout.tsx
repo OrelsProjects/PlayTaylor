@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import "../../../firebase.config";
 import type { Viewport } from "next";
 
@@ -10,22 +10,29 @@ import TopLoaderProvider from "../providers/TopLoaderProvider";
 import AnimationProvider from "../providers/AnimationProvider";
 import HeightProvider from "../providers/HeightProvider";
 import ContentProvider from "../providers/ContentProvider";
+import useGame from "../../lib/hooks/useGame";
 
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
 export default function ContentLayout({ children }: RootLayoutProps) {
+  const { initQuestions } = useGame();
+
+  useEffect(() => {
+    initQuestions();
+  }, []);
+
   return (
     <main>
       <AuthProvider>
         <NotificationsProvider />
-          <HeightProvider>
-            <ContentProvider>
-              <TopLoaderProvider />
-              <AnimationProvider>{children}</AnimationProvider>
-            </ContentProvider>
-          </HeightProvider>
+        <HeightProvider>
+          <ContentProvider>
+            <TopLoaderProvider />
+            <AnimationProvider>{children}</AnimationProvider>
+          </ContentProvider>
+        </HeightProvider>
       </AuthProvider>
     </main>
   );

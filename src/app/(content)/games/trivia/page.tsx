@@ -1,8 +1,8 @@
 import React from "react";
-import { TriviaQuestion } from "../../../../components/games/model";
+import { Question } from "../../../../models/question.js";
 import TriviaQuestions from "../../../../components/games/trivia/triviaQuestions";
 
-const questions: TriviaQuestion[] = [
+const questions: Question[] = [
   {
     title: "What's the meaning of",
     content: "Condescending",

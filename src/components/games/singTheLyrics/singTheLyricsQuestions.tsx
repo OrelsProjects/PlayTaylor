@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import Card from "../card";
-import { TriviaQuestion } from "../model";
+import { Question } from "../../../models/question";
 import SignTheLyricsContent from "./singTheLyricsContent";
 
 interface SingTheLyricsQuestionsProps {
-  questions: TriviaQuestion[];
+  questions: Question[];
 }
 
 const SingTheLyricsQuestions: React.FC<SingTheLyricsQuestionsProps> = ({

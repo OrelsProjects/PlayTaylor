@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import OptimizedImage from "../../ui/optimizedImage";
-import { TriviaQuestion } from "../model";
+import { Question } from "../../../models/question";
 import { Button } from "../../ui/button";
 import { motion } from "framer-motion";
 import { cn } from "../../../lib/utils";
 import AdTrivia from "../../ads/adTrivia";
 
 interface TriviaContentProps {
-  question: TriviaQuestion;
+  question: Question;
   className?: string;
   onNext: () => void;
   showAd?: boolean;

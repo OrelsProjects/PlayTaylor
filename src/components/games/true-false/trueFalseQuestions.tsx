@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import Card from "../card";
 import Interactable from "./interactable";
-import { TrueFalseQuestion as TrueFalseQuestion } from "../model";
+import { Question } from "../../../models/question";
 import TrueFalseContent from "./trueFalseContent";
 import { cn } from "../../../lib/utils";
 
 interface TrueFalseQuestionsProps {
-  questions: TrueFalseQuestion[];
+  questions: Question[];
 }
 
 type AnswerResponse = "correct" | "incorrect" | "none";
@@ -21,7 +21,8 @@ const TrueFalseQuestions: React.FC<TrueFalseQuestionsProps> = ({
     useState<AnswerResponse>("none");
 
   const handleSwipe = (response: boolean) => {
-    if (questions[index].correctAnswer === response) {
+    const answer = questions[index].answer === "true";
+    if (answer === response) {
       setAnsweredCorrectly("correct");
     } else {
       setAnsweredCorrectly("incorrect");

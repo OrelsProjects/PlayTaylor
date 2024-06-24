@@ -1,25 +1,30 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
-import _ from "lodash";
+import { Question, QuestionId } from "../../../models/question";
 
 export type Game = "trivia" | "sing-the-lyrics" | "swipe";
 export type Difficulty = "debut" | "midnights" | "folklore";
 export type Theme = "light" | "dark" | "blossom" | "midnight" | "sun";
+export type QuestionsStatus = "idle" | "loading" | "succeeded" | "failed";
 
 export interface GameState {
   theme: Theme;
   game: Game;
   difficulty: Difficulty;
+  questions: Question[];
+  questionsStatus?: QuestionsStatus;
 }
 
 export const initialState: GameState = {
   theme: "sun",
   game: "swipe",
   difficulty: "debut",
+  questions: [],
+  questionsStatus: "idle",
 };
 
-const themeSlice = createSlice({
-  name: "theme",
+const gameSlice = createSlice({
+  name: "game",
   initialState,
   reducers: {
     setGame: (
@@ -46,11 +51,45 @@ const themeSlice = createSlice({
     setDifficulty: (state, action) => {
       state.difficulty = action.payload;
     },
+    setQuestions: (state, action: PayloadAction<Question[]>) => {
+      state.questions = action.payload;
+    },
+    addQuestion: (state, action: PayloadAction<Question>) => {
+      state.questions.push(action.payload);
+    },
+    removeQuestion: (state, action: PayloadAction<QuestionId>) => {
+      state.questions = state.questions.filter(
+        question => question.id !== action.payload,
+      );
+    },
+    updateQuestion: (
+      state,
+      action: PayloadAction<{ id: QuestionId; question: Question }>,
+    ) => {
+      state.questions = state.questions.map(question =>
+        question.id === action.payload.id ? action.payload.question : question,
+      );
+    },
+    updateQuestionStatus: (
+      state,
+      action: PayloadAction<{ status: QuestionsStatus }>,
+    ) => {
+      state.questionsStatus = action.payload.status;
+    },
   },
 });
 
-export const { setGame, setTheme, setDifficulty } = themeSlice.actions;
+export const {
+  addQuestion,
+  setDifficulty,
+  removeQuestion,
+  setGame,
+  setTheme,
+  setQuestions,
+  updateQuestion,
+  updateQuestionStatus,
+} = gameSlice.actions;
 
 export const selectAuth = (state: RootState): GameState => state.game;
 
-export default themeSlice.reducer;
+export default gameSlice.reducer;
