@@ -32,6 +32,7 @@ export default function AdminLayout({
     email?: string | null;
     image?: string | null;
     userId?: string | null;
+    role?: string | null;
     meta: {
       referralCode?: string | null;
     };
@@ -42,6 +43,7 @@ export default function AdminLayout({
         email: user?.email || "",
         photoURL: user?.image || null,
         userId: user?.userId || "",
+        role: user?.role || "",
         meta: {
           referralCode: user?.meta.referralCode || "",
         },
