@@ -2,14 +2,12 @@
 
 import React, { useMemo, useState } from "react";
 import Card from "../card";
-import { Question } from "../../../models/question";
 import TriviaContent from "./triviaContent";
+import useGame from "../../../lib/hooks/useGame";
 
-interface TriviaQuestionsProps {
-  questions: Question[];
-}
+const TriviaQuestions: React.FC = () => {
+  const { triviaQuestions: questions } = useGame();
 
-const TriviaQuestions: React.FC<TriviaQuestionsProps> = ({ questions }) => {
   const [index, setIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(1);
   const [showAd, setShowAd] = useState(false);

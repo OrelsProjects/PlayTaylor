@@ -3,19 +3,15 @@
 import React, { useState } from "react";
 import Card from "../card";
 import Interactable from "./interactable";
-import { Question } from "../../../models/question";
 import TrueFalseContent from "./trueFalseContent";
 import { cn } from "../../../lib/utils";
-
-interface TrueFalseQuestionsProps {
-  questions: Question[];
-}
+import useGame from "../../../lib/hooks/useGame";
 
 type AnswerResponse = "correct" | "incorrect" | "none";
 
-const TrueFalseQuestions: React.FC<TrueFalseQuestionsProps> = ({
-  questions,
-}) => {
+const TrueFalseQuestions: React.FC = () => {
+  const { swipeQuestions: questions } = useGame();
+
   const [index, setIndex] = useState(0);
   const [answeredCorrectly, setAnsweredCorrectly] =
     useState<AnswerResponse>("none");

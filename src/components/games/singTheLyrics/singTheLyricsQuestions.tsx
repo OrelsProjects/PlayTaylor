@@ -2,16 +2,12 @@
 
 import React, { useState } from "react";
 import Card from "../card";
-import { Question } from "../../../models/question";
 import SignTheLyricsContent from "./singTheLyricsContent";
+import useGame from "../../../lib/hooks/useGame";
 
-interface SingTheLyricsQuestionsProps {
-  questions: Question[];
-}
+const SingTheLyricsQuestions: React.FC = () => {
+  const { singTheLyricsQuestions: questions } = useGame();
 
-const SingTheLyricsQuestions: React.FC<SingTheLyricsQuestionsProps> = ({
-  questions,
-}) => {
   const [index, setIndex] = useState(0);
   const question = questions[index];
 
