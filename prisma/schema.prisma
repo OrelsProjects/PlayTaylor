@@ -57,11 +57,12 @@ model AppUserSettings {
 model Question {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  title   String @unique
-  content String
-  image   String
-  answer  String
-  type    String // trivia / swipe / sing-the-lyrics
+  title      String @unique
+  content    String
+  image      String
+  answer     String
+  type       String // trivia / swipe / sing-the-lyrics
+  difficulty String // debut / midnights / folklore
 
   isDeleted Boolean @default(false)
 

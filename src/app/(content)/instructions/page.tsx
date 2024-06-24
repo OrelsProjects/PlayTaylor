@@ -4,12 +4,10 @@ import React from "react";
 import { InstructionItem, instructionItems } from "./_consts";
 import { Button } from "../../../components/ui/button";
 import Link from "next/link";
-import {
-  Difficulty,
-  setDifficulty,
-} from "../../../lib/features/game/gameSlice";
+import { setDifficulty } from "../../../lib/features/game/gameSlice";
 import { useAppDispatch, useAppSelector } from "../../../lib/hooks/redux";
 import { cn } from "../../../lib/utils";
+import { Difficulty, allDifficulties } from "../../../models/question";
 
 const InstructionsItem: React.FC<InstructionItem> = ({
   title,
@@ -28,8 +26,6 @@ const InstructionsItem: React.FC<InstructionItem> = ({
     </div>
   );
 };
-
-const allDifficulties: Difficulty[] = ["debut", "midnights", "folklore"];
 
 const InstructionsPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -57,7 +53,7 @@ const InstructionsPage: React.FC = () => {
               key={difficulty}
               onClick={() => dispatch(setDifficulty(difficulty))}
               className={cn(
-                "w-fit relative text-muted-foreground p-2.5 py-1.5",
+                "w-fit relative text-muted-foreground p-2.5 py-1.5 hover:cursor-pointer",
                 {
                   "text-primary border-primary border-[1px] rounded-full":
                     selectedDifficulty === difficulty,

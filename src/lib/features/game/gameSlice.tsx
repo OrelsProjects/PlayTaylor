@@ -1,15 +1,18 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
-import { Question, QuestionId } from "../../../models/question";
+import {
+  Difficulty,
+  Question,
+  QuestionId,
+  QuestionType,
+} from "../../../models/question";
 
-export type Game = "trivia" | "sing-the-lyrics" | "swipe";
-export type Difficulty = "debut" | "midnights" | "folklore";
 export type Theme = "light" | "dark" | "blossom" | "midnight" | "sun";
 export type QuestionsStatus = "idle" | "loading" | "succeeded" | "failed";
 
 export interface GameState {
   theme: Theme;
-  game: Game;
+  game: QuestionType;
   difficulty: Difficulty;
   questions: Question[];
   questionsStatus?: QuestionsStatus;
@@ -29,7 +32,7 @@ const gameSlice = createSlice({
   reducers: {
     setGame: (
       state,
-      action: PayloadAction<{ game: Game; setTheme?: boolean }>,
+      action: PayloadAction<{ game: QuestionType; setTheme?: boolean }>,
     ) => {
       state.game = action.payload.game;
       if (!action.payload.setTheme) return;

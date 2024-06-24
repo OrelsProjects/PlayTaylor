@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { cn } from "../../lib/utils";
+import { Images, imageTitles, imagesToUrl } from "../dropdown/consts";
 
 interface OptimizedImageProps {
   src: string;
@@ -38,11 +39,18 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     [shouldOptimize],
   );
 
-  const imageSrc = useMemo(
-    () =>
-      shouldOptimize ? (srcForOptimization ? srcForOptimization : src) : src,
-    [shouldOptimize, src, srcForOptimization],
-  );
+  const imageSrc = useMemo(() => {
+    const imageSrc = shouldOptimize
+      ? srcForOptimization
+        ? srcForOptimization
+        : src
+      : src;
+    if ((imageTitles as string[]).includes(imageSrc)) {
+      return imagesToUrl[imageSrc as Images]!;
+    } else {
+      return imageSrc;
+    }
+  }, [shouldOptimize, src, srcForOptimization]);
 
   return fill ? (
     <Image

@@ -36,22 +36,24 @@ const TrueFalseQuestions: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full justify-evenly">
-      <div className="flex items-center justify-center m-4">
-        <Interactable
-          snapPoints={[{ x: -300 }, { x: 0 }, { x: 300 }]}
-          onSnap={handleSnap}
-          onSwipe={handleSwipe}
-        >
-          <Card
-            className={cn("transition-colors duration-300", {
-              "bg-green-400/60": answeredCorrectly === "correct",
-              "bg-red-400/40": answeredCorrectly === "incorrect",
-            })}
+      {question && (
+        <div className="flex items-center justify-center m-4">
+          <Interactable
+            snapPoints={[{ x: -300 }, { x: 0 }, { x: 300 }]}
+            onSnap={handleSnap}
+            onSwipe={handleSwipe}
           >
-            <TrueFalseContent question={question} />
-          </Card>
-        </Interactable>
-      </div>
+            <Card
+              className={cn("transition-colors duration-300", {
+                "bg-green-400/60": answeredCorrectly === "correct",
+                "bg-red-400/40": answeredCorrectly === "incorrect",
+              })}
+            >
+              <TrueFalseContent question={question} />
+            </Card>
+          </Interactable>
+        </div>
+      )}
     </div>
   );
 };

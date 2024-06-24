@@ -31,6 +31,7 @@ export default function NewQuestionPage({
       image: "",
       answer: "",
       type: "trivia",
+      difficulty: "debut",
     },
     onSubmit: async values => {
       if (isEdit) {
@@ -121,6 +122,36 @@ export default function NewQuestionPage({
         onChange={formik.handleChange}
         required
       />
+
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button
+            variant="outline"
+            className="w-fit rounded-md text-start justify-start px-10 hover:bg-transparent bg-primary text-primary-foreground"
+          >
+            {formik.values.difficulty.charAt(0).toUpperCase() +
+              formik.values.difficulty.slice(1)}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent error={formik.errors.type}>
+          <DropdownMenuItem
+            onSelect={() => formik.setFieldValue("difficulty", "debut")}
+          >
+            Debut
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => formik.setFieldValue("difficulty", "midnights")}
+          >
+            Midnights
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onSelect={() => formik.setFieldValue("difficulty", "folklore")}
+          >
+            Folklore
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <Button type="submit" className="text-primary-foreground">
         {isEdit ? "Update" : "Create"}

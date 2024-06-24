@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import axios from "axios";
 import useGame from "../../../../lib/hooks/useGame";
+import OptimizedImage from "../../../../components/ui/optimizedImage";
 
 export const columns: ColumnDef<Omit<Question, "isDeleted">>[] = [
   {
@@ -39,6 +40,20 @@ export const columns: ColumnDef<Omit<Question, "isDeleted">>[] = [
     enableHiding: false,
   },
   {
+    header: "Image",
+    accessorKey: "image",
+    cell: ({ row }) => {
+      return (
+        <OptimizedImage
+          src={row.original.image}
+          alt="Question image"
+          fill
+          className="!w-10 !h-10 rounded-md"
+        />
+      );
+    },
+  },
+  {
     header: "Title",
     accessorKey: "title",
   },
@@ -47,12 +62,12 @@ export const columns: ColumnDef<Omit<Question, "isDeleted">>[] = [
     accessorKey: "content",
   },
   {
-    header: "Image",
-    accessorKey: "image",
-  },
-  {
     header: "Answer",
     accessorKey: "answer",
+  },
+  {
+    header: "Difficulty",
+    accessorKey: "difficulty",
   },
   {
     header: ({ column }) => {

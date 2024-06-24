@@ -1,7 +1,6 @@
 import { useTheme } from "next-themes";
 import { useAppDispatch, useAppSelector } from "./redux";
 import {
-  Game,
   setGame as setGameAction,
   setTheme as setThemeAction,
   setDifficulty as setDifficultyAction,
@@ -11,12 +10,12 @@ import {
   updateQuestion as updateQuestionAction,
   updateQuestionStatus as updateQuestionStatusAction,
   Theme,
-  Difficulty,
 } from "../features/game/gameSlice";
 import { useCallback, useMemo } from "react";
-import { Question, QuestionId } from "../../models/question";
+import { Difficulty, Question, QuestionId, QuestionType } from "../../models/question";
 import { Logger } from "../../logger";
 import axios from "axios";
+import { Images, imagesToUrl } from "../../components/dropdown/consts";
 
 const useGame = () => {
   const dispatch = useAppDispatch();
@@ -25,7 +24,7 @@ const useGame = () => {
   );
   const { setTheme: setSystemTheme, resolvedTheme } = useTheme();
 
-  const getGameTheme = useCallback((game: Game): Theme => {
+  const getGameTheme = useCallback((game: QuestionType): Theme => {
     switch (game) {
       case "trivia":
         return "sun";
@@ -56,8 +55,17 @@ const useGame = () => {
     if (questionsStatus === "loading") return;
     try {
       dispatch(updateQuestionStatusAction({ status: "loading" }));
-      const response = await axios.get("/api/questions");
-      const questions = response.data.questions;
+      const response = await axios.get<{ questions: Question[] }>(
+        "/api/questions",
+      );
+      let questions = response.data.questions;
+      questions = questions.map(question => {
+        const imageUrl = imagesToUrl[question.image as Images] || "";
+        return {
+          ...question,
+          image: imageUrl,
+        };
+      });
       dispatch(setQuestionsAction(questions));
     } catch (error: any) {
       Logger.error("Failed to fetch questions", { error });
@@ -66,7 +74,7 @@ const useGame = () => {
     }
   }, []);
 
-  const setGame = (game: Game) => {
+  const setGame = (game: QuestionType) => {
     const shouldSetTheme = resolvedTheme !== "dark";
     if (shouldSetTheme) {
       setSystemTheme(getGameTheme(game));

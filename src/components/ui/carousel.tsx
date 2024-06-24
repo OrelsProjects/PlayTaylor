@@ -29,7 +29,7 @@ const CarouselItemComponent = ({
   return (
     <div
       onClick={onClick}
-      className={cn("w-full h-[205px] z-20 relative min-w-14", {
+      className={cn("w-full h-[205px] z-20 relative min-w-14 hover:cursor-pointer", {
         "animate-full-image": selected,
         "animate-full-image-back": !selected,
       })}

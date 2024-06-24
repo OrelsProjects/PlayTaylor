@@ -17,11 +17,13 @@ const SingTheLyricsQuestions: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full justify-evenly">
-      <div className="flex items-center justify-center relative">
-        <Card className="z-50">
-          <SignTheLyricsContent question={question} onNext={handleNext} />
-        </Card>
-      </div>
+      {question && (
+        <div className="flex items-center justify-center relative">
+          <Card className="z-50">
+            <SignTheLyricsContent question={question} onNext={handleNext} />
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
