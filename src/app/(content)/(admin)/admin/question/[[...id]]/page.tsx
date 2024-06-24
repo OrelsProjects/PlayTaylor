@@ -54,6 +54,13 @@ export default function NewQuestionPage({
       const question = allQuestions.find(q => q.id === params.id[0]);
       if (question) {
         formik.setValues(question);
+        if (question.type === "swipe") {
+          formik.setFieldValue("title", "");
+        } else if (question.type === "sing-the-lyrics") {
+          formik.setFieldValue("title", "Sing the lyrics");
+        } else if (question.type === "trivia") {
+          formik.setFieldValue("title", "What's the meaning of");
+        }
       }
     }
   }, [params.id, allQuestions]);
@@ -76,31 +83,33 @@ export default function NewQuestionPage({
         </DropdownMenuTrigger>
         <DropdownMenuContent error={formik.errors.type}>
           <DropdownMenuItem
-            onSelect={() => formik.setFieldValue("type", "trivia")}
+            onSelect={() => {
+              formik.setFieldValue("type", "trivia");
+              formik.setFieldValue("title", "What's the meaning of");
+            }}
           >
             Trivia
           </DropdownMenuItem>
           <DropdownMenuItem
-            onSelect={() => formik.setFieldValue("type", "swipe")}
+            onSelect={() => {
+              formik.setFieldValue("type", "swipe");
+              formik.setFieldValue("title", "");
+            }}
           >
             Swipe
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onSelect={() => formik.setFieldValue("type", "sing-the-lyrics")}
+            onSelect={() => {
+              formik.setFieldValue("type", "sing-the-lyrics");
+              formik.setFieldValue("title", "Sing the lytics");
+            }}
           >
             Sing the lyrics
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <Input
-        error={formik.errors.title}
-        name="title"
-        placeholder="Title"
-        value={formik.values.title}
-        onChange={formik.handleChange}
-        required
-      />
+
       <Input
         error={formik.errors.content}
         name="content"

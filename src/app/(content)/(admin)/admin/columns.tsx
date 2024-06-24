@@ -54,10 +54,6 @@ export const columns: ColumnDef<Omit<Question, "isDeleted">>[] = [
     },
   },
   {
-    header: "Title",
-    accessorKey: "title",
-  },
-  {
     header: "Content",
     accessorKey: "content",
   },
