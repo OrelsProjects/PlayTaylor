@@ -15,6 +15,10 @@ import useGame from "../../../../../../lib/hooks/useGame";
 import ImagesDropdown from "../../../../../../components/dropdown/imagesDropdown";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import {
+  Images,
+  imagesToUrl,
+} from "../../../../../../components/dropdown/consts";
 
 export default function NewQuestionPage({
   params,
@@ -28,7 +32,7 @@ export default function NewQuestionPage({
       id: "",
       title: "",
       content: "",
-      image: "",
+      image: "Debut",
       answer: "",
       type: "trivia",
       difficulty: "debut",
@@ -121,6 +125,7 @@ export default function NewQuestionPage({
 
       <ImagesDropdown
         onImageSelect={image => formik.setFieldValue("image", image)}
+        defaultImage={formik.values.image as Images}
       />
 
       <Input
@@ -162,7 +167,7 @@ export default function NewQuestionPage({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button type="submit" className="text-primary-foreground">
+      <Button type="submit" className="text-primary-foreground rounded-md">
         {isEdit ? "Update" : "Create"}
       </Button>
     </form>

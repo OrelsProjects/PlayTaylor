@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,26 +14,32 @@ interface ImagesDropdownProps {
   defaultImage?: Images;
 }
 
-const DropdownItem = ({ image }: { image: Images }) => (
-  <div className="flex flex-row justify-start items-center gap-2" key={image}>
-    <OptimizedImage
-      src={imagesToUrl[image] || ""}
-      alt={image}
-      fill
-      className="!w-6 !h-6 rounded-md"
-    />
-    <span className="text-primary">{image}</span>
-  </div>
-);
+const DropdownItem = ({ image }: { image: Images }) => {
+  return (
+    <div className="flex flex-row justify-start items-center gap-2" key={image}>
+      <OptimizedImage
+        src={imagesToUrl[image] || ""}
+        alt={image}
+        fill
+        className="!w-6 !h-6 rounded-md"
+      />
+      <span className="text-primary">{image}</span>
+    </div>
+  );
+};
 
 const ImagesDropdown: React.FC<ImagesDropdownProps> = ({
   onImageSelect,
   defaultImage,
 }) => {
   const [selectedImage, setSelectedImage] = useState<Images>(
-    defaultImage || "Debute",
+    defaultImage || "Debut",
   );
-  
+
+  useEffect(() => {
+    setSelectedImage(defaultImage || "Debut");
+  }, [defaultImage]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -49,7 +55,7 @@ const ImagesDropdown: React.FC<ImagesDropdownProps> = ({
           <DropdownMenuItem
             className="bg-background w-full hover:bg-primary/30"
             key={title}
-            onSelect={() => { 
+            onSelect={() => {
               setSelectedImage(title);
               onImageSelect(title, imagesToUrl[title]);
             }}

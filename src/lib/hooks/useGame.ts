@@ -12,7 +12,12 @@ import {
   Theme,
 } from "../features/game/gameSlice";
 import { useCallback, useMemo } from "react";
-import { Difficulty, Question, QuestionId, QuestionType } from "../../models/question";
+import {
+  Difficulty,
+  Question,
+  QuestionId,
+  QuestionType,
+} from "../../models/question";
 import { Logger } from "../../logger";
 import axios from "axios";
 import { Images, imagesToUrl } from "../../components/dropdown/consts";

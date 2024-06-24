@@ -1,5 +1,5 @@
 export type Images =
-  | "Debute"
+  | "Debut"
   | "Fearless"
   | "Speak Now"
   | "Red"
@@ -12,7 +12,7 @@ export type Images =
   | "TTPD";
 
 export const imageTitles: Images[] = [
-  "Debute",
+  "Debut",
   "Fearless",
   "Speak Now",
   "Red",
@@ -28,7 +28,7 @@ export const imageTitles: Images[] = [
 export type ImagesToUrl = Record<Images, string | undefined>;
 
 export const imagesToUrl: ImagesToUrl = {
-  Debute: process.env.NEXT_PUBLIC_IMAGE_LOW_DEBUTE,
+  Debut: process.env.NEXT_PUBLIC_IMAGE_LOW_DEBUT,
   Fearless: process.env.NEXT_PUBLIC_IMAGE_LOW_FEARLESS,
   "Speak Now": process.env.NEXT_PUBLIC_IMAGE_LOW_SPEAK_NOW,
   Red: process.env.NEXT_PUBLIC_IMAGE_LOW_RED,
