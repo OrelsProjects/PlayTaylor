@@ -64,7 +64,20 @@ model Question {
   type       String // trivia / swipe / sing-the-lyrics
   difficulty String // debut / midnights / folklore
 
-  isDeleted Boolean @default(false)
+  isDeleted         Boolean            @default(false)
+  questionResponses questionResponse[]
 
   @@map("question")
+}
+
+model questionResponse {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  questionId String   @db.ObjectId
+  userId     String
+  responses  String[] // answers by user
+  isCorrect  Boolean
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("questionResponse")
 }
