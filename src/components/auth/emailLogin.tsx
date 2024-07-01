@@ -27,18 +27,15 @@ export default function EmailLogin({ className, register }: EmailLoginProps) {
     },
     onSubmit: async values => {
       if (values.email && values.password) {
-        toast.promise(
-          signUpWithEmail(values.email, values.password, register),
-          {
-            pending: "Signing in...",
-            success: "Signed in!",
-            error: {
-              render(e: any) {
-                return "Failed to sign in";
-              },
-            },
-          },
-        );
+        // toast.promise(signUpWithEmail(values.email, values.password), {
+        //   pending: "Signing in...",
+        //   success: "Signed in!",
+        //   error: {
+        //     render(e: any) {
+        //       return "Failed to sign in";
+        //     },
+        //   },
+        // });
       }
     },
   });
