@@ -18,6 +18,7 @@ import { useEffect, useMemo } from "react";
 import {
   Images,
   imagesToUrl,
+  urlToImages,
 } from "../../../../../../components/dropdown/consts";
 
 export default function NewQuestionPage({
@@ -58,6 +59,7 @@ export default function NewQuestionPage({
       const question = allQuestions.find(q => q.id === params.id[0]);
       if (question) {
         formik.setValues(question);
+        formik.setFieldValue("image", urlToImages[question.image]);
         if (question.type === "swipe") {
           formik.setFieldValue("title", "");
         } else if (question.type === "sing-the-lyrics") {
