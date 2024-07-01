@@ -6,11 +6,16 @@ import Interactable from "./interactable";
 import TrueFalseContent from "./trueFalseContent";
 import { cn } from "../../../lib/utils";
 import useGame from "../../../lib/hooks/useGame";
+import GameFinishedComponent from "../../ui/gameFinished";
 
 type AnswerResponse = "correct" | "incorrect" | "none";
 
 const TrueFalseQuestions: React.FC = () => {
-  const { swipeQuestions: questions } = useGame();
+  const {
+    swipeQuestions: questions,
+    swipeCorrectAnswers: correctAnswers,
+    handleQuestionAnswered,
+  } = useGame();
 
   const [index, setIndex] = useState(0);
   const [answeredCorrectly, setAnsweredCorrectly] =
@@ -18,6 +23,7 @@ const TrueFalseQuestions: React.FC = () => {
 
   const handleSwipe = (response: boolean) => {
     const answer = questions[index].answer === "true";
+    handleQuestionAnswered(questions[index], response.toString());
     if (answer === response) {
       setAnsweredCorrectly("correct");
     } else {
@@ -36,10 +42,10 @@ const TrueFalseQuestions: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full justify-evenly">
-      {question && (
+      {question ? (
         <div className="flex items-center justify-center m-4">
           <Interactable
-            snapPoints={[{ x: -300 }, { x: 0 }, { x: 300 }]}
+            snapPoints={[{ x: -150 }, { x: 0 }, { x: 150 }]}
             onSnap={handleSnap}
             onSwipe={handleSwipe}
           >
@@ -53,6 +59,11 @@ const TrueFalseQuestions: React.FC = () => {
             </Card>
           </Interactable>
         </div>
+      ) : (
+        <GameFinishedComponent
+          questionsCount={questions.length}
+          correctAnswers={correctAnswers.length}
+        />
       )}
     </div>
   );

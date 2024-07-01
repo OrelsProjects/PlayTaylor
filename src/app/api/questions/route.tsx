@@ -21,6 +21,7 @@ export async function GET(req: NextRequest): Promise<any> {
     const questions = await prisma.question.findMany({
       where: { isDeleted: false },
     });
+
     return NextResponse.json({ questions });
   } catch (error: any) {
     Logger.error("Error getting questions", session.user.userId || "unknown", {

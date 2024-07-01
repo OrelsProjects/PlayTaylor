@@ -23,10 +23,30 @@ model AppUser {
 
   role String?
 
-  meta     AppUserMetadata?
-  settings AppUserSettings?
+  meta             AppUserMetadata?
+  settings         AppUserSettings?
+  QuestionResponse QuestionResponse[]
+  AppUserOrders    AppUserOrders[]
 
   @@map("appUser")
+}
+
+// Paypal order
+model AppUserOrders {
+  appUserOrdersId String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String
+  orderId         String
+  payerId         String
+  paymentId       String
+  paymentSource   String
+  amount          Float
+  currency        String
+  status          String
+  createdAt       DateTime @default(now())
+
+  appUser AppUser @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("appUserOrders")
 }
 
 model AppUserMetadata {
@@ -64,20 +84,25 @@ model Question {
   type       String // trivia / swipe / sing-the-lyrics
   difficulty String // debut / midnights / folklore
 
+  createdAt DateTime? @default(now())
+
   isDeleted         Boolean            @default(false)
-  questionResponses questionResponse[]
+  questionResponses QuestionResponse[]
 
   @@map("question")
 }
 
-model questionResponse {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  questionId String   @db.ObjectId
-  userId     String
-  responses  String[] // answers by user
+model QuestionResponse {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  questionId String  @db.ObjectId
+  userId     String  @db.ObjectId
+  response   String // answers by user
   isCorrect  Boolean
 
+  answeredAt DateTime @default(now())
+
   question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     AppUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("questionResponse")
 }

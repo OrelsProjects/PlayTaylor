@@ -65,18 +65,14 @@ const useAuth = () => {
     [],
   );
 
-  const signUpWithEmail = useCallback(
+  const signUpGuest = useCallback(
     async (
-      email: string,
-      password: string,
       register?: boolean,
       displayName: string = "",
     ) => {
       setLoading(true);
       try {
-        const result = await signIn("credentials", {
-          email,
-          password,
+        const result = await signIn("Guest", {
           displayName: displayName,
           isSignIn: !register,
           redirect: false,
@@ -128,7 +124,7 @@ const useAuth = () => {
     signInWithGoogle,
     signInWithApple,
     signInWithEmail,
-    signUpWithEmail,
+    signUpWithEmail: signUpGuest,
     deleteUser,
     signOut,
     loading,

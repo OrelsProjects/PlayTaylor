@@ -45,7 +45,7 @@ const SingTheLyricsContent: React.FC<SingTheLyricsContentProps> = ({
         <span className="font-medium text-primary">{question.title}</span>
       </div>
       <div className="w-full h-full flex flex-col gap-20">
-        <div className="w-full h-full flex flex-col gap-5">
+        <div className="w-full h-full flex flex-col gap-10">
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: showAnswer ? 1 : 0 }}

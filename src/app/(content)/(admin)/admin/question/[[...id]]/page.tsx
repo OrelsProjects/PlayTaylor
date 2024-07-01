@@ -98,6 +98,7 @@ export default function NewQuestionPage({
             onSelect={() => {
               formik.setFieldValue("type", "swipe");
               formik.setFieldValue("title", "");
+              formik.setFieldValue("answer", "true");
             }}
           >
             Swipe
@@ -128,14 +129,43 @@ export default function NewQuestionPage({
         defaultImage={formik.values.image as Images}
       />
 
-      <Input
-        error={formik.errors.answer}
-        name="answer"
-        placeholder="Answer"
-        value={formik.values.answer}
-        onChange={formik.handleChange}
-        required
-      />
+      {formik.values.type === "swipe" ? (
+        // True false dropdown
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button
+              variant="outline"
+              className="w-full rounded-md text-start justify-start hover:bg-transparent bg-transparent text-primary"
+            >
+              {formik.values.answer.charAt(0).toUpperCase() +
+                formik.values.answer.slice(1)}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent error={formik.errors.answer} className="w-full">
+            <DropdownMenuItem
+              onSelect={() => formik.setFieldValue("answer", "true")}
+              className="w-full"
+            >
+              True
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="w-full"
+              onSelect={() => formik.setFieldValue("answer", "false")}
+            >
+              False
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <Input
+          error={formik.errors.answer}
+          name="answer"
+          placeholder="Answer"
+          value={formik.values.answer}
+          onChange={formik.handleChange}
+          required
+        />
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger>

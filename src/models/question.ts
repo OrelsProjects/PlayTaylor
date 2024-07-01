@@ -14,3 +14,12 @@ export interface Question {
   type: QuestionType;
   difficulty: Difficulty;
 }
+
+export interface QuestionResponse {
+  id: string;
+  questionId: string;
+  userId: string;
+  response: string;
+  isCorrect: boolean;
+  answeredAt: Date;
+}

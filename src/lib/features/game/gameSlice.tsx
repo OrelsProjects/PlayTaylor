@@ -4,6 +4,7 @@ import {
   Difficulty,
   Question,
   QuestionId,
+  QuestionResponse,
   QuestionType,
 } from "../../../models/question";
 
@@ -15,6 +16,7 @@ export interface GameState {
   game: QuestionType;
   difficulty: Difficulty;
   questions: Question[];
+  questionsResponses: QuestionResponse[];
   questionsStatus?: QuestionsStatus;
 }
 
@@ -23,6 +25,7 @@ export const initialState: GameState = {
   game: "swipe",
   difficulty: "debut",
   questions: [],
+  questionsResponses: [],
   questionsStatus: "idle",
 };
 
@@ -79,17 +82,39 @@ const gameSlice = createSlice({
     ) => {
       state.questionsStatus = action.payload.status;
     },
+    addQuestionResponse: (state, action: PayloadAction<QuestionResponse>) => {
+      state.questionsResponses.push(action.payload);
+    },
+    updateQuestionResponse: (
+      state,
+      action: PayloadAction<QuestionResponse>,
+    ) => {
+      state.questionsResponses = state.questionsResponses.map(response =>
+        response.id === action.payload.id ? action.payload : response,
+      );
+    },
+    removeQuestionResponse: (
+      state,
+      action: PayloadAction<{id: string}>,
+    ) => {
+      state.questionsResponses = state.questionsResponses.filter(
+        response => response.id !== action.payload.id,
+      );
+    },
   },
 });
 
 export const {
   addQuestion,
+  addQuestionResponse,
   setDifficulty,
   removeQuestion,
+  removeQuestionResponse,
   setGame,
   setTheme,
   setQuestions,
   updateQuestion,
+  updateQuestionResponse,
   updateQuestionStatus,
 } = gameSlice.actions;
 

@@ -13,7 +13,7 @@ const GameFinishedComponent: React.FC<GameFinishedComponentProps> = ({
   correctAnswers,
 }) => {
   const score = useMemo(
-    () => (correctAnswers / questionsCount) * 100,
+    () => Math.ceil((correctAnswers / questionsCount) * 100),
     [correctAnswers, questionsCount],
   );
 

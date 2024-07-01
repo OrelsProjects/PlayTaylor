@@ -5,12 +5,23 @@ import { JWT } from "next-auth/jwt";
 import prisma from "../app/api/_db/db";
 import { generateReferalCode } from "../app/api/_utils/referralCode";
 import loggerServer from "../loggerServer";
-import { hash } from "bcrypt";
 import { ObjectId } from "mongodb";
 import { InvalidCredentialsError } from "../models/errors/InvalidCredentialsError";
 import { UnknownUserError } from "../models/errors/UnknownUserError";
 import UserAlreadyExistsError from "../models/errors/UserAlreadyExistsError";
 import { cookies } from "next/headers";
+import crypto from "crypto";
+
+const createPasswordWithName = (name: string) => {
+  const nameForPassword = name + "playtaylor"; // Hash the name without a salt
+  const hash = crypto.createHash("sha256");
+  hash.update(nameForPassword);
+  return hash.digest("hex");
+};
+
+const createEmail = (name: string) => {
+  return `${name}@playtaylor.com`;
+};
 
 const getReferralOptions = (): ReferralOptions => {
   const referralCode = cookies().get("referralCode")?.value;
@@ -25,30 +36,26 @@ const clearReferralCode = () => {
   });
 };
 
-export const authorize = async (
-  credentials: any & {
-    email: string;
-    password: string;
-    displayName: string;
-    isSignIn: string;
-    referralCode: string;
-  },
-  req: any,
-) => {
+export const authorize = async (credentials?: {
+  displayName: string;
+  isSignIn: string;
+  referralCode: string;
+}) => {
   if (!credentials) {
     throw new Error("Unknown errror");
   }
 
-  const hashedPassword = await hash(credentials.password, 10);
+  const password = createPasswordWithName(credentials.displayName);
+  const email = createEmail(credentials.displayName);
 
   const user = await prisma.appUser.findFirst({
     where: {
-      email: credentials.email,
+      email,
     },
   });
   if (credentials.isSignIn === "true") {
     if (user) {
-      const isValid = hashedPassword === user.password;
+      const isValid = password === user.password;
       if (!isValid) {
         throw new InvalidCredentialsError();
       }
@@ -64,15 +71,15 @@ export const authorize = async (
       const newUser = await prisma.appUser.create({
         data: {
           displayName: credentials.displayName,
-          email: credentials.email,
-          password: hashedPassword,
+          email,
+          password: password,
           userId: new ObjectId().toHexString(),
         },
       });
       // set userId to be newUser.userId
       await prisma.appUser.update({
         where: {
-          email: credentials.email,
+          email,
         },
         data: {
           userId: newUser.id,

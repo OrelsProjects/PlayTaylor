@@ -9,6 +9,9 @@ import {
   removeQuestion as removeQuestionAction,
   updateQuestion as updateQuestionAction,
   updateQuestionStatus as updateQuestionStatusAction,
+  addQuestionResponse as addQuestionResponseAction,
+  updateQuestionResponse as updateQuestionResponseAction,
+  removeQuestionResponse as removeQuestionResponseAction,
   Theme,
 } from "../features/game/gameSlice";
 import { useCallback, useMemo } from "react";
@@ -16,6 +19,7 @@ import {
   Difficulty,
   Question,
   QuestionId,
+  QuestionResponse,
   QuestionType,
 } from "../../models/question";
 import { Logger } from "../../logger";
@@ -24,9 +28,9 @@ import { Images, imagesToUrl } from "../../components/dropdown/consts";
 
 const useGame = () => {
   const dispatch = useAppDispatch();
-  const { game, theme, questions, questionsStatus } = useAppSelector(
-    state => state.game,
-  );
+  const { user } = useAppSelector(state => state.auth);
+  const { game, theme, questions, questionsStatus, questionsResponses } =
+    useAppSelector(state => state.game);
   const { setTheme: setSystemTheme, resolvedTheme } = useTheme();
 
   const getGameTheme = useCallback((game: QuestionType): Theme => {
@@ -55,6 +59,56 @@ const useGame = () => {
   const singTheLyricsQuestions = useMemo(() => {
     return questions.filter(question => question.type === "sing-the-lyrics");
   }, [questions]);
+
+  const triviaCorrectAnswers = useMemo(() => {
+    return questionsResponses.filter(
+      response =>
+        triviaQuestions.some(question => question.id === response.questionId) &&
+        response.isCorrect,
+    );
+  }, [questionsResponses]);
+
+  const swipeCorrectAnswers = useMemo(() => {
+    return questionsResponses.filter(
+      response =>
+        swipeQuestions.some(question => question.id === response.questionId) &&
+        response.isCorrect,
+    );
+  }, [questionsResponses]);
+
+  const singTheLyricsCorrectAnswers = useMemo(() => {
+    return questionsResponses.filter(
+      response =>
+        singTheLyricsQuestions.some(
+          question => question.id === response.questionId,
+        ) && response.isCorrect,
+    );
+  }, [questionsResponses]);
+
+  const triviaIncorrectAnswers = useMemo(() => {
+    return questionsResponses.filter(
+      response =>
+        triviaQuestions.some(question => question.id === response.questionId) &&
+        !response.isCorrect,
+    );
+  }, [questionsResponses]);
+
+  const swipeIncorrectAnswers = useMemo(() => {
+    return questionsResponses.filter(
+      response =>
+        swipeQuestions.some(question => question.id === response.questionId) &&
+        !response.isCorrect,
+    );
+  }, [questionsResponses]);
+
+  const singTheLyricsIncorrectAnswers = useMemo(() => {
+    return questionsResponses.filter(
+      response =>
+        singTheLyricsQuestions.some(
+          question => question.id === response.questionId,
+        ) && !response.isCorrect,
+    );
+  }, [questionsResponses]);
 
   const initQuestions = useCallback(async () => {
     if (questionsStatus === "loading") return;
@@ -88,7 +142,7 @@ const useGame = () => {
   };
 
   const setTheme = (darkTheme?: boolean) => {
-    const newTheme = darkTheme ? "dark" : getGameTheme(game);
+    const newTheme = darkTheme ? "battery-saver" : getGameTheme(game);
     if (!darkTheme) {
       dispatch(setThemeAction(newTheme));
     }
@@ -139,10 +193,39 @@ const useGame = () => {
     }
   };
 
+  const handleQuestionAnswered = useCallback(
+    async (question: Question, answer: string) => {
+      const correct = question.answer === answer;
+      const questionResponse: QuestionResponse = {
+        id: "temp-id",
+        questionId: question.id,
+        userId: user?.userId || "unknown",
+        response: answer,
+        isCorrect: correct,
+        answeredAt: new Date(),
+      };
+
+      dispatch(addQuestionResponseAction(questionResponse));
+
+      try {
+        const response = await axios.post<QuestionResponse>(
+          `/api/questions/${question.id}/response`,
+          { questionResponse },
+        );
+        dispatch(updateQuestionResponseAction(response.data));
+      } catch (error: any) {
+        Logger.error("Failed to add question response", { error });
+        dispatch(removeQuestionResponseAction({ id: "temp-id" }));
+      }
+    },
+    [],
+  );
+
   return {
     addQuestion,
     allQuestions,
     game,
+    handleQuestionAnswered,
     initQuestions,
     removeQuestion,
     setGame,
@@ -150,7 +233,13 @@ const useGame = () => {
     setQuestions,
     setDifficulty,
     swipeQuestions,
+    swipeCorrectAnswers,
+    swipeIncorrectAnswers,
+    triviaCorrectAnswers,
+    triviaIncorrectAnswers,
     singTheLyricsQuestions,
+    singTheLyricsCorrectAnswers,
+    singTheLyricsIncorrectAnswers,
     theme,
     triviaQuestions,
     updateQuestion,

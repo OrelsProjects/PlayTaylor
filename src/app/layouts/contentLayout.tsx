@@ -11,12 +11,18 @@ import AnimationProvider from "../providers/AnimationProvider";
 import HeightProvider from "../providers/HeightProvider";
 import ContentProvider from "../providers/ContentProvider";
 import useGame from "../../lib/hooks/useGame";
+import Script from "next/script";
+import { cn } from "../../lib/utils";
 
 interface RootLayoutProps {
   children: React.ReactNode;
+  className?: string;
 }
 
-export default function ContentLayout({ children }: RootLayoutProps) {
+export default function ContentLayout({
+  children,
+  className,
+}: RootLayoutProps) {
   const { initQuestions } = useGame();
 
   useEffect(() => {
@@ -24,7 +30,7 @@ export default function ContentLayout({ children }: RootLayoutProps) {
   }, []);
 
   return (
-    <main>
+    <main className={cn(className)}>
       <AuthProvider>
         <NotificationsProvider />
         <HeightProvider>

@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useAnimation } from "framer-motion";
+import {
+  motion,
+  useAnimation,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
 import { PanInfo } from "framer-motion";
 
 interface SnapPoint {
@@ -33,8 +38,13 @@ const Interactable: React.FC<InteractableProps> = ({
 }) => {
   const controls = useAnimation();
   const interactableRef = useRef<HTMLDivElement>(null);
+
+  const xRotation = useMotionValue(0);
+
   const [initialPosition, setInitialPosition] = useState(initialX);
   const [referencePoint, setReferencePoint] = useState(initialX);
+
+  const rotate = useTransform(xRotation, [-100, 100], [-45, 45]); // Transform x to rotation values
 
   useEffect(() => {
     if (interactableRef.current) {
@@ -89,7 +99,7 @@ const Interactable: React.FC<InteractableProps> = ({
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
       onDragEnd={handleDragEnd}
-      style={style}
+      style={{ ...style, rotate }}
       animate={controls}
       initial={{ x: initialPosition }}
       ref={interactableRef}
