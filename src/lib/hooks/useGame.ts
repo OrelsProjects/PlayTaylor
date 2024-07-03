@@ -25,6 +25,7 @@ import {
 import { Logger } from "../../logger";
 import axios from "axios";
 import { Images, imagesToUrl } from "../../components/dropdown/consts";
+import { EventTracker } from "../../eventTracker";
 
 const useGame = () => {
   const dispatch = useAppDispatch();
@@ -208,6 +209,12 @@ const useGame = () => {
       dispatch(addQuestionResponseAction(questionResponse));
 
       try {
+        EventTracker.track("question_answered", {
+          questionId: question.id,
+          userId: user?.userId,
+          response: answer,
+          isCorrect: correct,
+        });
         const response = await axios.post<QuestionResponse>(
           `/api/questions/${question.id}/response`,
           { questionResponse },

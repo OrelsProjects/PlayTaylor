@@ -5,6 +5,7 @@ import Card from "../card";
 import TriviaContent from "./triviaContent";
 import useGame from "../../../lib/hooks/useGame";
 import GameFinishedComponent from "../../ui/gameFinished";
+import { EventTracker } from "../../../eventTracker";
 
 const TriviaQuestions: React.FC = () => {
   const { triviaQuestions: questions } = useGame();
@@ -22,7 +23,10 @@ const TriviaQuestions: React.FC = () => {
     } else {
       setShowAd(false);
     }
-
+    EventTracker.track("Trivia Question Answered", {
+      question: question.content,
+      answer: question.answer,
+    });
     setNextIndex(nextIndex + 1);
   };
 
