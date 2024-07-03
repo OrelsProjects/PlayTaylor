@@ -7,13 +7,12 @@ import { Label } from "./ui/label";
 import useGame from "../lib/hooks/useGame";
 
 export function ThemeToggle() {
-  const { theme, systemTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const { setTheme } = useGame();
 
-  const isDark = React.useMemo(
-    () => (theme === "system" ? systemTheme === "dark" : theme === "dark"),
-    [theme],
-  );
+  const isDark = React.useMemo(() => {
+    return resolvedTheme === "battery-save";
+  }, [resolvedTheme]);
 
   return (
     <RadioGroup
