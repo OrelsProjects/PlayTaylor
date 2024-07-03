@@ -1,13 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { InstructionItem, instructionItems } from "./_consts";
 import { Button } from "../../../components/ui/button";
 import Link from "next/link";
-import { setDifficulty } from "../../../lib/features/game/gameSlice";
-import { useAppDispatch, useAppSelector } from "../../../lib/hooks/redux";
-import { cn } from "../../../lib/utils";
-import { Difficulty, allDifficulties } from "../../../models/question";
+import { useAppSelector } from "../../../lib/hooks/redux";
 
 const InstructionsItem: React.FC<InstructionItem> = ({
   title,
@@ -28,10 +25,11 @@ const InstructionsItem: React.FC<InstructionItem> = ({
 };
 
 const InstructionsPage: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { difficulty: selectedDifficulty, game } = useAppSelector(
-    state => state.game,
-  );
+  const { game } = useAppSelector(state => state.game);
+
+  const instructions = useMemo(() => {
+    return instructionItems[game];
+  }, [game]);
 
   return (
     <div className="h-full w-full flex flex-col gap-16">
@@ -40,28 +38,8 @@ const InstructionsPage: React.FC = () => {
           How to play
         </h1>
         <div className="flex flex-col">
-          {instructionItems.map(item => (
+          {instructions.map(item => (
             <InstructionsItem key={item.title} {...item} />
-          ))}
-        </div>
-      </div>
-      <div className="w-full flex flex-col gap-6">
-        <h2 className="w-full text-center">Difficulty level</h2>
-        <div className="w-full h-fit relative flex flex-row justify-center items-center gap-7 px-1.5 py-5">
-          {allDifficulties.map(difficulty => (
-            <div
-              key={difficulty}
-              onClick={() => dispatch(setDifficulty(difficulty))}
-              className={cn(
-                "w-fit relative text-muted-foreground p-2.5 py-1.5 hover:cursor-pointer",
-                {
-                  "text-primary border-primary border-[1px] rounded-full":
-                    selectedDifficulty === difficulty,
-                },
-              )}
-            >
-              {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-            </div>
           ))}
         </div>
       </div>

@@ -34,7 +34,7 @@ const carouselTitles = [
 
 export default function Home() {
   const { game, setGame } = useGame();
-  const [defaultSelected, setDefaultSelected] = useState(0);
+  const [defaultSelected, setDefaultSelected] = useState(1);
 
   useEffect(() => {
     const selected = carouselItems.findIndex(item => item.value === game);
@@ -63,7 +63,7 @@ export default function Home() {
             setGame(item.value as QuestionType);
           }}
         />
-        <span className="text-primary">{title.value}</span>
+        <span className="text-primary h-5">{title.value}</span>
       </div>
       <Button asChild className="w-fit self-end">
         <Link href={`/instructions`}>Play</Link>

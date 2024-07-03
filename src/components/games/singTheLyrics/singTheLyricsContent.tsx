@@ -57,7 +57,7 @@ const SingTheLyricsContent: React.FC<SingTheLyricsContentProps> = ({
 
           <motion.span
             initial={{ opacity: 1 }}
-            className="w-full text-base font-normal italic text-center text-primary"
+            className="w-full text-lg font-normal italic text-center text-primary"
           >
             <ContentText content={question.content} />
           </motion.span>

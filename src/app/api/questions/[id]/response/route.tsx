@@ -7,9 +7,9 @@ import prisma from "../../../_db/db";
 
 export async function POST(req: NextRequest): Promise<any> {
   const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  // if (!session) {
+  //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // }
 
   try {
     const { questionResponse }: { questionResponse: QuestionResponse } =
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest): Promise<any> {
   } catch (error: any) {
     Logger.error(
       "Error creating a question",
-      session.user.userId || "unknown",
+      session?.user.userId || "unknown",
       {
         error,
       },

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Dialog,
   DialogClose,
@@ -14,6 +14,7 @@ import {
 import { Icons } from "./ui/icons";
 import OptimizedImage from "./ui/optimizedImage";
 import { IoClose } from "react-icons/io5";
+import { useAppSelector } from "../lib/hooks/redux";
 
 export const InstructionsItem: React.FC<InstructionItem> = ({
   title,
@@ -40,6 +41,12 @@ export const InstructionsItem: React.FC<InstructionItem> = ({
 };
 
 const InstructionsContainer: React.FC = () => {
+  const { game } = useAppSelector(state => state.game);
+
+  const instructions = useMemo(() => {
+    return instructionItems[game];
+  }, [game]);
+
   const Content = () => (
     <Dialog>
       <DialogTrigger>
@@ -62,7 +69,7 @@ const InstructionsContainer: React.FC = () => {
         </DialogTitle>
         <DialogDescription>
           <div className="flex flex-col">
-            {instructionItems.map(item => (
+            {instructions.map(item => (
               <InstructionsItem key={item.title} {...item} />
             ))}
           </div>
