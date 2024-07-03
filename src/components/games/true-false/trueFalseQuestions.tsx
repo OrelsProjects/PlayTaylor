@@ -23,6 +23,7 @@ const TrueFalseQuestions: React.FC = () => {
 
   const handleSwipe = (response: boolean) => {
     const answer = questions[index].answer === "true";
+    
     handleQuestionAnswered(questions[index], response.toString());
     if (answer === response) {
       setAnsweredCorrectly("correct");
