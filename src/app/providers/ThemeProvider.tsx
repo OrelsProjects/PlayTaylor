@@ -9,7 +9,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     <NextThemesProvider
       attribute="class"
       defaultTheme="system"
-      themes={["light", "battery-saver", "blossom", "midnight", "sun"]}
+      themes={["light", "battery-save", "blossom", "midnight", "sun"]}
       {...props}
     >
       {children}

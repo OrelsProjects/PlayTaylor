@@ -20,8 +20,10 @@
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
-    --primary: 258 100% 87%;
-    --primary-foreground: 259 58% 28%;
+    /* --primary: 258 100% 87%;
+    --primary-foreground: 259 58% 28%; */
+    --primary: 0 0 98%;
+    --primary-foreground: 0 0 27%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 270 11% 79%;
     --muted: 0 0% 15%;
@@ -36,7 +38,7 @@
     --radius: 0.75rem;
   }
 
-  .battery-saver {
+  .battery-save {
     --primary: 0 0 98%;
     --primary-foreground: 0 0 27%;
     --foreground: 0 0 98%;

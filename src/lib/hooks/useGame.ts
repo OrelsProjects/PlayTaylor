@@ -142,7 +142,7 @@ const useGame = () => {
   };
 
   const setTheme = (darkTheme?: boolean) => {
-    const newTheme = darkTheme ? "battery-saver" : getGameTheme(game);
+    const newTheme = darkTheme ? "battery-save" : getGameTheme(game);
     if (!darkTheme) {
       dispatch(setThemeAction(newTheme));
     }

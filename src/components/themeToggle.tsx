@@ -26,11 +26,21 @@ export function ThemeToggle() {
     >
       <div className="flex items-center py-[18px] space-x-[14px]">
         <RadioGroupItem value="battery-save" id="battery-save" />
-        <Label htmlFor="battery-save" className="text-primary dark:text-secondary-foreground">Black and white</Label>
+        <Label
+          htmlFor="battery-save"
+          className="text-primary dark:text-secondary-foreground"
+        >
+          Black and white
+        </Label>
       </div>
       <div className="flex items-center py-[18px] space-x-[14px]">
         <RadioGroupItem value="colourful" id="colourful" />
-        <Label htmlFor="colourful" className="text-primary dark:text-secondary-foreground">Screaming colors</Label>
+        <Label
+          htmlFor="colourful"
+          className="text-primary dark:text-secondary-foreground"
+        >
+          Screaming colors
+        </Label>
       </div>
     </RadioGroup>
   );

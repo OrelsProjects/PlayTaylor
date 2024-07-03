@@ -30,7 +30,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const { resolvedTheme } = useTheme();
 
   const shouldOptimize = useMemo(
-    () => resolvedTheme === "battery-saver",
+    () => resolvedTheme === "battery-save",
     [resolvedTheme],
   );
 

@@ -13,10 +13,10 @@ async function isUserAdmin(userId: string): Promise<boolean> {
 }
 
 export async function GET(req: NextRequest): Promise<any> {
+  // if (!session) {
+  //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // }
   const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
   try {
     const questions = await prisma.question.findMany({
       where: { isDeleted: false },
@@ -24,9 +24,13 @@ export async function GET(req: NextRequest): Promise<any> {
 
     return NextResponse.json({ questions });
   } catch (error: any) {
-    Logger.error("Error getting questions", session.user.userId || "unknown", {
-      error,
-    });
+    Logger.error(
+      "Error getting questions",
+      session?.user?.userId || "unknown",
+      {
+        error,
+      },
+    );
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

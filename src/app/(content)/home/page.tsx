@@ -47,7 +47,7 @@ export default function Home() {
           setGame(item.value as QuestionType);
         }}
       />
-      <AdTrivia />
+      {/* <AdTrivia /> */}
       <Button asChild className="w-fit self-end mt-auto">
         <Link href={`/instructions`}>Play</Link>
       </Button>
