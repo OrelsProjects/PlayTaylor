@@ -12,11 +12,15 @@ interface Dict {
   [key: string]: any;
 }
 export const initEventTracker = () => {
-  const env = process.env.NODE_ENV;
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_API_KEY ?? "", {
-    api_host: "https://us.i.posthog.com",
-    disable_session_recording: env !== "production",
-  });
+  try {
+    const env = process.env.NODE_ENV;
+    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_API_KEY ?? "", {
+      api_host: "https://us.i.posthog.com",
+      disable_session_recording: env !== "production",
+    });
+  } catch (error: any) {
+    Logger.error("Error initializing event tracker", { error });
+  }
 };
 
 export const setUserEventTracker = (user?: AppUser | null) => {
