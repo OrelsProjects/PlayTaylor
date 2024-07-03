@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import Card from "../card";
 import TriviaContent from "./triviaContent";
 import useGame from "../../../lib/hooks/useGame";
+import GameFinishedComponent from "../../ui/gameFinished";
 
 const TriviaQuestions: React.FC = () => {
   const { triviaQuestions: questions } = useGame();
@@ -32,7 +33,7 @@ const TriviaQuestions: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full justify-evenly">
-      {question && (
+      {question ? (
         <div className="flex items-center justify-center relative">
           <Card className="w-full z-50">
             <TriviaContent
@@ -49,6 +50,8 @@ const TriviaQuestions: React.FC = () => {
             </div>
           )}
         </div>
+      ) : (
+        <GameFinishedComponent />
       )}
     </div>
   );
