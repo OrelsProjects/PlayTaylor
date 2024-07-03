@@ -215,11 +215,11 @@ const useGame = () => {
           response: answer,
           isCorrect: correct,
         });
-        const response = await axios.post<QuestionResponse>(
-          `/api/questions/${question.id}/response`,
-          { questionResponse },
-        );
-        dispatch(updateQuestionResponseAction(response.data));
+        // const response = await axios.post<QuestionResponse>(
+        //   `/api/questions/${question.id}/response`,
+        //   { questionResponse },
+        // );
+        // dispatch(updateQuestionResponseAction(response.data));
       } catch (error: any) {
         Logger.error("Failed to add question response", { error });
         dispatch(removeQuestionResponseAction({ id: "temp-id" }));
