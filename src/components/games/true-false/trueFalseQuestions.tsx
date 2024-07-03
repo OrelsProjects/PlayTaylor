@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Card from "../card";
 import Interactable from "./interactable";
 import TrueFalseContent from "./trueFalseContent";
@@ -21,9 +21,13 @@ const TrueFalseQuestions: React.FC = () => {
   const [answeredCorrectly, setAnsweredCorrectly] =
     useState<AnswerResponse>("none");
 
+  const shuffledQuestions = useMemo(() => {
+    return questions.sort(() => Math.random() - 0.5);
+  }, [questions]);
+
   const handleSwipe = (response: boolean) => {
     const answer = questions[index].answer === "true";
-    
+
     handleQuestionAnswered(questions[index], response.toString());
     if (answer === response) {
       setAnsweredCorrectly("correct");
@@ -39,7 +43,9 @@ const TrueFalseQuestions: React.FC = () => {
     }
   };
 
-  const question = questions[index];
+  const question = useMemo(() => {
+    return shuffledQuestions[index];
+  }, [index, shuffledQuestions]);
 
   return (
     <div className="flex flex-col h-full justify-evenly">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Card from "../card";
 import SignTheLyricsContent from "./singTheLyricsContent";
 import useGame from "../../../lib/hooks/useGame";
@@ -11,7 +11,14 @@ const SingTheLyricsQuestions: React.FC = () => {
   const { singTheLyricsQuestions: questions } = useGame();
 
   const [index, setIndex] = useState(0);
-  const question = questions[index];
+
+  const shuffledQuestions = useMemo(() => {
+    return questions.sort(() => Math.random() - 0.5);
+  }, [questions]);
+
+  const question = useMemo(() => {
+    return shuffledQuestions[index];
+  }, [index, shuffledQuestions]);
 
   const handleNext = () => {
     EventTracker.track("Sing The Lyrics Question Answered", {

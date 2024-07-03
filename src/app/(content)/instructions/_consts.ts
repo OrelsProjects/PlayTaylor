@@ -46,14 +46,13 @@ export const instructionItems: Record<QuestionType, InstructionItem[]> = {
     {
       index: 1,
       title: "See the word",
-      description:
-        "This is a list item. You can click on it to view more details.",
+      description: "Speak now if you know the meaning.",
     },
     {
       index: 2,
       title: "Reveal it",
       description:
-        "If it's a blank space in your mind, press \"Show Meaning\" and shake it off.",
+        'If it\'s a blank space in your mind, press "Show Meaning" and shake it off.',
     },
     {
       index: 3,

@@ -31,7 +31,7 @@ const TriviaContent: React.FC<TriviaContentProps> = ({
     >
       <div
         className={cn(
-          "h-full w-full flex flex-col items-start justify-start p-4 gap-24 relative",
+          "h-full w-full flex flex-col items-start justify-start p-4 gap-10 relative",
           className,
         )}
       >
@@ -53,7 +53,7 @@ const TriviaContent: React.FC<TriviaContentProps> = ({
               height: showAnswer ? 0 : "",
             }}
             transition={{ duration: 0.5 }}
-            className="w-full text-[32px] tracking-[0.5px] font-bold text-center text-primary "
+            className="w-full text-[24px] tracking-[0.5px] font-bold text-center text-primary "
           >
             {question.content}
           </motion.span>
@@ -61,7 +61,7 @@ const TriviaContent: React.FC<TriviaContentProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: showAnswer ? 1 : 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full text-[32px] tracking-[0.5px] font-bold text-center h-8 text-primary"
+            className="w-full text-lg font-light tracking-[0.5px] text-center h-8 text-primary"
           >
             {forceHideAnswer ? "" : question.answer}
           </motion.span>
@@ -74,7 +74,7 @@ const TriviaContent: React.FC<TriviaContentProps> = ({
                 setForceHideAnswer(false);
               }}
             >
-              Show
+              Show meaning
             </Button>
             <Button
               className="w-fit"

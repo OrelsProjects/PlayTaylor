@@ -33,7 +33,7 @@ const SingTheLyricsContent: React.FC<SingTheLyricsContentProps> = ({
   const [forceHideAnswer, setForceHideAnswer] = useState(false);
 
   return (
-    <div className="h-full w-full flex flex-col items-start justify-start p-4 gap-20">
+    <div className="h-full w-full flex flex-col items-start justify-start p-4 gap-10">
       <div className="w-full flex flex-row gap-2 items-center p-4">
         <OptimizedImage
           src={question.image}

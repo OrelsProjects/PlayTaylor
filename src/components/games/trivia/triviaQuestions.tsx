@@ -14,7 +14,13 @@ const TriviaQuestions: React.FC = () => {
   const [nextIndex, setNextIndex] = useState(1);
   const [showAd, setShowAd] = useState(false);
 
-  const question = questions[index];
+  const shuffledQuestions = useMemo(() => {
+    return questions.sort(() => Math.random() - 0.5);
+  }, [questions]);
+
+  const question = useMemo(() => {
+    return shuffledQuestions[index];
+  }, [index, shuffledQuestions]);
 
   const handleNext = () => {
     setIndex(index + 1);

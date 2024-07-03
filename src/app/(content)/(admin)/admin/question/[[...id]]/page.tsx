@@ -109,7 +109,7 @@ export default function NewQuestionPage({
           <DropdownMenuItem
             onSelect={() => {
               formik.setFieldValue("type", "sing-the-lyrics");
-              formik.setFieldValue("title", "Sing the lytics");
+              formik.setFieldValue("title", "Sing the lyrics");
             }}
           >
             Sing the lyrics
