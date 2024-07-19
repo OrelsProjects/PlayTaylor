@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "../../firebase.config.admin";
 import StoreProvider from "./providers/StoreProvider";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import SessionWrapper from "./providers/SessionWrapper";

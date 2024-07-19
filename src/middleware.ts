@@ -13,7 +13,7 @@ export default withAuth(
           token?.sub === "111758644225543792927"
         );
       },
-    },
+      },
   },
 );
 

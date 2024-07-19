@@ -14,19 +14,18 @@ const serviceAccount = {
   universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
 };
 
-
 try {
-  if (!admin.apps.length) {
-    // admin.initializeApp({
-    //   credential: admin.credential.cert(serviceAccount as ServiceAccount),
-    //   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    // });
-  }
-} catch (e) {
-  
-}
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount as ServiceAccount),
+    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  });
+} catch (e) {}
 
 // const storage = admin.storage();
 // const messaging = admin.messaging();
+
+const db = admin.firestore;
+
+export { db };
 
 // export { storage, messaging };
