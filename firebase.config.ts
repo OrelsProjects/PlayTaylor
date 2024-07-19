@@ -4,7 +4,7 @@ import firebase from "firebase/compat/app";
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { Messaging, getToken } from "firebase/messaging";
 import { canUseNotifications } from "./src/lib/utils/notificationUtils";
-import { getFirestore } from "firebase/firestore";
+import { Firestore, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -20,9 +20,10 @@ let app: FirebaseApp | null =
   firebase.apps.length > 0 ? firebase.apps?.[0] : null;
 let messaging: Messaging | null = null;
 
-if (typeof window !== "undefined") {
-  app = !firebase.apps.length ? initializeApp(firebaseConfig) : firebase.app();
+if (!app && typeof window !== "undefined") {
+  app = initializeApp(firebaseConfig);
 }
+
 // If notifications are enabled, initialize messaging
 if (app) {
   if (canUseNotifications()) {
@@ -50,6 +51,9 @@ const getUserToken = async () => {
   }
 };
 
-const db = getFirestore();
+let db: Firestore | null = null;
+if (app) {
+  db = getFirestore(app);
+}
 
 export { app, messaging, initMessaging, getUserToken, db };

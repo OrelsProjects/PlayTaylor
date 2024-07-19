@@ -14,7 +14,7 @@ import {
 import { Input } from "../../../components/ui/input";
 import { cn } from "../../../lib/utils";
 import { db } from "@/../firebase.config";
-import { onSnapshot, collection, query, where, doc } from "firebase/firestore";
+import { onSnapshot, doc } from "firebase/firestore";
 
 const JoinRoomDialog = ({
   open,

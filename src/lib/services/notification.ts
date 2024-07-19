@@ -1,4 +1,5 @@
 "use client";
+
 import { getUserToken } from "../../../firebase.config";
 
 function isNotificationSupported() {
