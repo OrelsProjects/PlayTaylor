@@ -22,6 +22,8 @@ const config = {
         plusJakartaSans: ["PlusJakartaSans", "Hauora", "sans-serif"],
         roboto: ["Roboto", "Hauora", "sans-serif"],
         hauora: ["Hauora", "PlusJakartaSans", "sans-serif"],
+        montserrat: ["Montserrat", "Hauora", "sans-serif"],
+        stalemate: ["Stalemate", "Hauora", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -40,6 +42,14 @@ const config = {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",

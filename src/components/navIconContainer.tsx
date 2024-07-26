@@ -40,7 +40,7 @@ const NavIconContainer: React.FC<NavIconContainerProps> = () => {
       </Link>
       {showInstructions && <InstructionsContainer />}
       <Link
-        href="/home"
+        href="/room"
         className="w-fit h-fit p-1 rounded-full border-primary border-[1px]"
       >
         <Icons.Home className="h-5 w-5 fill-primary" />

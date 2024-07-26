@@ -3,6 +3,7 @@ import Logger from "../../../../../loggerServer";
 import { db } from "../../../../../../firebase.config.admin";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../auth/authOptions";
+import { Participant } from "../../../../../models/room";
 
 export async function POST(
   req: NextRequest,
@@ -27,6 +28,8 @@ export async function POST(
     const participants = roomData.participants || [];
 
     const existingParticipant = participants.find((p: any) => p.name === name);
+    let newParticipant: Participant | null = null;
+
     if (existingParticipant) {
       if (!existingParticipant.leftAt) {
         return NextResponse.json(
@@ -39,11 +42,12 @@ export async function POST(
           .collection("rooms")
           .doc(roomKey)
           .update({ participants });
+        newParticipant = existingParticipant;
       }
     } else {
       const userId: string | null = session?.user?.userId || null;
 
-      const newParticipant = {
+      newParticipant = {
         name,
         correctAnswers: 0,
         joinedAt: timestamp,
@@ -55,7 +59,7 @@ export async function POST(
       await database.collection("rooms").doc(roomKey).update({ participants });
     }
 
-    return NextResponse.json({ room: roomData }, { status: 200 });
+    return NextResponse.json(newParticipant, { status: 200 });
   } catch (error: any) {
     Logger.error("Error initializing logger", "unknown", { error });
     return NextResponse.json({ error: error.message }, { status: 500 });

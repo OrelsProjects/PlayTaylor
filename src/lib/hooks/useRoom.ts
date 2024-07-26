@@ -1,4 +1,11 @@
 import axios from "axios";
+import Room, { Participant } from "../../models/room";
+import { doc, onSnapshot } from "firebase/firestore";
+import { useEffect } from "react";
+import { db } from "../../../firebase.config";
+import { useAppSelector } from "./redux";
+
+export type Unsubscribe = () => void;
 
 export default function useRoom() {
   async function createRoom(name: string): Promise<string> {
@@ -11,7 +18,7 @@ export default function useRoom() {
     }
   }
 
-  async function joinRoom(code: string, name: string) {
+  async function joinRoom(code: string, name: string): Promise<Participant> {
     try {
       const joinRoomResponse = await axios.post(`/api/game/${code}/join`, {
         name,
@@ -32,9 +39,9 @@ export default function useRoom() {
     }
   }
 
-  async function getRoom(code: string) {
+  async function getRoom(code: string): Promise<Room> {
     try {
-      const response = await axios.get(`/api/game/${code}`);
+      const response = await axios.get<Room>(`/api/game/${code}`);
       return response.data;
     } catch (error) {
       console.error(error);
@@ -42,5 +49,42 @@ export default function useRoom() {
     }
   }
 
-  return { createRoom, joinRoom, leaveRoom, getRoom };
+  async function startGame(code: string) {
+    try {
+      await axios.get(`/api/game/${code}/start`);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  const listenToRoomChanges = (
+    code: string,
+    onChange: (newRoom: Room) => void,
+    onError?: (error: any) => void,
+  ): Unsubscribe => {
+    let unsubscribe = () => {};
+    if (db) {
+      const roomRef = doc(db, "rooms", code);
+      unsubscribe = onSnapshot(
+        roomRef,
+        snapshot => {
+          onChange(snapshot.data() as Room);
+        },
+        error => {
+          onError?.(error);
+        },
+      );
+    }
+    return unsubscribe;
+  };
+
+  return {
+    createRoom,
+    joinRoom,
+    leaveRoom,
+    startGame,
+    getRoom,
+    listenToRoomChanges,
+  };
 }

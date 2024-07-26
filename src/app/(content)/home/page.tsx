@@ -6,7 +6,6 @@ import Link from "next/link";
 import Carousel from "../../../components/ui/carousel";
 import useGame from "../../../lib/hooks/useGame";
 import { QuestionType } from "../../../models/question";
-import GameFinishedComponent from "../../../components/ui/gameFinished";
 
 const carouselItems = [
   { title: "Mastermind", value: "trivia", image: "/Mastermind.png" },

@@ -16,8 +16,7 @@ export async function GET(
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    const roomKey = Object.keys(roomData)[0];
-    return NextResponse.json(roomData[roomKey]);
+    return NextResponse.json(roomData, { status: 200 });
   } catch (error: any) {
     Logger.error("Error in finding the room", "unknown", {
       error,

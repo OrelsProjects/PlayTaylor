@@ -75,12 +75,13 @@ const JoinRoomDialog = ({
 };
 
 export default function RoomPage() {
-  const { createRoom, getRoom, joinRoom, leaveRoom } = useRoom();
+  const { createRoom, getRoom, joinRoom, leaveRoom, startGame } = useRoom();
   const [showJoinRoom, setShowJoinRoom] = useState(false);
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [room, setRoom] = useState<any>(null);
   const [participants, setParticipants] = useState<any>([]);
+
   useEffect(() => {
     let unsubscribe = () => {};
 
@@ -89,7 +90,6 @@ export default function RoomPage() {
       unsubscribe = onSnapshot(
         roomRef,
         snapshot => {
-          debugger;
           const updatedParticipants = snapshot.data()?.participants || [];
           setParticipants(updatedParticipants);
         },
@@ -138,6 +138,17 @@ export default function RoomPage() {
     setRoom(room);
   };
 
+  const handleStartGame = async () => {
+    const toastId = toast.loading("Starting game...");
+    try {
+      await startGame(code);
+    } catch (error) {
+      toast.error("Error starting game");
+    } finally {
+      toast.dismiss(toastId);
+    }
+  };
+
   const handleLeaveRoom = async () => {
     const toastId = toast.loading("Leaving room...");
     try {
@@ -156,6 +167,11 @@ export default function RoomPage() {
         className={cn("text-2xl transition-colors", {
           "text-green-500": room,
         })}
+        onClick={() => {
+          // copy to clipboard and show toast
+          navigator.clipboard.writeText(code);
+          toast.success("Room code copied to clipboard");
+        }}
       >
         {code}
       </h1>
@@ -180,6 +196,9 @@ export default function RoomPage() {
         opOpenChange={setShowJoinRoom}
         onJoinRoom={handleJoinRoom}
       />
+      <Button onClick={handleStartGame} className="w-44">
+        Start Game
+      </Button>
       <Button variant="destructive" onClick={handleLeaveRoom} className="w-44">
         Leave room
       </Button>

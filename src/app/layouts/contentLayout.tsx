@@ -30,15 +30,13 @@ export default function ContentLayout({
 
   return (
     <main className={cn(className)}>
-      <AuthProvider>
-        <NotificationsProvider />
-        <HeightProvider>
-          <ContentProvider>
-            <TopLoaderProvider />
-            <AnimationProvider>{children}</AnimationProvider>
-          </ContentProvider>
-        </HeightProvider>
-      </AuthProvider>
+      <NotificationsProvider />
+      <HeightProvider>
+        <ContentProvider>
+          <TopLoaderProvider />
+          <AnimationProvider>{children}</AnimationProvider>
+        </ContentProvider>
+      </HeightProvider>
     </main>
   );
 }
