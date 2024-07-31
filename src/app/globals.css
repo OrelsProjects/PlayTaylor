@@ -31,7 +31,7 @@
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 212 100% 47%;
+    --primary: 239 86% 74%;
     --primary-foreground: 0 0% 95%;
     --secondary: 270 67% 47%;
     --secondary-foreground: 0 0% 95%;
@@ -114,5 +114,9 @@
   }
   .card {
     @apply h-[480px] w-[300px] rounded-lg bg-card border-[1px] border-primary dark:border-foreground;
+  }
+
+  .gradient-purple {
+    @apply bg-gradient-to-r from-[hsla(239,86%,74%,1)] to-[hsla(252,88%,74%,1)];
   }
 }

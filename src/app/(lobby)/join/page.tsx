@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "../../components/ui/input";
-import { Button } from "../../components/ui/button";
-import useRoom from "../../lib/hooks/useRoom";
-import { useAppDispatch, useAppSelector } from "../../lib/hooks/redux";
-import { setRoom, setUserParticipant } from "../../lib/features/room/roomSlice";
-import Room from "../../models/room";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
+import useRoom from "../../../lib/hooks/useRoom";
+import { useAppDispatch, useAppSelector } from "../../../lib/hooks/redux";
+import {
+  setRoom,
+  setUserParticipant,
+} from "../../../lib/features/room/roomSlice";
+import Room from "../../../models/room";
 import { useRouter } from "next/navigation";
+import RoomNameComponent from "../../../components/roomName";
 
 type Stage = "pin" | "name";
 
@@ -51,9 +55,6 @@ export default function Home() {
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-start gap-16 px-14 py-10">
-      <h3 className="font-stalemate text-5xl text-foreground font-light">
-        {room?.name || "Eras Tour 2024"}
-      </h3>
       <div className="h-full w-full flex flex-col gap-[52px] justify-center items-center">
         <p className="text-[40px] leading-10">
           {stage === "pin" ? "Insert pin" : "Insert name"}
@@ -83,7 +84,7 @@ export default function Home() {
               }}
             />
           )}
-          <Button onClick={handleSubmit} variant="success" isLoading={loading}>
+          <Button onClick={handleSubmit} isLoading={loading}>
             Continue
           </Button>
         </div>

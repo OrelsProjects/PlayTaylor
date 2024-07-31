@@ -10,8 +10,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground shadow sm:hover:bg-primary/90",
+        default: "bg-primary text-primary-foreground shadow gradient-purple",
         success:
           "bg-success text-success-foreground shadow sm:hover:bg-primary/90",
         warning:

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button } from "../../../components/ui/button";
-import useRoom from "../../../lib/hooks/useRoom";
+import { Button } from "../../../../components/ui/button";
+import useRoom from "../../../../lib/hooks/useRoom";
 import { toast } from "react-toastify";
 import {
   Dialog,
@@ -10,9 +10,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTrigger,
-} from "../../../components/ui/dialog";
-import { Input } from "../../../components/ui/input";
-import { cn } from "../../../lib/utils";
+} from "../../../../components/ui/dialog";
+import { Input } from "../../../../components/ui/input";
+import { cn } from "../../../../lib/utils";
 import { db } from "@/../firebase.config";
 import { onSnapshot, doc } from "firebase/firestore";
 
@@ -113,7 +113,11 @@ export default function RoomPage() {
       setCode(roomCode);
       setRoom(null);
       toast.success("Room created!");
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        toast.error("Unauthorized. Did you login?");
+        return;
+      }
       toast.error("Error creating room");
     } finally {
       toast.dismiss(toastId);
@@ -164,7 +168,7 @@ export default function RoomPage() {
   return (
     <div className="h-full w-full flex flex-col gap-4 items-center">
       <h1
-        className={cn("text-2xl transition-colors", {
+        className={cn("text-2xl transition-colors hover:cursor-pointer", {
           "text-green-500": room,
         })}
         onClick={() => {
