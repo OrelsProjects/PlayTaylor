@@ -68,7 +68,6 @@ export default function Home() {
         montserratAlternates.className,
       )}
     >
-      <RoomNameComponent name={room?.name || ""} />
       {participants.length > 0 && (
         <div className="w-full h-full flex flex-col gap-8 justify-center items-center">
           <span className="text-[32px] leading-[40px] text-foreground">
