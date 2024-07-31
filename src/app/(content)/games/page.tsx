@@ -5,7 +5,7 @@ import Link from "next/link";
 const GamePage: React.FC = () => {
   return (
     <div className="w-full h-full flex flex-row justify-center items-center gap-2">
-      <Button asChild className=" h-20 w-20 rounded-lg">
+      {/* <Button asChild className=" h-20 w-20 rounded-lg">
         <Link href="/games/trivia">Trivia</Link>
       </Button>
       <Button asChild className=" h-20 w-20 rounded-lg">
@@ -13,7 +13,7 @@ const GamePage: React.FC = () => {
       </Button>
       <Button asChild className=" h-20 w-20 rounded-lg">
         <Link href="/games/sing-the-lyrics">Sing</Link>
-      </Button>
+      </Button> */}
     </div>
   );
 };
