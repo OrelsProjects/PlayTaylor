@@ -127,7 +127,8 @@ export default function RoomPage() {
   const handleJoinRoom = async () => {
     const loadingToastId = toast.loading("Joining room...");
     try {
-      const room = await joinRoom(code, name);
+      const room = await getRoom(code);
+      await joinRoom(room, name);
       setRoom(room);
       setShowJoinRoom(false);
     } catch (error) {

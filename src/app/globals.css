@@ -51,6 +51,9 @@
     --input: 240 6% 90%;
     --ring: 40 30.7% 15.9%;
     --radius: 0.75rem;
+
+    --answers-in-row: 2;
+    --answers-in-row-mobile: 2;
   }
 
   /* .battery-save {

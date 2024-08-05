@@ -1,30 +1,47 @@
 "use client";
 
-import { useState } from "react";
-import { Input } from "../../../components/ui/input";
-import { Button } from "../../../components/ui/button";
-import useRoom from "../../../lib/hooks/useRoom";
-import { useAppDispatch, useAppSelector } from "../../../lib/hooks/redux";
+import { useEffect, useState } from "react";
+import { Input } from "../../../../components/ui/input";
+import { Button } from "../../../../components/ui/button";
+import useRoom from "../../../../lib/hooks/useRoom";
+import { useAppDispatch, useAppSelector } from "../../../../lib/hooks/redux";
 import {
   setRoom,
   setUserParticipant,
-} from "../../../lib/features/room/roomSlice";
-import Room from "../../../models/room";
+} from "../../../../lib/features/room/roomSlice";
+import Room from "../../../../models/room";
 import { useRouter } from "next/navigation";
-import RoomNameComponent from "../../../components/roomName";
+import { Logger } from "../../../../logger";
 
 type Stage = "pin" | "name";
 
-export default function Home() {
+export default function Join({ params }: { params: { code?: string[] } }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { getRoom, joinRoom } = useRoom();
+  const { getRoom, joinRoom, setPreviouslyJoinedRoom } = useRoom();
   const { room } = useAppSelector(state => state.room);
 
   const [pin, setPin] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState<Stage>("pin");
+
+  useEffect(() => {
+    if (params.code) {
+      const pin = params.code[0];
+      setPreviouslyJoinedRoom(pin)
+        .then(response => {
+          if (response) {
+            if (response.room.gameStartedAt) {
+              router.push("/lobby/" + pin);
+            } else {
+              router.push("/waiting/" + pin);
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [params.code]);
 
   const handleSubmit = async () => {
     if (loading) return;
@@ -37,13 +54,17 @@ export default function Home() {
           setStage("name");
         }
       } else {
-        const participant = await joinRoom(pin, name);
+        if (!room) {
+          Logger.error("Room not found");
+          return;
+        }
+        const participant = await joinRoom(room, name);
         if (participant) {
           dispatch(setUserParticipant(participant));
           if (room?.gameStartedAt) {
-            router.push("/lobby");
+            router.push("/lobby/" + pin);
           } else {
-            router.push("/waiting");
+            router.push("/waiting/" + pin);
           }
         }
       }

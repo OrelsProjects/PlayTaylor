@@ -1,35 +1,40 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { cn } from "../../../lib/utils";
-import { montserratAlternates } from "../../../lib/utils/fontUtils";
+import { cn } from "../../../../lib/utils";
+import { montserratAlternates } from "../../../../lib/utils/fontUtils";
 import { AnimatePresence, motion } from "framer-motion";
+import useRoom from "../../../../lib/hooks/useRoom";
+import Loading from "../../../../components/ui/loading";
+import { useRouter } from "next/navigation";
 
 const leftToRightAnimation = {
   initial: { x: "-100%", opacity: 0, transition: { duration: 0.3 } },
   animate: { x: 0, opacity: 1 },
 };
 
-const fadeAnimation = {
-  initial: { opacity: 0, transition: { duration: 0.8 } },
-  animate: { opacity: 1 },
-};
-
-export default function Home() {
+export default function Lobby({ params }: { params: { code: string } }) {
+  const router = useRouter();
+  const { setPreviouslyJoinedRoom } = useRoom();
   const [count, setCount] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const interval = useRef<NodeJS.Timeout>();
   useEffect(() => {
-    interval.current = setInterval(() => {
-      setCount(prevCount => {
-        if (prevCount < 5) {
-          return prevCount + 1;
-        } else {
-          clearInterval(interval.current);
-          return prevCount;
-        }
-      });
-    }, 1000);
+    setPreviouslyJoinedRoom(params.code).then(() => {
+      setLoading(false);
+      interval.current = setInterval(() => {
+        setCount(prevCount => {
+          if (prevCount < 7) {
+            return prevCount + 1;
+          } else {
+            clearInterval(interval.current);
+            router.push("/game");
+            return prevCount;
+          }
+        });
+      }, 1000);
+    });
 
     return () => clearInterval(interval.current); // Clean up the interval on component unmount
   }, []);
@@ -49,6 +54,10 @@ export default function Home() {
   );
 
   const countText = useMemo(() => (count <= 4 ? count : null), [count]);
+
+  if (loading) {
+    return <Loading className="w-16 h-16" />;
+  }
 
   return (
     <div

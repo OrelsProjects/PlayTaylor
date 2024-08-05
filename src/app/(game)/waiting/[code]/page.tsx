@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import useRoom from "../../../lib/hooks/useRoom";
-import { useAppDispatch, useAppSelector } from "../../../lib/hooks/redux";
-import { setRoom } from "../../../lib/features/room/roomSlice";
-import Room, { Participant } from "../../../models/room";
+import useRoom from "../../../../lib/hooks/useRoom";
+import { useAppDispatch, useAppSelector } from "../../../../lib/hooks/redux";
+import { setRoom } from "../../../../lib/features/room/roomSlice";
+import Room, { Participant } from "../../../../models/room";
 import { useRouter } from "next/navigation";
-import { cn } from "../../../lib/utils";
-import { montserratAlternates } from "../../../lib/utils/fontUtils";
-import RoomNameComponent from "../../../components/roomName";
+import { cn } from "../../../../lib/utils";
+import { montserratAlternates } from "../../../../lib/utils/fontUtils";
 import Image from "next/image";
 
 const MAX_PARTICIPANTS_UI = 4;
 
-export default function Home() {
+export default function Waiting({ params }: { params: { code?: string } }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { room } = useAppSelector(state => state.room);

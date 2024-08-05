@@ -7,32 +7,36 @@ import { montserratAlternates } from "../../lib/utils/fontUtils";
 import { useAppSelector } from "../../lib/hooks/redux";
 import { motion, useAnimation } from "framer-motion";
 
-export default function LobbyLayout({ children }: { children: React.ReactNode }) {
+export default function LobbyLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const gradients = [
     [
       "hsla(288, 78%, 93%, 1)",
       "hsla(251, 100%, 96%, 1)",
       "hsla(276, 100%, 99%, 1)",
-      "hsla(288, 78%, 93%, 1)"
+      "hsla(288, 78%, 93%, 1)",
     ],
     [
       "hsla(251, 100%, 96%, 1)",
       "hsla(276, 100%, 99%, 1)",
       "hsla(288, 78%, 93%, 1)",
-      "hsla(288, 78%, 93%, 1)"
+      "hsla(288, 78%, 93%, 1)",
     ],
     [
       "hsla(276, 100%, 99%, 1)",
       "hsla(288, 78%, 93%, 1)",
       "hsla(288, 78%, 93%, 1)",
-      "hsla(251, 100%, 96%, 1)"
+      "hsla(251, 100%, 96%, 1)",
     ],
     [
       "hsla(288, 78%, 93%, 1)",
       "hsla(288, 78%, 93%, 1)",
       "hsla(251, 100%, 96%, 1)",
-      "hsla(276, 100%, 99%, 1)"
-    ]
+      "hsla(276, 100%, 99%, 1)",
+    ],
   ];
 
   const [currentGradient, setCurrentGradient] = useState(0);
@@ -45,7 +49,7 @@ export default function LobbyLayout({ children }: { children: React.ReactNode })
           background: `linear-gradient(to bottom right, ${gradients[currentGradient][0]}, ${gradients[currentGradient][1]}, ${gradients[currentGradient][2]}, ${gradients[currentGradient][3]})`,
           transition: { duration: 3 },
         });
-        setCurrentGradient((prev) => (prev + 1) % gradients.length);
+        setCurrentGradient(prev => (prev + 1) % gradients.length);
       }
     };
     cycleGradients();
@@ -66,7 +70,9 @@ export default function LobbyLayout({ children }: { children: React.ReactNode })
       >
         <RoomNameComponent name={room?.name || ""} />
       </div>
-      <div className="w-full flex justify-center items-center">{children}</div>
+      <div className="h-full w-full flex justify-center items-center px-4">
+        {children}
+      </div>
     </motion.div>
   );
 }

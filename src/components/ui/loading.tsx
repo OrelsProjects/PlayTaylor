@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "../../lib/utils";
 
 interface LoadingProps {
   text?: string;
@@ -16,7 +17,7 @@ const separateBackslashN = (text: string): React.ReactNode[] => {
         key={`loading-text-${index}`}
       >
         {t}
-      </span>
+      </span>,
     );
     if (index !== splitText.length - 1) {
       textNodes.push(<br key={`br-${index}`} />);
@@ -59,11 +60,11 @@ const Loading: React.FC<LoadingProps> = ({
     } ${className ?? ""}`}
     role="status"
   >
-    <LoadingSvg className={spinnerClassName} />
+    <LoadingSvg className={cn("fill-primary", spinnerClassName)} />
     <div className="text-foreground line-clamp-2 w-full text-center gap-0">
       {text ? separateBackslashN(text) : null}
     </div>
   </div>
-); 
+);
 
 export default Loading;

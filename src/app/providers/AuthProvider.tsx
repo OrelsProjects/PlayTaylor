@@ -81,24 +81,24 @@ export default function AuthProvider({
     // if (pathname === "/") {
     //   router.push("/room");
     // }
-    if (status === "loading") return;
-    if (status === "authenticated") {
-      if (
-        pathname.includes("login") ||
-        pathname.includes("register") ||
-        // pathname === "/" ||
-        pathname === "/room"
-      ) {
-        router.push("/room");
-      }
-    } else {
-      if (
-        !pathname.includes("login") &&
-        !pathname.includes("register")
-      ) {
-        router.push("/");
-      }
-    }
+    // if (status === "loading") return;
+    // if (status === "authenticated") {
+    //   if (
+    //     pathname.includes("login") ||
+    //     pathname.includes("register") ||
+    //     // pathname === "/" ||
+    //     pathname === "/room"
+    //   ) {
+    //     router.push("/room");
+    //   }
+    // } else {
+    //   if (
+    //     !pathname.includes("login") &&
+    //     !pathname.includes("register")
+    //   ) {
+    //     router.push("/");
+    //   }
+    // }
   }, [status]);
   if (status === "loading") {
     return (
