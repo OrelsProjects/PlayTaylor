@@ -26,7 +26,7 @@ export default function Waiting({ params }: { params: { code?: string } }) {
     const unsubscribe = listenToRoomChanges(room.code, (newRoom: Room) => {
       if (newRoom.gameStartedAt) {
         dispatch(setRoom(newRoom));
-        router.push("/lobby");
+        router.push("/lobby" + room.code);
       } else {
         // setParticipants(newRoom.participants || []);
         setParticipants(

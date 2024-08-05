@@ -31,7 +31,7 @@ const AnswerComponent = ({
   return (
     <div
       className={cn(
-        "p-4 rounded-lg shadow-md aspect-square flex justify-center items-center text-white",
+        "p-4 rounded-lg aspect-square flex justify-center items-center text-white",
       )}
       style={{ backgroundColor: colors[index % colors.length] }}
       onClick={onClick}
