@@ -29,7 +29,7 @@ export default function Lobby({ params }: { params: { code: string } }) {
             return prevCount + 1;
           } else {
             clearInterval(interval.current);
-            router.push("/game");
+            router.push("/game/" + params.code);
             return prevCount;
           }
         });

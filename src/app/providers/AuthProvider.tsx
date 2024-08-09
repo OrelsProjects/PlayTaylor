@@ -79,7 +79,7 @@ export default function AuthProvider({
 
   useEffect(() => {
     // if (pathname === "/") {
-    //   router.push("/room");
+    //   router.push("/admin/room");
     // }
     // if (status === "loading") return;
     // if (status === "authenticated") {
@@ -87,9 +87,9 @@ export default function AuthProvider({
     //     pathname.includes("login") ||
     //     pathname.includes("register") ||
     //     // pathname === "/" ||
-    //     pathname === "/room"
+    //     pathname === "/admin/room"
     //   ) {
-    //     router.push("/room");
+    //     router.push("/admin/room");
     //   }
     // } else {
     //   if (

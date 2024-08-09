@@ -32,7 +32,7 @@
     --popover-foreground: 0 0% 95%;
 
     --primary: 239 86% 74%;
-    --primary-foreground: 0 0% 95%;
+    --primary-foreground: 100 100% 100%;
     --secondary: 270 67% 47%;
     --secondary-foreground: 0 0% 95%;
     --muted: 0 0% 15%;
@@ -96,14 +96,14 @@
     @apply bg-background text-foreground;
   }
   h1 {
-    @apply title-main text-primary font-montserrat;
+    @apply title-main text-primary;
   }
   h2 {
-    @apply title-secondary text-primary font-montserrat;
+    @apply title-secondary text-primary;
   }
 
   h3 {
-    @apply title-tertiary text-primary font-montserrat;
+    @apply title-tertiary text-primary;
   }
 
   .title-main {

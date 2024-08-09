@@ -2,28 +2,24 @@
 
 import GoogleLogin from "../../../components/auth/googleLogin";
 import AppleLogin from "../../../components/auth/appleLogin";
-import { Button } from "../../../components/ui/button";
-import Link from "next/link";
+import { montserratAlternates } from "../../../lib/utils/fontUtils";
+import { cn } from "../../../lib/utils";
 
 const Auth = () => {
   return (
-    <div className="h-screen w-screen flex flex-col justify-center items-center text-center overflow-hidden px-6 lg:px-0 ">
-     <div className="w-full flex flex-col gap-3 lg:max-w-[420px] rounded-xl p-8 bg-card">
+    <div
+      className={cn(
+        "h-screen w-screen flex flex-col items-center pt-36 gap-10",
+        montserratAlternates.className,
+      )}
+    >
+      <h3 className="text-[32px] leading-[32px] font-normal text-black">
+        Log in or Sign up
+      </h3>
+      <div className="w-fit flex flex-col gap-4 rounded-xl">
         <GoogleLogin signInTextPrefix="Sign in with" />
         <AppleLogin signInTextPrefix="Sign in with" />
       </div>
-      {/* <div className="flex flex-row gap-1 justify-center items-center">
-        <span className="text-muted-foreground">
-          Don&apos;t have an account?
-        </span>
-        <Button
-          variant="link"
-          className="text-base underline text-muted-foreground !p-0"
-          asChild
-        >
-          <Link href="/register">Sign up</Link>
-        </Button>
-      </div> */}
     </div>
   );
 };

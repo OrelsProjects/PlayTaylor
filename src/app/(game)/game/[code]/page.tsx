@@ -61,6 +61,9 @@ export default function Game({ params }: { params: { code: string } }) {
           unsubscribe = onSnapshot(
             roomRef,
             snapshot => {
+              if (!snapshot.data()?.gameStartedAt) {
+                router.push("/lobby/" + response.room.code);
+              }
               const currentQuestionNumber = snapshot.data()
                 ?.currentQuestion as number;
               const questions = snapshot.data()?.questions as Question[];
@@ -86,9 +89,8 @@ export default function Game({ params }: { params: { code: string } }) {
     return unsubscribe;
   }, [room]);
 
-
   if (loading) return <Loading className="w-16 h-16" />;
-  const style = { "--value": 70 } as React.CSSProperties
+  const style = { "--value": 70 } as React.CSSProperties;
 
   return (
     <div
@@ -99,13 +101,13 @@ export default function Game({ params }: { params: { code: string } }) {
     >
       <div className="radial-progress">
         {/* <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-11/12 h-11/12 rounded-full overflow-hidden  flex justify-center items-center"> */}
-          <Image
-            src="/Manuscript.png"
-            alt="Manuscript"
-            fill
-            objectFit="cover"
-            className="!relative rounded-full !h-40 !w-40 flex-shrink-0"
-          />
+        <Image
+          src="/Manuscript.png"
+          alt="Manuscript"
+          fill
+          objectFit="cover"
+          className="!relative rounded-full !h-40 !w-40 flex-shrink-0"
+        />
         {/* </div> */}
       </div>
       <span className="text-lg text-center font-medium">

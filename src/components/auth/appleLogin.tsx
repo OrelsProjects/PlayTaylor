@@ -39,25 +39,12 @@ export default function AppleLogin({
 
   return (
     <div
-      className={`w-full h-12 flex flex-row gap-2 justify-center hover:cursor-pointer items-center bg-black rounded-lg text-white ${className}`}
-      onClick={requestAppleSignIn}
+      className={`w-72 h-12 flex flex-row gap-2 bg-primary text-primary-foreground justify-center items-center rounded-lg hover:cursor-pointer ${className}`}
+      onClick={handleAppleLogin}
     >
-      {loading ? (
-        <Loading className="w-7 h-7" />
-      ) : showThanks ? (
-        <motion.div
-          animate={{ opacity: 1 }}
-          initial={{ opacity: 0 }}
-          exit={{ opacity: 0 }}
-        >
-          <span>We got your request :)</span>
-        </motion.div>
-      ) : (
-        <>
-          <FaApple className="w-7 h-7" />
-          <span>Request apple sign up</span>
-        </>
-      )}
+      {loading && <Loading className="w-7 h-7" />}
+      <FaApple className="w-[18px] h-[18px] fill-primary-foreground" />
+      <span>{signInTextPrefix} Google</span>
     </div>
   );
 }

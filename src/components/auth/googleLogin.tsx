@@ -1,11 +1,11 @@
 import React from "react";
 import useAuth from "../../lib/hooks/useAuth";
-import { FcGoogle } from "react-icons/fc";
 import { InvalidCredentialsError } from "../../models/errors/InvalidCredentialsError";
 import { toast } from "react-toastify";
 import { UnknownUserError } from "../../models/errors/UnknownUserError";
 import UserAlreadyExistsError from "../../models/errors/UserAlreadyExistsError";
 import Loading from "../ui/loading";
+import { FaGoogle } from "react-icons/fa";
 
 interface GoogleLoginProps {
   className?: string;
@@ -38,12 +38,12 @@ export default function GoogleLogin({
 
   return (
     <div
-      className={`w-full h-12 flex flex-row gap-2 bg-background dark:bg-card-foreground dark:text-card justify-center items-center rounded-lg hover:cursor-pointer ${className}`}
+      className={`w-72 h-12 flex flex-row gap-2 bg-primary text-primary-foreground justify-center items-center rounded-lg hover:cursor-pointer ${className}`}
       onClick={handleGoogleLogin}
     >
       {loading && <Loading className="w-7 h-7" />}
-      <FcGoogle className="w-7 h-7" />
-      <span className="uppercase">{signInTextPrefix} Google</span>
+      <FaGoogle className="w-[18px] h-[18px] fill-primary-foreground" />
+      <span>{signInTextPrefix} Google</span>
     </div>
   );
 }

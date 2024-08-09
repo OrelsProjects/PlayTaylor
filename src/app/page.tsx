@@ -2,31 +2,36 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "../components/ui/button";
-
+import { montserratAlternates } from "@/lib/utils/fontUtils";
+import { cn } from "../lib/utils";
 
 export default function Home() {
   const router = useRouter();
 
   return (
-    <main className="h-svh w-full flex flex-col items-center justify-start gap-16">
+    <main
+      className={cn(
+        "h-svh w-full flex flex-col items-center justify-start gap-16",
+        montserratAlternates.className,
+      )}
+    >
       <div className="flex flex-col gap-6">
-        <h1 className="font-stalemate font-thin text-foreground text-8xl mt-52">
+        <span className="font-thin text-foreground text-[40px] leading-[40px] mt-52 text-center">
           Play Taylor
-        </h1>
-        <p className="text-center mt-">
+        </span>
+        <p className="text-center text-xl mt-">
           Play with your fellow Swifties, <br /> and let&apos;s see who&apos;s
           the greatest
           <br />
           Swiftie of all time!
         </p>
       </div>
-      <div className="flex flex-row gap-6">
-        <Button variant="success" onClick={() => router.push("/room")}>
+      <div className="flex flex-col gap-6">
+        <Button onClick={() => router.push("/admin/room")}>
           Start a New Game
         </Button>
-        <Button onClick={() => router.push("/join")}>Join Game</Button>
+        <Button variant="outline" onClick={() => router.push("/join")}>Join Game</Button>
       </div>
-
     </main>
   );
 }

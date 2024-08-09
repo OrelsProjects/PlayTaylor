@@ -10,7 +10,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import TopLoaderProvider from "./providers/TopLoaderProvider";
 import Script from "next/script";
-import * as toast from "react-toastify";
+import BackgroundProvider from "./providers/BackgroundProvider";
 
 const APP_NAME = "Play Taylor";
 const APP_DEFAULT_TITLE = "Play Taylor";
@@ -80,20 +80,9 @@ export default function Layout({ children }: RootLayoutProps) {
         <StoreProvider>
           <SessionWrapper>
             <ThemeProvider>
-              {/* <toast.ToastContainer
-                stacked
-                newestOnTop
-                autoClose={2500}
-                draggablePercent={60}
-                // className="!mb-16 z-[51]"
-                transition={toast.Flip}
-                position="bottom-center"
-                pauseOnHover={false}
-              /> */}
-
               <AuthProvider>
                 <TopLoaderProvider />
-                {children}
+                <BackgroundProvider>{children}</BackgroundProvider>
                 <SpeedInsights />
                 <Analytics />
               </AuthProvider>
