@@ -27,7 +27,7 @@ export default function Home() {
         </p>
       </div>
       <div className="flex flex-col gap-6">
-        <Button onClick={() => router.push("/admin/room")}>
+        <Button onClick={() => router.push("/admin/room/create")}>
           Start a New Game
         </Button>
         <Button variant="outline" onClick={() => router.push("/join")}>Join Game</Button>
