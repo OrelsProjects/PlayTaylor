@@ -2,15 +2,15 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useAppSelector } from "../../../../lib/hooks/redux";
+import { useAppSelector } from "@/lib/hooks/redux";
 import { useRouter } from "next/navigation";
 import { db } from "@/../firebase.config";
 import { onSnapshot, doc } from "firebase/firestore";
 import { Question } from "@prisma/client";
-import useRoom from "../../../../lib/hooks/useRoom";
-import Loading from "../../../../components/ui/loading";
-import { cn } from "../../../../lib/utils";
-import { montserratAlternates } from "../../../../lib/utils/fontUtils";
+import useRoom from "@/lib/hooks/useRoom";
+import Loading from "@/components/ui/loading";
+import { cn } from "@/lib/utils";
+import { montserratAlternates } from "@/lib/utils/fontUtils";
 
 const colors = [
   "hsla(37, 91%, 55%, 1)",

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "../components/ui/button";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { cn } from "../lib/utils";
+import { LOCAL_STORAGE_PREFIX } from "../lib/hooks/useRoom";
 
 export default function Home() {
   const router = useRouter();
@@ -27,10 +28,23 @@ export default function Home() {
         </p>
       </div>
       <div className="flex flex-col gap-6">
-        <Button onClick={() => router.push("/admin/room/create")}>
+        <Button
+          onClick={() => {
+            Object.keys(localStorage)
+              .filter(key => {
+                const prefix = `${LOCAL_STORAGE_PREFIX}_`;
+                return key.includes(prefix);
+              })
+              .forEach(key => localStorage.removeItem(key));
+
+            router.push("/admin/room/create");
+          }}
+        >
           Start a New Game
         </Button>
-        <Button variant="outline" onClick={() => router.push("/join")}>Join Game</Button>
+        <Button variant="outline" onClick={() => router.push("/join")}>
+          Join Game
+        </Button>
       </div>
     </main>
   );

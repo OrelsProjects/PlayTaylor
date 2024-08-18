@@ -11,6 +11,7 @@ import { Analytics } from "@vercel/analytics/react";
 import TopLoaderProvider from "./providers/TopLoaderProvider";
 import Script from "next/script";
 import BackgroundProvider from "./providers/BackgroundProvider";
+import LoggersProvider from "./providers/LoggersProvider";
 
 const APP_NAME = "Play Taylor";
 const APP_DEFAULT_TITLE = "Play Taylor";
@@ -82,6 +83,7 @@ export default function Layout({ children }: RootLayoutProps) {
             <ThemeProvider>
               <AuthProvider>
                 <TopLoaderProvider />
+                <LoggersProvider />
                 <BackgroundProvider>{children}</BackgroundProvider>
                 <SpeedInsights />
                 <Analytics />

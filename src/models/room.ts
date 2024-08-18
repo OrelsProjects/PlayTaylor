@@ -1,4 +1,5 @@
 import { Question } from "@prisma/client";
+import { Difficulty } from "./question";
 
 export interface Participant {
   correctAnswers: number;
@@ -13,7 +14,15 @@ export default interface Room {
   currentQuestion: number;
   name: string;
   createdBy: string;
+  countdownStartedAt?: number | null;
+  countdownCurrentTime?: number | null;
   participants: Participant[];
   questions: Question[];
   gameStartedAt?: number | null;
 }
+
+export type CreateRoom = Pick<Room, "name"> & {
+  questionsCount: number;
+  participantsCount: number;
+  difficulty: Difficulty;
+};

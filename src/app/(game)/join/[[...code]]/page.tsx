@@ -89,7 +89,8 @@ export default function Join({ params }: { params: { code?: string[] } }) {
               maxLength={6}
               onChange={e => {
                 if (stage === "pin") {
-                  setPin(e.target.value);
+                  const upperCasePin = e.target.value.toUpperCase();
+                  setPin(upperCasePin);
                 }
               }}
             />

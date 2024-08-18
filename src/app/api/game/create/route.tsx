@@ -1,10 +1,11 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import Logger from "../../../../loggerServer";
-import { authOptions } from "../../../../auth/authOptions";
-import { db } from "../../../../../firebase.config.admin";
+import Logger from "@/loggerServer";
+import { authOptions } from "@/auth/authOptions";
+import { db } from "@/../firebase.config.admin";
 import crypto from "crypto";
-import prisma from "../../_db/db";
+import prisma from "@/app/api/_db/db";
+import { CreateRoom } from "@/models/room";
 
 export async function POST(req: NextRequest): Promise<any> {
   const session = await getServerSession(authOptions); // Ensure you pass `req` to `getServerSession` if needed.
@@ -13,7 +14,10 @@ export async function POST(req: NextRequest): Promise<any> {
   }
   let user = session.user;
   try {
-    const { name } = await req.json();
+    const createRoom: CreateRoom = await req.json();
+    if (!createRoom) {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
     const database = db();
 
     const code = crypto
@@ -30,13 +34,16 @@ export async function POST(req: NextRequest): Promise<any> {
       where: {
         type: "swipe",
       },
+      take: createRoom.questionsCount,
     });
 
     const randomOrderQuestions = questions.sort(() => Math.random() - 0.5);
 
     await roomRef.set({
-      name,
-      code, // This is redundant since `code` is already the document ID
+      name: createRoom.name,
+      code,
+      participantsCount: createRoom.participantsCount,
+      difficulty: createRoom.difficulty,
       participants: [],
       questions: randomOrderQuestions,
       currentQuestion: 0,

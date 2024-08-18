@@ -1,29 +1,30 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../store";
+import { RootState } from "@/lib/store";
 import {
   Difficulty,
-  Question,
   QuestionId,
   QuestionResponse,
-  QuestionType,
-} from "../../../models/question";
-
-export type Theme = "light" | "dark" | "blossom" | "midnight" | "sun";
-export type QuestionsStatus = "idle" | "loading" | "succeeded" | "failed";
+  QuestionsStatus,
+} from "@/models/question";
+import { Question } from "@prisma/client";
 
 export interface GameState {
-  theme: Theme;
-  game: QuestionType;
-  difficulty: Difficulty;
+  gameName?: string;
+  difficulty?: Difficulty;
+  participantsCount?: number;
+  questionsCount?: number;
+  pin?: string;
   questions: Question[];
   questionsResponses: QuestionResponse[];
   questionsStatus?: QuestionsStatus;
 }
 
 export const initialState: GameState = {
-  theme: "sun",
-  game: "swipe",
-  difficulty: "debut",
+  gameName: undefined,
+  difficulty: undefined,
+  questionsCount: undefined,
+  participantsCount: undefined,
+  pin: undefined,
   questions: [],
   questionsResponses: [],
   questionsStatus: "idle",
@@ -33,29 +34,20 @@ const gameSlice = createSlice({
   name: "game",
   initialState,
   reducers: {
-    setGame: (
-      state,
-      action: PayloadAction<{ game: QuestionType; setTheme?: boolean }>,
-    ) => {
-      state.game = action.payload.game;
-      if (!action.payload.setTheme) return;
-      switch (action.payload.game) {
-        case "swipe":
-          state.theme = "sun";
-          break;
-        case "sing-the-lyrics":
-          state.theme = "blossom";
-          break;
-        case "trivia":
-          state.theme = "midnight";
-          break;
-      }
+    setGameName: (state, action: PayloadAction<string>) => {
+      state.gameName = action.payload;
     },
-    setTheme: (state, action) => {
-      state.theme = action.payload;
+    setParticipantsCount: (state, action: PayloadAction<number>) => {
+      state.participantsCount = action.payload;
     },
-    setDifficulty: (state, action) => {
+    setGameDifficulty: (state, action: PayloadAction<Difficulty>) => {
       state.difficulty = action.payload;
+    },
+    setQuestionsCount: (state, action: PayloadAction<number>) => {
+      state.questionsCount = action.payload;
+    },
+    setPin: (state, action: PayloadAction<string>) => {
+      state.pin = action.payload;
     },
     setQuestions: (state, action: PayloadAction<Question[]>) => {
       state.questions = action.payload;
@@ -93,10 +85,7 @@ const gameSlice = createSlice({
         response.id === action.payload.id ? action.payload : response,
       );
     },
-    removeQuestionResponse: (
-      state,
-      action: PayloadAction<{id: string}>,
-    ) => {
+    removeQuestionResponse: (state, action: PayloadAction<{ id: string }>) => {
       state.questionsResponses = state.questionsResponses.filter(
         response => response.id !== action.payload.id,
       );
@@ -107,11 +96,13 @@ const gameSlice = createSlice({
 export const {
   addQuestion,
   addQuestionResponse,
-  setDifficulty,
+  setGameDifficulty,
   removeQuestion,
   removeQuestionResponse,
-  setGame,
-  setTheme,
+  setGameName,
+  setParticipantsCount,
+  setPin,
+  setQuestionsCount,
   setQuestions,
   updateQuestion,
   updateQuestionResponse,

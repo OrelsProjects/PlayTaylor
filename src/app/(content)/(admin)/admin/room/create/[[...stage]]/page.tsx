@@ -2,40 +2,43 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import useRoom from "@/lib/hooks/useRoom";
 import { toast } from "react-toastify";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { db } from "@/../firebase.config";
-import { onSnapshot, doc } from "firebase/firestore";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
-import RoomNameComponent from "../../../../../../../components/roomName";
-
-type Stage = "name" | "participants" | "difficulty" | "question";
+import { useAppDispatch } from "@/lib/hooks/redux";
+import {
+  setGameDifficulty,
+  setGameName,
+  setParticipantsCount,
+  setQuestionsCount as setGameQuestionsCount,
+} from "@/lib/features/game/gameSlice";
+import { Difficulty } from "@/models/question";
+import DifficultyComponent from "./difficultyComponent";
+import useRoom, { buildLocalSotrageKey, Stage } from "@/lib/hooks/useRoom";
+import { Logger } from "../../../../../../../logger";
 
 const writeRoomNameToLocal = (name: string) => {
-  localStorage.setItem("roomName", name);
+  localStorage.setItem(buildLocalSotrageKey("room_name"), name);
 };
 
 const readRoomNameFromLocal = () => {
-  return localStorage.getItem("roomName");
+  return localStorage.getItem(buildLocalSotrageKey("room_name"));
 };
 
 const writeParticipantsToLocal = (participants: number) => {
-  localStorage.setItem("participants", JSON.stringify(participants));
+  localStorage.setItem(
+    buildLocalSotrageKey("participants"),
+    JSON.stringify(participants),
+  );
 };
 
 const readParticipantsFromLocal = () => {
-  const participants = localStorage.getItem("participants");
+  const participants = localStorage.getItem(
+    buildLocalSotrageKey("participants"),
+  );
   if (participants) {
     const count = parseInt(JSON.parse(participants));
     return isNaN(count) ? 0 : count;
@@ -43,14 +46,40 @@ const readParticipantsFromLocal = () => {
 };
 
 const writeDifficultyToLocal = (difficulty: string) => {
-  localStorage.setItem("difficulty", difficulty);
+  localStorage.setItem(buildLocalSotrageKey("difficulty"), difficulty);
 };
 
 const readDifficultyFromLocal = () => {
-  return localStorage.getItem("difficulty");
+  return localStorage.getItem(buildLocalSotrageKey("difficulty"));
 };
 
-const Stage = ({
+const writeQuestionsCountToLocal = (count: number) => {
+  localStorage.setItem(
+    buildLocalSotrageKey("questions_count"),
+    JSON.stringify(count),
+  );
+};
+
+const readQuestionsCountFromLocal = () => {
+  const count = localStorage.getItem(buildLocalSotrageKey("questions_count"));
+  if (count) {
+    return parseInt(JSON.parse(count));
+  }
+};
+
+const writeLastStageToLocal = (stage: Stage) => {
+  localStorage.setItem(buildLocalSotrageKey("last_stage"), stage);
+};
+
+const readLastStageFromLocal = () => {
+  return localStorage.getItem(buildLocalSotrageKey("last_stage")) as Stage;
+};
+
+const deleteLastStageFromLocal = () => {
+  localStorage.removeItem(buildLocalSotrageKey("last_stage"));
+};
+
+const StageComponent = ({
   title,
   subtitle,
   children,
@@ -61,7 +90,7 @@ const Stage = ({
 }) => {
   return (
     <motion.div
-      initial={{ x: -100, opacity: 0 }}
+      initial={{ x: 100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: -100, opacity: 0 }}
       className="w-full flex flex-col gap-4"
@@ -81,37 +110,82 @@ const Stage = ({
 };
 
 export default function RoomPage({ params }: { params: { stage: string } }) {
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
+  const { createRoom } = useRoom();
   const [stage, setStage] = useState<Stage>("name");
   const [name, setName] = useState("");
-  const [participants, setParticipants] = useState<number>(0);
+  const [participants, setParticipants] = useState<number>(2);
+  const [difficulty, setDifficulty] = useState<Difficulty>("debut");
+  const [questionsCount, setQuestionsCount] = useState<number | undefined>();
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     const name = readRoomNameFromLocal();
     if (name) {
       setName(name);
+      dispatch(setGameName(name));
     }
     const participants = readParticipantsFromLocal();
     if (participants) {
       setParticipants(participants);
+      dispatch(setParticipantsCount(participants));
     }
     const difficulty = readDifficultyFromLocal();
     if (difficulty) {
-      setStage("question");
+      setDifficulty(difficulty as Difficulty);
+      dispatch(setGameDifficulty(difficulty as Difficulty));
+    }
+
+    const questionsCount = readQuestionsCountFromLocal();
+    if (questionsCount) {
+      setQuestionsCount(questionsCount);
+      dispatch(setGameQuestionsCount(questionsCount));
     }
   }, []);
 
   useEffect(() => {
-    const stage = params.stage?.[0] as Stage;
-    if (stage) {
-      setStage(stage);
+    const paramsStage = params.stage?.[0] as Stage;
+    // const lastStage = readLastStageFromLocal();
+    // if (lastStage && paramsStage && lastStage !== paramsStage) {
+    //   setStage(lastStage);
+    //   router.push(`/admin/room/create/${lastStage}`);
+    //   deleteLastStageFromLocal();
+    //   return;
+    // }
+    if (paramsStage) {
+      setStage(paramsStage);
     } else {
       router.push(`/admin/room/create`);
     }
   }, [pathname]);
 
-  const nextStage = () => {
+  const handleCreateRoom = async () => {
+    if (!questionsCount || !name || !participants || !difficulty) {
+      toast.error("Please fill all the fields");
+      return;
+    }
+    if (isCreating) return;
+    setIsCreating(true);
+    const toastId = toast.loading("Creating room...");
+    try {
+      const code = await createRoom({
+        name,
+        participantsCount: participants,
+        difficulty,
+        questionsCount: questionsCount!,
+      });
+      router.push("/admin/room/" + code);
+    } catch (error: any) {
+      Logger.error(error);
+      toast.error("Something went wrong... try again :)");
+    } finally {
+      setIsCreating(false);
+      toast.dismiss(toastId);
+    }
+  };
+  const nextStage = async () => {
     let newStage = stage;
     if (stage === "name") {
       newStage = "participants";
@@ -119,66 +193,87 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
       newStage = "difficulty";
     } else if (stage === "difficulty") {
       newStage = "question";
+    } else if (stage === "question") {
+      await handleCreateRoom();
+      return;
     }
     router.push(`/admin/room/create/${newStage}`);
-  };
-
-  const prevStage = () => {
-    if (stage === "participants") {
-      setStage("name");
-    } else if (stage === "difficulty") {
-      setStage("participants");
-    } else if (stage === "question") {
-      setStage("difficulty");
-    }
+    writeLastStageToLocal(newStage);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     setName(name);
-    writeRoomNameToLocal(name);
   };
 
   const handleParticipantChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     const clampedValue = Math.min(10, Math.max(2, value));
     setParticipants(clampedValue);
-    writeParticipantsToLocal(clampedValue);
+  };
+
+  const handleDifficultyChange = (difficulty: Difficulty) => {
+    setDifficulty(difficulty);
+  };
+
+  const handleQuestionsCountChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = parseInt(e.target.value);
+    const clampedValue = Math.min(100, Math.max(1, value));
+    setQuestionsCount(clampedValue);
+  };
+
+  const handleNewNameSet = () => {
+    if (!name) {
+      toast.error("Please enter a name");
+      return;
+    }
+    dispatch(setGameName(name));
+    writeRoomNameToLocal(name);
+    nextStage();
+  };
+
+  const handleParticipantsCountSet = () => {
+    if (!participants) {
+      toast.error("Please enter a valid number");
+      return;
+    }
+    dispatch(setParticipantsCount(participants));
+    writeParticipantsToLocal(participants);
+    nextStage();
+  };
+
+  const handleDifficultySet = () => {
+    dispatch(setGameDifficulty(difficulty));
+    writeDifficultyToLocal(difficulty);
+    nextStage();
+  };
+
+  const handleQuestionsCountSet = () => {
+    if (!questionsCount) {
+      toast.error("Please enter a valid number");
+      return;
+    }
+    dispatch(setGameQuestionsCount(questionsCount));
+    writeQuestionsCountToLocal(questionsCount);
+    nextStage();
   };
 
   return (
-    <div className="h-full w-full flex flex-col gap-4 items-center justify-center px-[55px]">
-      {name && stage !== "name" && (
-        <div className="absolute top-10 mx-auto">
-          <RoomNameComponent name={name} />
-        </div>
-      )}
+    <div className="h-full w-full flex flex-col gap-4 items-center justify-center">
       {stage === "name" ? (
-        <Stage
-          title="Department's name"
-          // subtitle="Please enter your name to create a room"
-          key="name"
-        >
+        <StageComponent title="Department's name" key="name">
           <Input
             value={name}
             onChange={e => handleNameChange(e)}
             placeholder="Eras tour 2024"
             className="bg-white !py-6"
           />
-          <Button
-            onClick={() => {
-              if (!name) {
-                toast.error("Please enter a name");
-                return;
-              }
-              nextStage();
-            }}
-          >
-            Next
-          </Button>
-        </Stage>
+          <Button onClick={handleNewNameSet}>Next</Button>
+        </StageComponent>
       ) : stage === "participants" ? (
-        <Stage
+        <StageComponent
           title="Participants"
           subtitle="The number of Swifties who will participate"
           key="participants"
@@ -192,36 +287,40 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
             max={10}
             min={2}
           />
-          <Button
-            onClick={() => {
-              if (participants < 2 || participants > 10) {
-                toast.error("Please enter a number between 2-10");
-                return;
-              }
-              nextStage();
-            }}
-          >
-            Next
-          </Button>
-        </Stage>
+          <Button onClick={handleParticipantsCountSet}>Next</Button>
+        </StageComponent>
       ) : stage === "difficulty" ? (
-        <Stage title="Difficulty level" key="difficulty">
-          <Button onClick={() => setStage("question")}>Next</Button>
-        </Stage>
+        <StageComponent title="Difficulty level" key="difficulty">
+          <DifficultyComponent
+            value={difficulty}
+            onDifficultyChange={handleDifficultyChange}
+          />
+          <Button onClick={() => handleDifficultySet()}>Next</Button>
+        </StageComponent>
       ) : (
-        <Stage
+        <StageComponent
           title="Questions"
           subtitle="How many questions in the game"
           key="question"
         >
+          <Input
+            value={questionsCount}
+            onChange={e => handleQuestionsCountChange(e)}
+            placeholder="Between 1-100"
+            type="number"
+            className="bg-white !py-6"
+            max={1}
+            min={100}
+          />
           <Button
             onClick={() => {
-              toast.success("Orel: Implement pin page");
+              handleQuestionsCountSet();
             }}
+            disabled={isCreating}
           >
-            Next
+            Create room
           </Button>
-        </Stage>
+        </StageComponent>
       )}
     </div>
   );

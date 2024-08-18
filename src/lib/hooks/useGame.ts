@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "./redux";
 import {
   setGame as setGameAction,
   setTheme as setThemeAction,
-  setDifficulty as setDifficultyAction,
+  setGameDifficulty as setDifficultyAction,
   setQuestions as setQuestionsAction,
   addQuestion as addQuestionAction,
   removeQuestion as removeQuestionAction,
