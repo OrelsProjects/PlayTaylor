@@ -14,7 +14,7 @@ import {
 } from "../features/game/gameSlice";
 import { Logger } from "../../logger";
 import { Difficulty } from "../../models/question";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import LoadingError from "../../models/errors/LoadingError";
 
 export type Stage = "name" | "participants" | "difficulty" | "question";
@@ -73,6 +73,7 @@ export default function useRoom() {
   const dispatch = useAppDispatch();
   const { room, userParticipant } = useAppSelector(state => state.room);
   const loadingCountdown = useRef(false);
+  const [loadingGameState, setLoadingGameState] = useState(false);
 
   async function createRoom(room: CreateRoom): Promise<string> {
     try {
@@ -186,6 +187,38 @@ export default function useRoom() {
     }
   }
 
+  async function pauseGame(code: string) {
+    if (loadingGameState) {
+      throw new LoadingError("Loading pause");
+    }
+    setLoadingGameState(true);
+    try {
+      await axios.post(`/api/game/${code}/pause`);
+      return;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
+      setLoadingGameState(false);
+    }
+  }
+
+  async function resumeGame(code: string) {
+    if (loadingGameState) {
+      throw new LoadingError("Loading pause");
+    }
+    setLoadingGameState(true);
+    try {
+      await axios.post(`/api/game/${code}/resume`);
+      return;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
+      setLoadingGameState(false);
+    }
+  }
+
   const listenDefaults = {
     onChange: (newRoom: Room) => {
       dispatch(setRoom(newRoom));
@@ -221,7 +254,10 @@ export default function useRoom() {
     joinRoom,
     leaveRoom,
     startGame,
+    pauseGame,
+    resumeGame,
     getRoom,
+    loadingGameState,
     loadingCountdown: loadingCountdown.current,
     listenDefaults,
     listenToRoomChanges,

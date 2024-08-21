@@ -24,7 +24,7 @@ export default function Waiting({ params }: { params: { code?: string } }) {
           {params.code && (
             <ParticipantsComponent
               code={params.code}
-              onGameStarted={(newRoom: Room) => {
+              onCountdownStarted={(newRoom: Room) => {
                 dispatch(setRoom(newRoom));
                 router.push("/lobby/" + newRoom.code);
               }}

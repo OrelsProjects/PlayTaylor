@@ -35,11 +35,11 @@ const ParticipantComponent = ({
 export default function ParticipantsComponent({
   code,
   className,
-  onGameStarted,
+  onCountdownStarted,
 }: {
   code: string;
   className?: string;
-  onGameStarted: (room: Room) => void;
+  onCountdownStarted: (room: Room) => void;
 }) {
   const [participants, setParticipants] = useState<Participant[]>([]);
 
@@ -47,9 +47,10 @@ export default function ParticipantsComponent({
 
   useEffect(() => {
     const unsubscribe = listenToRoomChanges(code, (newRoom: Room) => {
-      if (newRoom.gameStartedAt) {
-        onGameStarted(newRoom);
-      } else {
+      if (newRoom) {
+        if (newRoom.countdownStartedAt) {
+          onCountdownStarted(newRoom);
+        }
         setParticipants(newRoom.participants);
       }
     });
@@ -60,7 +61,12 @@ export default function ParticipantsComponent({
 
   return (
     participants.length > 0 && (
-      <div className={cn("w-full h-full flex flex-col gap-8 justify-center items-center", className)}>
+      <div
+        className={cn(
+          "w-full h-full flex flex-col gap-8 justify-center items-center",
+          className,
+        )}
+      >
         <span className="text-[32px] leading-[40px] text-foreground">
           Waiting for all <br /> Swifties to join
         </span>

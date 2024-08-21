@@ -8,19 +8,17 @@ import { doc, onSnapshot } from "firebase/firestore";
 import Room from "@/models/room";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function AdminRoomPage({
   params,
 }: {
   params: { code: string };
 }) {
+  const router = useRouter();
   const [roomInitialized, setRoomInitialized] = React.useState(false);
-  const {
-    listenDefaults,
-    startGame,
-    setPreviouslyCreatedRoom,
-    loadingCountdown,
-  } = useRoom();
+  const { listenToRoomChanges, startGame, setPreviouslyCreatedRoom } =
+    useRoom();
 
   const initRoom = async () => {
     try {
@@ -36,30 +34,24 @@ export default function AdminRoomPage({
   }, [params.code]);
 
   useEffect(() => {
+    let unsubscribe = () => {};
     if (roomInitialized) {
-      let unsubscribe = () => {};
       if (db) {
-        const roomRef = doc(db, "rooms", params.code);
-        unsubscribe = onSnapshot(
-          roomRef,
-          snapshot => {
-            console.log(
-              "Room snapshot",
-              (snapshot.data() as Room).countdownCurrentTime,
-            );
-            listenDefaults.onChange(snapshot.data() as Room);
-          },
-          error => {},
-        );
+        unsubscribe = listenToRoomChanges(params.code, newRoom => {
+          if (newRoom?.gameStartedAt) {
+            router.push(`/game/${params.code}`);
+          }
+        });
       }
-      return unsubscribe;
     }
+    return unsubscribe;
   }, [roomInitialized]);
 
   const handleStartGame = async () => {
     const toastId = toast.loading("Starting game...");
     try {
       await startGame(params.code);
+      router.push(`/game/${params.code}`);
     } catch (error) {
       console.error(error);
       toast.error("Failed to start game");
@@ -72,7 +64,7 @@ export default function AdminRoomPage({
     <div className="w-full h-full flex flex-col gap-8 justify-center items-center mt-11">
       <ParticipantsComponent
         code={params.code}
-        onGameStarted={() => {}}
+        onCountdownStarted={() => {}}
         className=""
       />
       <Button

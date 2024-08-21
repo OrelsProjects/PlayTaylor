@@ -12,6 +12,7 @@ import TopLoaderProvider from "./providers/TopLoaderProvider";
 import Script from "next/script";
 import BackgroundProvider from "./providers/BackgroundProvider";
 import LoggersProvider from "./providers/LoggersProvider";
+import RoomListenerProvider from "./providers/RoomListenerProvider";
 
 const APP_NAME = "Play Taylor";
 const APP_DEFAULT_TITLE = "Play Taylor";
@@ -84,6 +85,7 @@ export default function Layout({ children }: RootLayoutProps) {
               <AuthProvider>
                 <TopLoaderProvider />
                 <LoggersProvider />
+                <RoomListenerProvider />
                 <BackgroundProvider>{children}</BackgroundProvider>
                 <SpeedInsights />
                 <Analytics />

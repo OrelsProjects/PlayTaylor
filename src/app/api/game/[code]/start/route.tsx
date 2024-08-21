@@ -38,6 +38,7 @@ export async function POST(
       const timestamp = Date.now();
       await roomRef.update({
         gameStartedAt: timestamp,
+        stage: "playing",
       });
     }
 

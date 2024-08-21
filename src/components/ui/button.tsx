@@ -43,10 +43,12 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   isLoading?: boolean;
+  loadingClassName?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
+    console.log(props.isLoading);
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
@@ -56,9 +58,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         <Loading
           className={cn({ hidden: !props.isLoading })}
-          spinnerClassName="w-5 h-5 mr-2"
+          spinnerClassName={cn("w-5 h-5 fill-secondary", props.loadingClassName)}
         />
-        {props.children}
+        <div className={cn({ hidden: props.isLoading })}>{props.children}</div>
       </Comp>
     );
   },

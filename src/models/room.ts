@@ -16,6 +16,13 @@ export default interface Room {
   createdBy: string;
   countdownStartedAt?: number | null;
   countdownCurrentTime?: number | null;
+  stage:
+    | "waiting"
+    | "countdown"
+    | "playing"
+    | "paused"
+    | "question-ended"
+    | "game-ended";
   participants: Participant[];
   questions: Question[];
   gameStartedAt?: number | null;
