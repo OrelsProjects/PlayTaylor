@@ -4,11 +4,9 @@ import * as React from "react";
 import { useTheme } from "next-themes";
 import { RadioGroup, RadioGroupItem } from "./ui/radioGroup";
 import { Label } from "./ui/label";
-import useGame from "../lib/hooks/useGame";
 
 export function ThemeToggle() {
   const { resolvedTheme } = useTheme();
-  const { setTheme } = useGame();
 
   const isDark = React.useMemo(() => {
     return resolvedTheme === "battery-save";
@@ -19,7 +17,6 @@ export function ThemeToggle() {
       defaultValue={isDark ? "battery-save" : "colourful"}
       onValueChange={value => {
         const isDark = value === "battery-save";
-        setTheme(isDark);
       }}
       className="flex flex-col gap-0 text-secondary-foreground"
     >

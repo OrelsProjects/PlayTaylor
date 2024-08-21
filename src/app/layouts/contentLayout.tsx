@@ -10,7 +10,6 @@ import TopLoaderProvider from "../providers/TopLoaderProvider";
 import AnimationProvider from "../providers/AnimationProvider";
 import HeightProvider from "../providers/HeightProvider";
 import ContentProvider from "../providers/ContentProvider";
-import useGame from "../../lib/hooks/useGame";
 import { cn } from "../../lib/utils";
 
 interface RootLayoutProps {
@@ -22,11 +21,6 @@ export default function ContentLayout({
   children,
   className,
 }: RootLayoutProps) {
-  const { initQuestions } = useGame();
-
-  useEffect(() => {
-    initQuestions();
-  }, []);
 
   return (
     <main className={cn(className)}>

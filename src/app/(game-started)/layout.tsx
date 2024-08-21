@@ -5,7 +5,7 @@ import RoomNameComponent from "../../components/roomName";
 import { cn } from "../../lib/utils";
 import { montserratAlternates } from "../../lib/utils/fontUtils";
 import { useAppSelector } from "../../lib/hooks/redux";
-import { PauseButton } from "./PauseButton";
+import { PauseButton } from "./pauseButton";
 
 export default function LobbyLayout({
   children,
