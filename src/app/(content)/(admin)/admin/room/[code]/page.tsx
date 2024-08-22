@@ -9,6 +9,7 @@ import Room from "@/models/room";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/lib/hooks/redux";
 
 export default function AdminRoomPage({
   params,
@@ -16,14 +17,12 @@ export default function AdminRoomPage({
   params: { code: string };
 }) {
   const router = useRouter();
-  const [roomInitialized, setRoomInitialized] = React.useState(false);
-  const { listenToRoomChanges, startGame, setPreviouslyCreatedRoom } =
-    useRoom();
+  const { room } = useAppSelector(state => state.room);
+  const { startGame, setPreviouslyCreatedRoom } = useRoom();
 
   const initRoom = async () => {
     try {
       await setPreviouslyCreatedRoom(params.code);
-      setRoomInitialized(true);
     } catch (error) {
       console.error(error);
     }
@@ -34,18 +33,10 @@ export default function AdminRoomPage({
   }, [params.code]);
 
   useEffect(() => {
-    let unsubscribe = () => {};
-    if (roomInitialized) {
-      if (db) {
-        unsubscribe = listenToRoomChanges(params.code, newRoom => {
-          if (newRoom?.gameStartedAt) {
-            router.push(`/game/${params.code}`);
-          }
-        });
-      }
+    if (room?.gameStartedAt) {
+      router.push(`/game/${params.code}`);
     }
-    return unsubscribe;
-  }, [roomInitialized]);
+  }, [room]);
 
   const handleStartGame = async () => {
     const toastId = toast.loading("Starting game...");

@@ -238,10 +238,11 @@ export default function useRoom() {
         snapshot => {
           onChange(snapshot.data() as Room);
         },
-        error => {
+        (error: any) => {
           if (!onError) {
             console.log("Failed to subscribe to room updates:", error);
           }
+          Logger.error(error);
           onError?.(error);
         },
       );

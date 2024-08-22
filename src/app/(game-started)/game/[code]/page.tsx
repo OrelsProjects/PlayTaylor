@@ -11,6 +11,7 @@ import useRoom from "@/lib/hooks/useRoom";
 import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
+import RadialProgressBar from "../../../../components/ui/radialProgressBar";
 
 const colors = [
   "hsla(37, 91%, 55%, 1)",
@@ -45,7 +46,7 @@ export default function Game({ params }: { params: { code: string } }) {
   const router = useRouter();
   const { user } = useAppSelector(state => state.auth);
   const { room } = useAppSelector(state => state.room);
-  const { setPreviouslyJoinedRoom, listenToRoomChanges } = useRoom();
+  const { setPreviouslyJoinedRoom } = useRoom();
 
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
@@ -91,7 +92,8 @@ export default function Game({ params }: { params: { code: string } }) {
         montserratAlternates.className,
       )}
     >
-      <div className="radial-progress">
+      {/* <div className="radial-progress"> */}
+      <RadialProgressBar progress={90} radius={90} strokeWidth={10}>
         <Image
           src="/Manuscript.png"
           alt="Manuscript"
@@ -99,7 +101,8 @@ export default function Game({ params }: { params: { code: string } }) {
           objectFit="cover"
           className="!relative rounded-full !h-40 !w-40 flex-shrink-0"
         />
-      </div>
+        </RadialProgressBar>
+      {/* </div> */}
       <span className="text-lg text-center font-medium">
         {currentQuestion?.content}
       </span>

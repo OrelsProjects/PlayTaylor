@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import useRoom from "../../lib/hooks/useRoom";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks/redux";
 import { setRoom } from "../../lib/features/room/roomSlice";
+import { useRouter } from "next/navigation";
 
 export default function RoomListenerProvider() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { listenToRoomChanges } = useRoom();
   const { room } = useAppSelector(state => state.room);
@@ -24,9 +26,15 @@ export default function RoomListenerProvider() {
 
   useEffect(() => {
     if (shouldListen && !unsubscribe.current && room) {
-      unsubscribe.current = listenToRoomChanges(room.code, newRoom => {
-        dispatch(setRoom(newRoom));
-      });
+      unsubscribe.current = listenToRoomChanges(
+        room.code,
+        newRoom => {
+          dispatch(setRoom(newRoom));
+        },
+        () => {
+          router.push("/");
+        },
+      );
     }
 
     return () => {

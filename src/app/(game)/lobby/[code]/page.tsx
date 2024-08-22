@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { cn } from "../../../../lib/utils";
-import { montserratAlternates } from "../../../../lib/utils/fontUtils";
+import { cn } from "@/lib/utils";
+import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { AnimatePresence, motion } from "framer-motion";
-import useRoom from "../../../../lib/hooks/useRoom";
-import Loading from "../../../../components/ui/loading";
+import useRoom from "@/lib/hooks/useRoom";
 import { useRouter } from "next/navigation";
+import { isGameStarted } from "@/models/gameStage";
+import { useAppSelector } from "@/lib/hooks/redux";
+import Room from "@/models/room";
 
 const leftToRightAnimation = {
   initial: { x: "-100%", opacity: 0, transition: { duration: 0.3 } },
@@ -21,21 +23,40 @@ const Counter = ({
   code: string;
   onCountdownZero: () => void;
 }) => {
-  const { setPreviouslyJoinedRoom, listenToRoomChanges } = useRoom();
+  const { room } = useAppSelector(state => state.room);
+
+  const { setPreviouslyJoinedRoom } = useRoom();
   const [count, setCount] = useState(1);
 
+  const handleNewCounter = (newCount?: number | null, newRoom?: Room) => {
+    if (!room && !newRoom) return;
+
+    const validCount = newCount === null || newCount === undefined ? 4 : newCount;
+
+    setCount(validCount);
+
+    const validRoom = (newRoom ? newRoom : room) as Room;
+
+    if (isGameStarted(validRoom.stage)) {
+      if (validCount <= 1) {
+        onCountdownZero();
+      }
+    }
+  };
   useEffect(() => {
-    setPreviouslyJoinedRoom(code).then(() => {
-      let unsubscribe = listenToRoomChanges(code, newRoom => {
-        if (newRoom.gameStartedAt) {
-          onCountdownZero();
-          unsubscribe();
-        } else if (newRoom.countdownStartedAt && newRoom.countdownCurrentTime) {
-          setCount(newRoom.countdownCurrentTime);
-        }
-      });
+    setPreviouslyJoinedRoom(code).then(response => {
+      if (!response) return;
+      const { room: newRoom } = response;
+      handleNewCounter(newRoom.countdownCurrentTime, newRoom);
     });
   }, [code]);
+
+  useEffect(() => {
+    if (room) {
+      handleNewCounter(room.countdownCurrentTime);
+    }
+  }, [room]);
+
   const countText = useMemo(() => (count <= 4 ? count : null), [count]);
 
   return (

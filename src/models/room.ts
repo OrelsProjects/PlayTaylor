@@ -1,5 +1,6 @@
 import { Question } from "@prisma/client";
 import { Difficulty } from "./question";
+import { GameStage } from "./gameStage";
 
 export interface Participant {
   correctAnswers: number;
@@ -16,13 +17,7 @@ export default interface Room {
   createdBy: string;
   countdownStartedAt?: number | null;
   countdownCurrentTime?: number | null;
-  stage:
-    | "waiting"
-    | "countdown"
-    | "playing"
-    | "paused"
-    | "question-ended"
-    | "game-ended";
+  stage: GameStage;
   participants: Participant[];
   questions: Question[];
   gameStartedAt?: number | null;

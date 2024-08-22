@@ -25,14 +25,18 @@ export const PauseButton = () => {
         className="h-fit w-fit px-3 py-3 self-center flex justify-center items-center"
         isLoading={loadingGameState}
         loadingClassName="w-7 h-7"
+        onClick={() => {
+          if (room?.stage === "paused") {
+            resumeGame(code);
+          } else {
+            pauseGame(code);
+          }
+        }}
       >
         {room?.stage === "paused" ? (
-          <FaPlay className="w-7 h-7" onClick={() => resumeGame(code)} />
+          <FaPlay className="w-7 h-7" />
         ) : (
-          <BsFillPauseFill
-            className="w-7 h-7"
-            onClick={() => pauseGame(code)}
-          />
+          <BsFillPauseFill className="w-7 h-7" />
         )}
       </Button>
     )

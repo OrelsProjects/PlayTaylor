@@ -5,6 +5,7 @@ import Image from "next/image";
 import useRoom from "../lib/hooks/useRoom";
 import Room, { Participant } from "../models/room";
 import { cn } from "../lib/utils";
+import { useAppSelector } from "../lib/hooks/redux";
 
 const MAX_PARTICIPANTS_UI = 4;
 
@@ -41,23 +42,17 @@ export default function ParticipantsComponent({
   className?: string;
   onCountdownStarted: (room: Room) => void;
 }) {
+  const { room } = useAppSelector(state => state.room);
   const [participants, setParticipants] = useState<Participant[]>([]);
 
-  const { listenToRoomChanges } = useRoom();
-
   useEffect(() => {
-    const unsubscribe = listenToRoomChanges(code, (newRoom: Room) => {
-      if (newRoom) {
-        if (newRoom.countdownStartedAt) {
-          onCountdownStarted(newRoom);
-        }
-        setParticipants(newRoom.participants);
+    if (room) {
+      if (room.countdownStartedAt) {
+        onCountdownStarted(room);
       }
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, [code]);
+      setParticipants(room.participants);
+    }
+  }, [room]);
 
   return (
     participants.length > 0 && (

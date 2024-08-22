@@ -270,7 +270,9 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
             placeholder="Eras tour 2024"
             className="bg-white !py-6"
           />
-          <Button onClick={handleNewNameSet}>Next</Button>
+          <Button type="submit" onClick={handleNewNameSet}>
+            Next
+          </Button>
         </StageComponent>
       ) : stage === "participants" ? (
         <StageComponent
