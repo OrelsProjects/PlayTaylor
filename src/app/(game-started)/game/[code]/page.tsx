@@ -92,7 +92,6 @@ export default function Game({ params }: { params: { code: string } }) {
         montserratAlternates.className,
       )}
     >
-      {/* <div className="radial-progress"> */}
       <RadialProgressBar progress={90} radius={90} strokeWidth={10}>
         <Image
           src="/Manuscript.png"
@@ -102,7 +101,6 @@ export default function Game({ params }: { params: { code: string } }) {
           className="!relative rounded-full !h-40 !w-40 flex-shrink-0"
         />
         </RadialProgressBar>
-      {/* </div> */}
       <span className="text-lg text-center font-medium">
         {currentQuestion?.content}
       </span>
@@ -111,7 +109,7 @@ export default function Game({ params }: { params: { code: string } }) {
         {Array.from({ length: 4 }).map((_, index) => (
           <AnswerComponent
             key={index}
-            // FOR NEXT: Work on questions synchronization and add play/pause button. Perhaps make 1 logic in 1 place to handle all the game's logic.
+            // FOR NEXT: Work on questions synchronization.
             index={index}
             answer={"Tim McGraw " + (index + 1)}
             onClick={() => {}}

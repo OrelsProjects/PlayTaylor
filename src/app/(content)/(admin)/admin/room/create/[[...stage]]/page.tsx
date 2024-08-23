@@ -19,6 +19,7 @@ import { Difficulty } from "@/models/question";
 import DifficultyComponent from "./difficultyComponent";
 import useRoom, { buildLocalSotrageKey, Stage } from "@/lib/hooks/useRoom";
 import { Logger } from "../../../../../../../logger";
+import axios from "axios";
 
 const writeRoomNameToLocal = (name: string) => {
   localStorage.setItem(buildLocalSotrageKey("room_name"), name);
@@ -120,6 +121,17 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
   const [difficulty, setDifficulty] = useState<Difficulty>("debut");
   const [questionsCount, setQuestionsCount] = useState<number | undefined>();
   const [isCreating, setIsCreating] = useState(false);
+
+  const [test, setTest] = useState(false);
+
+  const runTest = async () => {
+    if (test) return;
+    setTest(true);
+    await axios.get("/api/game/question/run");
+  };
+  useEffect(() => {
+    runTest();
+  }, []);
 
   useEffect(() => {
     const name = readRoomNameFromLocal();
