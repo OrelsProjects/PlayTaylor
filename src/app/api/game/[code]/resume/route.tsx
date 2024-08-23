@@ -4,6 +4,8 @@ import { db } from "@/../firebase.config.admin";
 import { roomConverter } from "../roomConverter";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../auth/authOptions";
+import { isOwnerOfRoom } from "../_utils";
+import { runLogic } from "../question/run/questionLogic";
 
 export async function POST(
   req: NextRequest,
@@ -20,6 +22,15 @@ export async function POST(
       .collection("rooms")
       .doc(params.code)
       .withConverter(roomConverter);
+
+    const isOwner = isOwnerOfRoom(user.userId, params.code, roomRef);
+    if (!isOwner) {
+      return NextResponse.json(
+        { error: "You are not authorized to resume the game" },
+        { status: 401 },
+      );
+    }
+
     const roomSnapshot = await roomRef.get();
     const roomData = roomSnapshot.data();
 
@@ -38,6 +49,7 @@ export async function POST(
       await roomRef.update({
         stage: "playing",
       });
+      runLogic(params.code);
     }
 
     return NextResponse.json(roomData, { status: 200 });
@@ -45,6 +57,9 @@ export async function POST(
     Logger.error("Error in finding the room", "unknown", {
       error,
     });
+    if (error.name === "RoomDoesNotExistError") {
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

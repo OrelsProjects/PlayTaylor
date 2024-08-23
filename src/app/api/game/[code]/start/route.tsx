@@ -4,6 +4,7 @@ import { db } from "@/../firebase.config.admin";
 import { roomConverter } from "../roomConverter";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../auth/authOptions";
+import { isOwnerOfRoom } from "../_utils";
 
 export async function POST(
   req: NextRequest,
@@ -20,6 +21,15 @@ export async function POST(
       .collection("rooms")
       .doc(params.code)
       .withConverter(roomConverter);
+
+    const isOwner = isOwnerOfRoom(user.userId, params.code, roomRef);
+    if (!isOwner) {
+      return NextResponse.json(
+        { error: "You are not authorized to start the game" },
+        { status: 401 },
+      );
+    }
+
     const roomSnapshot = await roomRef.get();
     const roomData = roomSnapshot.data();
 
@@ -36,8 +46,10 @@ export async function POST(
       );
     } else {
       const timestamp = Date.now();
+      const question = roomData.questions[0];
       await roomRef.update({
         gameStartedAt: timestamp,
+        currentQuestion: question,
         stage: "playing",
       });
     }

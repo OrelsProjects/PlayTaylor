@@ -2,6 +2,10 @@ import { Question } from "@prisma/client";
 import { Difficulty } from "./question";
 import { GameStage } from "./gameStage";
 
+export const QUESTION_TIME = 20; // 20 seconds
+export const QUESTION_ENDED_TIME = 3; // 3 seconds
+export const SHOW_LEADERBOARD_TIME = 7; // 7 seconds
+
 export interface Participant {
   correctAnswers: number;
   joinedAt: number;
@@ -10,13 +14,17 @@ export interface Participant {
   leftAt?: number | null;
 }
 
+export type QuestionWithTimer = Question & { timer: number };
+
 export default interface Room {
   code: string;
-  currentQuestion: number;
+  currentQuestion: QuestionWithTimer;
   name: string;
   createdBy: string;
   countdownStartedAt?: number | null;
   countdownCurrentTime?: number | null;
+  countdownQuestionEnded?: number | null;
+  countdownShowLeaderboard?: number | null;
   stage: GameStage;
   participants: Participant[];
   questions: Question[];

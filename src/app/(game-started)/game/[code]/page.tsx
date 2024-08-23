@@ -12,6 +12,7 @@ import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import RadialProgressBar from "../../../../components/ui/radialProgressBar";
+import { QUESTION_TIME, QuestionWithTimer } from "../../../../models/room";
 
 const colors = [
   "hsla(37, 91%, 55%, 1)",
@@ -48,7 +49,9 @@ export default function Game({ params }: { params: { code: string } }) {
   const { room } = useAppSelector(state => state.room);
   const { setPreviouslyJoinedRoom } = useRoom();
 
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [currentQuestion, setCurrentQuestion] =
+    useState<QuestionWithTimer | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(QUESTION_TIME);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,11 +63,11 @@ export default function Game({ params }: { params: { code: string } }) {
         router.push("/waiting/" + room.code);
       }
     }
-    const currentQuestionNumber = room.currentQuestion as number;
-    const questions = room.questions as Question[];
-    const currentQuestion = questions[currentQuestionNumber];
+    const currentQuestion = room.currentQuestion as QuestionWithTimer;
 
-    setCurrentQuestion(questions[currentQuestionNumber]);
+    setCountdown(currentQuestion.timer);
+
+    setCurrentQuestion(currentQuestion);
     setLoading(false);
   }, [room]);
 
@@ -73,10 +76,12 @@ export default function Game({ params }: { params: { code: string } }) {
     setPreviouslyJoinedRoom(params.code)
       .then(response => {
         if (!response?.room) {
+          debugger;
           router.push("/");
         }
       })
       .catch(() => {
+        debugger;
         router.push("/");
       });
 
@@ -92,7 +97,17 @@ export default function Game({ params }: { params: { code: string } }) {
         montserratAlternates.className,
       )}
     >
-      <RadialProgressBar progress={90} radius={90} strokeWidth={10}>
+      <RadialProgressBar
+        progress={
+          ((countdown !== undefined && countdown !== null
+            ? countdown
+            : QUESTION_TIME) /
+            QUESTION_TIME) *
+          100
+        }
+        radius={90}
+        strokeWidth={10}
+      >
         <Image
           src="/Manuscript.png"
           alt="Manuscript"
@@ -100,7 +115,7 @@ export default function Game({ params }: { params: { code: string } }) {
           objectFit="cover"
           className="!relative rounded-full !h-40 !w-40 flex-shrink-0"
         />
-        </RadialProgressBar>
+      </RadialProgressBar>
       <span className="text-lg text-center font-medium">
         {currentQuestion?.content}
       </span>

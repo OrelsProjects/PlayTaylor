@@ -122,17 +122,6 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
   const [questionsCount, setQuestionsCount] = useState<number | undefined>();
   const [isCreating, setIsCreating] = useState(false);
 
-  const [test, setTest] = useState(false);
-
-  const runTest = async () => {
-    if (test) return;
-    setTest(true);
-    await axios.get("/api/game/question/run");
-  };
-  useEffect(() => {
-    runTest();
-  }, []);
-
   useEffect(() => {
     const name = readRoomNameFromLocal();
     if (name) {

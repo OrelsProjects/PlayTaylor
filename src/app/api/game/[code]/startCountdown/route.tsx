@@ -4,6 +4,7 @@ import { db } from "@/../firebase.config.admin";
 import { roomConverter } from "../roomConverter";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../../auth/authOptions";
+import { isOwnerOfRoom } from "../_utils";
 
 // This function couts down from 4 to 0 and every second updates the room's countdownStartedAt
 const startCountdown = async (code: string): Promise<void> => {
@@ -61,6 +62,15 @@ export async function POST(
       .collection("rooms")
       .doc(params.code)
       .withConverter(roomConverter);
+
+    const isOwner = isOwnerOfRoom(user.userId, params.code, roomRef);
+    if (!isOwner) {
+      return NextResponse.json(
+        { error: "You are not authorized to start the countdown" },
+        { status: 401 },
+      );
+    }
+
     const roomSnapshot = await roomRef.get();
     const roomData = roomSnapshot.data();
 

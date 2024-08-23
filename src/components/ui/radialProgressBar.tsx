@@ -44,7 +44,7 @@ const RadialProgressBar = ({
           style={{
             strokeDashoffset: circumference - (progress / 100) * circumference,
             zIndex: 30,
-            transition: "stroke-dashoffset 0.6s ease-out", // Smooth transition for the dash offset
+            transition: "stroke-dashoffset 1s ease-out", // Smooth transition for the dash offset
             transform: "rotate(-90deg)", // Ensures it starts from the top
             transformOrigin: "50% 50%", // Keeps the rotation centered
           }}
