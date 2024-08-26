@@ -52,8 +52,14 @@
     --ring: 40 30.7% 15.9%;
     --radius: 0.75rem;
 
+    --question-correct: 146 79% 44%;
+    --question-incorrect: 339 90% 51%;
+
     --answers-in-row: 2;
     --answers-in-row-mobile: 2;
+
+    --players-in-row: 2;
+    --players-in-row-mobile: 2;
   }
 
   /* .battery-save {

@@ -73,10 +73,10 @@ export default function Game({ params }: { params: { code: string } }) {
 
   useEffect(() => {
     let unsubscribe = () => {};
+    if (!params.code) return;
     setPreviouslyJoinedRoom(params.code)
       .then(response => {
         if (!response?.room) {
-          debugger;
           router.push("/");
         }
       })

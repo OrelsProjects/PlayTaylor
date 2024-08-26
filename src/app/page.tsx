@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { cn } from "../lib/utils";
 import { LOCAL_STORAGE_PREFIX } from "../lib/hooks/useRoom";
+import QuestionResultsComponent from "../components/questionResultsComponent";
 
 export default function Home() {
   const router = useRouter();
@@ -46,6 +47,7 @@ export default function Home() {
           Join Game
         </Button>
       </div>
+      {/* <QuestionResultsComponent isCorrectAnswer={false} open /> */}
     </main>
   );
 }

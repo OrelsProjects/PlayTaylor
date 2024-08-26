@@ -27,6 +27,10 @@ const config = {
       },
       colors: {
         border: "hsl(var(--border))",
+        question: {
+          correct: "hsl(var(--question-correct))",
+          incorrect: "hsl(var(--question-incorrect))",
+        },
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",

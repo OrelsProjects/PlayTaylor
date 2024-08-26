@@ -86,7 +86,9 @@ export default function Layout({ children }: RootLayoutProps) {
                 <TopLoaderProvider />
                 <LoggersProvider />
                 <RoomListenerProvider />
-                <BackgroundProvider>{children}</BackgroundProvider>
+                <BackgroundProvider className="w-full h-svh flex flex-col">
+                  {children}
+                </BackgroundProvider>
                 <SpeedInsights />
                 <Analytics />
               </AuthProvider>

@@ -179,7 +179,6 @@ export default function useRoom() {
       await axios.post(`/api/game/${code}/startCountdown`);
       await axios.post(`/api/game/${code}/start`);
       axios.post(`/api/game/${code}/question/run`).catch(error => {
-        debugger;
         console.error("Failed to start question", error);
         Logger.error(error);
       });

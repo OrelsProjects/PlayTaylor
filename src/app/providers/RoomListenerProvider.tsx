@@ -6,7 +6,11 @@ import { useAppDispatch, useAppSelector } from "../../lib/hooks/redux";
 import { setRoom } from "../../lib/features/room/roomSlice";
 import { useRouter } from "next/navigation";
 
-export default function RoomListenerProvider() {
+export default function RoomListenerProvider({
+  params,
+}: {
+  params?: { code: string };
+}) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { listenToRoomChanges } = useRoom();
@@ -17,21 +21,22 @@ export default function RoomListenerProvider() {
   let unsubscribe = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    if (room) {
+    if (room || params?.code) {
       setShouldListen(true);
     } else {
       setShouldListen(false);
     }
-  }, [room]);
+  }, [room, params]);
 
   useEffect(() => {
-    if (shouldListen && !unsubscribe.current && room) {
+    if (shouldListen && !unsubscribe.current && (room || params?.code)) {
       unsubscribe.current = listenToRoomChanges(
-        room.code,
+        room ? room.code : params!.code,
         newRoom => {
           dispatch(setRoom(newRoom));
         },
         () => {
+          debugger;
           router.push("/");
         },
       );

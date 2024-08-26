@@ -1,6 +1,7 @@
 "use client";
 import { motion, useAnimation } from "framer-motion";
 import React, { useEffect, useState } from "react";
+import { cn } from "../../lib/utils";
 
 const gradients = [
   [
@@ -30,8 +31,10 @@ const gradients = [
 ];
 export default function BackgroundProvider({
   children,
+  className,
 }: {
   children: React.ReactNode;
+  className?: string;
 }) {
   const [currentGradient, setCurrentGradient] = useState(0);
   const controls = useAnimation();
@@ -51,7 +54,7 @@ export default function BackgroundProvider({
 
   return (
     <motion.div
-      className="w-full h-svh flex flex-col bg-[hsla(277, 100%, 99%, 1)]"
+      className={cn("bg-[hsla(277, 100%, 99%, 1)]", className)}
       animate={controls}
     >
       {children}

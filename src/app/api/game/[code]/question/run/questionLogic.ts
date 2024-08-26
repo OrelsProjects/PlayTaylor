@@ -71,6 +71,7 @@ async function startQuestionCountdown(roomRef: RoomRef) {
         const currentStage = room.stage;
 
         let questionTimer = room.currentQuestion.timer || QUESTION_TIME;
+        // FOR NEXT DESIGN THE REST OF THE SCREENS AND SET THE LOGIC TO WORK WITH THEM (STAGE)
         if (currentStage === "paused") {
           const currentTime = room.currentQuestion.timer;
           questionTimer = currentTime;
