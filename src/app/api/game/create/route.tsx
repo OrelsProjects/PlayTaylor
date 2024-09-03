@@ -6,8 +6,11 @@ import { db } from "@/../firebase.config.admin";
 import crypto from "crypto";
 import prisma from "@/app/api/_db/db";
 import { CreateRoom } from "@/models/room";
+import { Question } from "@/models/question";
 
-export async function POST(req: NextRequest): Promise<any> {
+export async function POST(
+  req: NextRequest,
+): Promise<NextResponse<{ code: string } | { error: string }>> {
   const session = await getServerSession(authOptions); // Ensure you pass `req` to `getServerSession` if needed.
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -32,14 +35,17 @@ export async function POST(req: NextRequest): Promise<any> {
 
     const questions = await prisma.question.findMany({
       where: {
-        type: "swipe",
+        difficulty: createRoom.difficulty,
+      },
+      include: {
+        options: true,
       },
       take: createRoom.questionsCount,
     });
 
     const randomOrderQuestions = questions.sort(() => Math.random() - 0.5);
 
-    await roomRef.set({
+    const newRoom = {
       name: createRoom.name,
       code,
       participantsCount: createRoom.participantsCount,
@@ -49,9 +55,11 @@ export async function POST(req: NextRequest): Promise<any> {
       currentQuestion: 0,
       createdBy: user?.userId,
       createdAt: timestamp,
-    });
+    }
 
-    return NextResponse.json({ code }, { status: 200 });
+    await roomRef.set(newRoom);
+
+    return NextResponse.json({ ...newRoom }, { status: 200 });
   } catch (error: any) {
     Logger.error("Error creating a room", user?.userId || "unknown", {
       error,

@@ -19,7 +19,7 @@ export async function GET(req: NextRequest): Promise<any> {
   const session = await getServerSession(authOptions);
   try {
     const questions = await prisma.question.findMany({
-      where: { isDeleted: false },
+      include: { options: true },
     });
 
     return NextResponse.json({ questions });
@@ -79,7 +79,7 @@ export async function PUT(req: NextRequest): Promise<any> {
     const { id, ...questionNoId } = question;
     await prisma.question.update({
       where: { id },
-      data: { ...questionNoId, isDeleted: false },
+      data: { ...questionNoId },
     });
     return NextResponse.json({}, { status: 200 });
   } catch (error: any) {
@@ -106,9 +106,8 @@ export async function DELETE(req: NextRequest): Promise<any> {
 
   try {
     const { id }: { id: string } = await req.json();
-    await prisma.question.update({
+    await prisma.question.delete({
       where: { id },
-      data: { isDeleted: true },
     });
   } catch (error: any) {
     Logger.error(

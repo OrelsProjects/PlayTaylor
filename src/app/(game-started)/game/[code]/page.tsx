@@ -4,15 +4,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { useRouter } from "next/navigation";
-import { db } from "@/../firebase.config";
-import { onSnapshot, doc } from "firebase/firestore";
-import { Question } from "@prisma/client";
 import useRoom from "@/lib/hooks/useRoom";
 import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
-import RadialProgressBar from "../../../../components/ui/radialProgressBar";
-import { QUESTION_TIME, QuestionWithTimer } from "../../../../models/room";
+import RadialProgressBar from "@/components/ui/radialProgressBar";
+import { QUESTION_TIME, QuestionWithTimer } from "@/models/room";
+import useGame from "@/lib/hooks/useGame";
+import { QuestionOption } from "@/models/question";
 
 const colors = [
   "hsla(37, 91%, 55%, 1)",
@@ -24,19 +23,26 @@ const colors = [
 const AnswerComponent = ({
   answer,
   index,
+  disabled,
   onClick,
 }: {
   answer: string;
   index: number;
+  disabled: boolean;
   onClick: () => void;
 }) => {
   return (
     <div
       className={cn(
         "rounded-lg w-40 h-36 flex justify-center items-center text-white",
+        { "opacity-50": disabled },
       )}
       style={{ backgroundColor: colors[index % colors.length] }}
-      onClick={onClick}
+      onClick={() => {
+        if (!disabled) {
+          onClick();
+        }
+      }}
     >
       {answer}
     </div>
@@ -47,7 +53,8 @@ export default function Game({ params }: { params: { code: string } }) {
   const router = useRouter();
   const { user } = useAppSelector(state => state.auth);
   const { room } = useAppSelector(state => state.room);
-  const { setPreviouslyJoinedRoom } = useRoom();
+  const { setPreviouslyJoinedRoom, setPreviouslyCreatedRoom } = useRoom();
+  const { answerQuestion } = useGame();
 
   const [currentQuestion, setCurrentQuestion] =
     useState<QuestionWithTimer | null>(null);
@@ -56,6 +63,7 @@ export default function Game({ params }: { params: { code: string } }) {
 
   useEffect(() => {
     if (!room) return;
+
     if (!room.gameStartedAt) {
       if (room.createdBy === user?.userId) {
         router.push("/admin/room/" + room.code);
@@ -72,21 +80,59 @@ export default function Game({ params }: { params: { code: string } }) {
   }, [room]);
 
   useEffect(() => {
-    let unsubscribe = () => {};
     if (!params.code) return;
-    setPreviouslyJoinedRoom(params.code)
-      .then(response => {
-        if (!response?.room) {
-          router.push("/");
-        }
-      })
-      .catch(() => {
-        debugger;
-        router.push("/");
-      });
 
-    return unsubscribe;
+    if (room?.createdBy === user?.userId) {
+      setPreviouslyCreatedRoom(params.code)
+        .then(previouslyCreatedRoom => {
+          if (!previouslyCreatedRoom) {
+            router.push("/");
+          }
+        })
+        .catch(() => {
+          router.push("/");
+        });
+    } else {
+      setPreviouslyJoinedRoom(params.code)
+        .then(response => {
+          if (!response?.room) {
+            router.push("/");
+          }
+        })
+        .catch(() => {
+          router.push("/");
+        });
+    }
   }, [params.code]);
+
+  const didAnswerCurrentQuestion = useMemo(() => {
+    if (!room || !user) return false;
+    const participant = room.participants.find(p => p.userId === user.userId);
+    if (!participant) return false;
+    return participant.questionResponses?.some(
+      qr => qr.response.questionId === currentQuestion?.id,
+    );
+  }, [room, user, currentQuestion]);
+
+  const canAnswer = useMemo(
+    () =>
+      room?.stage === "playing" &&
+      currentQuestion !== null &&
+      !didAnswerCurrentQuestion,
+    [room],
+  );
+
+  const handleQuestionResponse = async (response: QuestionOption) => {
+    try {
+      if (!currentQuestion) return;
+      await answerQuestion(response, currentQuestion.id);
+    } catch (error: any) {
+      if (error.name === "AnsweredTooLateError") {
+        alert("You answered too late");
+      }
+      console.error(error);
+    }
+  };
 
   if (loading) return <Loading className="w-16 h-16" />;
 
@@ -117,19 +163,23 @@ export default function Game({ params }: { params: { code: string } }) {
         />
       </RadialProgressBar>
       <span className="text-lg text-center font-medium">
-        {currentQuestion?.content}
+        {currentQuestion?.question}
       </span>
       {/* <div className="w-full grid grid-cols-[repeat(var(--answers-in-row-mobile),minmax(0,1fr))] md:grid-cols-[repeat(var(--answers-in-row),minmax(0,1fr))] gap-8 auto-rows-auto"> */}
       <div className="w-full flex flex-wrap gap-4 justify-center items-center">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <AnswerComponent
-            key={index}
-            // FOR NEXT: Work on questions synchronization.
-            index={index}
-            answer={"Tim McGraw " + (index + 1)}
-            onClick={() => {}}
-          />
-        ))}
+        {[...(currentQuestion?.options || [])]
+          .sort((a, b) => a.position - b.position)
+          .map(option => (
+            <AnswerComponent
+              key={option.option}
+              disabled={!canAnswer}
+              index={option.position}
+              answer={option.option}
+              onClick={() => {
+                handleQuestionResponse(option);
+              }}
+            />
+          ))}
       </div>
     </div>
   );

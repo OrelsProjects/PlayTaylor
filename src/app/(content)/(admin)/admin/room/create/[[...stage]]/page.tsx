@@ -8,77 +8,12 @@ import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
-import { useAppDispatch } from "@/lib/hooks/redux";
-import {
-  setGameDifficulty,
-  setGameName,
-  setParticipantsCount,
-  setQuestionsCount as setGameQuestionsCount,
-} from "@/lib/features/game/gameSlice";
 import { Difficulty } from "@/models/question";
 import DifficultyComponent from "./difficultyComponent";
-import useRoom, { buildLocalSotrageKey, Stage } from "@/lib/hooks/useRoom";
-import { Logger } from "../../../../../../../logger";
-import axios from "axios";
-
-const writeRoomNameToLocal = (name: string) => {
-  localStorage.setItem(buildLocalSotrageKey("room_name"), name);
-};
-
-const readRoomNameFromLocal = () => {
-  return localStorage.getItem(buildLocalSotrageKey("room_name"));
-};
-
-const writeParticipantsToLocal = (participants: number) => {
-  localStorage.setItem(
-    buildLocalSotrageKey("participants"),
-    JSON.stringify(participants),
-  );
-};
-
-const readParticipantsFromLocal = () => {
-  const participants = localStorage.getItem(
-    buildLocalSotrageKey("participants"),
-  );
-  if (participants) {
-    const count = parseInt(JSON.parse(participants));
-    return isNaN(count) ? 0 : count;
-  }
-};
-
-const writeDifficultyToLocal = (difficulty: string) => {
-  localStorage.setItem(buildLocalSotrageKey("difficulty"), difficulty);
-};
-
-const readDifficultyFromLocal = () => {
-  return localStorage.getItem(buildLocalSotrageKey("difficulty"));
-};
-
-const writeQuestionsCountToLocal = (count: number) => {
-  localStorage.setItem(
-    buildLocalSotrageKey("questions_count"),
-    JSON.stringify(count),
-  );
-};
-
-const readQuestionsCountFromLocal = () => {
-  const count = localStorage.getItem(buildLocalSotrageKey("questions_count"));
-  if (count) {
-    return parseInt(JSON.parse(count));
-  }
-};
-
-const writeLastStageToLocal = (stage: Stage) => {
-  localStorage.setItem(buildLocalSotrageKey("last_stage"), stage);
-};
-
-const readLastStageFromLocal = () => {
-  return localStorage.getItem(buildLocalSotrageKey("last_stage")) as Stage;
-};
-
-const deleteLastStageFromLocal = () => {
-  localStorage.removeItem(buildLocalSotrageKey("last_stage"));
-};
+import useRoom from "@/lib/hooks/useRoom";
+import { Logger } from "@/logger";
+import { Stage } from "@/lib/hooks/_utils";
+import useGame from "@/lib/hooks/useGame";
 
 const StageComponent = ({
   title,
@@ -111,10 +46,18 @@ const StageComponent = ({
 };
 
 export default function RoomPage({ params }: { params: { stage: string } }) {
-  const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const { createRoom } = useRoom();
+  const {
+    initGameFromLocal,
+    updateDifficulty,
+    updateGameName,
+    writeStageToLocal,
+    updateParticipants,
+    updateQuestionsCount,
+    clearLocalGame,
+  } = useGame();
   const [stage, setStage] = useState<Stage>("name");
   const [name, setName] = useState("");
   const [participants, setParticipants] = useState<number>(2);
@@ -123,27 +66,12 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
-    const name = readRoomNameFromLocal();
-    if (name) {
-      setName(name);
-      dispatch(setGameName(name));
-    }
-    const participants = readParticipantsFromLocal();
-    if (participants) {
-      setParticipants(participants);
-      dispatch(setParticipantsCount(participants));
-    }
-    const difficulty = readDifficultyFromLocal();
-    if (difficulty) {
-      setDifficulty(difficulty as Difficulty);
-      dispatch(setGameDifficulty(difficulty as Difficulty));
-    }
-
-    const questionsCount = readQuestionsCountFromLocal();
-    if (questionsCount) {
-      setQuestionsCount(questionsCount);
-      dispatch(setGameQuestionsCount(questionsCount));
-    }
+    const { name, participants, difficulty, questionsCount } =
+      initGameFromLocal();
+    setName(name || "");
+    setParticipants(participants || 2);
+    setDifficulty(difficulty || "debut");
+    setQuestionsCount(questionsCount || undefined);
   }, []);
 
   useEffect(() => {
@@ -178,6 +106,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
         questionsCount: questionsCount!,
       });
       router.push("/admin/room/" + code);
+      clearLocalGame();
     } catch (error: any) {
       Logger.error(error);
       toast.error("Something went wrong... try again :)");
@@ -199,7 +128,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
       return;
     }
     router.push(`/admin/room/create/${newStage}`);
-    writeLastStageToLocal(newStage);
+    writeStageToLocal(newStage);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,8 +159,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
       toast.error("Please enter a name");
       return;
     }
-    dispatch(setGameName(name));
-    writeRoomNameToLocal(name);
+    updateGameName(name);
     nextStage();
   };
 
@@ -240,14 +168,12 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
       toast.error("Please enter a valid number");
       return;
     }
-    dispatch(setParticipantsCount(participants));
-    writeParticipantsToLocal(participants);
+    updateParticipants(participants);
     nextStage();
   };
 
   const handleDifficultySet = () => {
-    dispatch(setGameDifficulty(difficulty));
-    writeDifficultyToLocal(difficulty);
+    updateDifficulty(difficulty);
     nextStage();
   };
 
@@ -256,8 +182,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
       toast.error("Please enter a valid number");
       return;
     }
-    dispatch(setGameQuestionsCount(questionsCount));
-    writeQuestionsCountToLocal(questionsCount);
+    updateQuestionsCount(questionsCount);
     nextStage();
   };
 

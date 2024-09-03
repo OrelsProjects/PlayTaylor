@@ -1,0 +1,602 @@
+{
+  "questions": [
+    {
+      "question": "What is Taylor Swift's middle name?",
+      "options": [
+        {
+          "option": "Alison",
+          "correct": true,
+          "position": 0
+        },
+        {
+          "option": "Veronica",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "Ariel",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "Mary",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "When was Taylor Swift born?",
+      "options": [
+        {
+          "option": "1988",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "1998",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "1989",
+          "correct": true,
+          "position": 2
+        },
+        {
+          "option": "1992",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "Where was Taylor Swift born?",
+      "options": [
+        {
+          "option": "California",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "New York",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "Nashville",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "Pennsylvania",
+          "correct": true,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "What was Taylor Swift's first single?",
+      "options": [
+        {
+          "option": "Love Story",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "Tim McGraw",
+          "correct": true,
+          "position": 1
+        },
+        {
+          "option": "Red",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "Mine",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "When was the song Tim McGraw released?",
+      "options": [
+        {
+          "option": "2007",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "2005",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "2008",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "2006",
+          "correct": true,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "When was Fearless (Taylor's Version) released?",
+      "options": [
+        {
+          "option": "2022",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "2023",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "2019",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "2021",
+          "correct": true,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "When was Red (Taylor's Version) released?",
+      "options": [
+        {
+          "option": "2021",
+          "correct": true,
+          "position": 0
+        },
+        {
+          "option": "2020",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "2019",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "2023",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "When was Speak Now (Taylor's Version) released?",
+      "options": [
+        {
+          "option": "2022",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "2023",
+          "correct": true,
+          "position": 1
+        },
+        {
+          "option": "2019",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "2021",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "When was 1989 (Taylor's Version) released?",
+      "options": [
+        {
+          "option": "2022",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "2024",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "2019",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "2023",
+          "correct": true,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "From which album is the song Our Song?",
+      "options": [
+        {
+          "option": "Reputation",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "Speak now",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "Taylor Swift",
+          "correct": true,
+          "position": 2
+        },
+        {
+          "option": "Fearless",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "From which album is the song it's time to Go?",
+      "options": [
+        {
+          "option": "Reputation",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "Folklore",
+          "correct": true,
+          "position": 1
+        },
+        {
+          "option": "Evermore",
+          "correct": true,
+          "position": 2
+        },
+        {
+          "option": "Reputation",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "question": "From which album is the song happiness?",
+      "options": [
+        {
+          "option": "Evermore",
+          "correct": true,
+          "position": 0
+        },
+        {
+          "option": "Speak now",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "Taylor Swift",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "Fearless",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "question": "From which album is the song Timeless (from the vault)?",
+      "options": [
+        {
+          "option": "Reputation",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "Speak now",
+          "correct": true,
+          "position": 1
+        },
+        {
+          "option": "Taylor Swift",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "Fearless",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "From which album is the song Red?",
+      "options": [
+        {
+          "option": "TTPD",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "Red",
+          "correct": true,
+          "position": 1
+        },
+        {
+          "option": "1989",
+          "correct": true,
+          "position": 2
+        },
+        {
+          "option": "Fearless",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "From which album is the song Love Story?",
+      "options": [
+        {
+          "option": "Red",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "Taylor Swift",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "1989",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "Fearless",
+          "correct": true,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "From which album is the song Welcome to New York?",
+      "options": [
+        {
+          "option": "1989",
+          "correct": true,
+          "position": 0
+        },
+        {
+          "option": "Red",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "TTPD",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "Folklore",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "Complete the lyrics: Tell them how",
+      "options": [
+        {
+          "option": "crowds went wild",
+          "correct": true,
+          "position": 0
+        },
+        {
+          "option": "I fake a smile",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "stars aligned",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "we painted the sky",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "Complete the lyrics: forever winter if",
+      "options": [
+        {
+          "option": "if you knew",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "you go",
+          "correct": true,
+          "position": 1
+        },
+        {
+          "option": "if you fall",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "if you leave",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "question": "Complete the lyrics: talk your talk and",
+      "options": [
+        {
+          "option": "shake it off",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "go viral",
+          "correct": true,
+          "position": 1
+        },
+        {
+          "option": "take my hand",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "disappear",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "Complete the lyrics: I forgot that you",
+      "options": [
+        {
+          "option": "existed",
+          "correct": true,
+          "position": 0
+        },
+        {
+          "option": "were here",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "were gone",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "cried",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "Complete the lyrics: I watched superman",
+      "options": [
+        {
+          "option": "drift away",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "fly away",
+          "correct": true,
+          "position": 1
+        },
+        {
+          "option": "lose his way",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "fly to me",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "question": "Complete the lyrics: Bittersweet sixteen",
+      "options": [
+        {
+          "option": "with you",
+          "correct": true,
+          "position": 0
+        },
+        {
+          "option": "every time",
+          "correct": false,
+          "position": 1
+        },
+        {
+          "option": "suddenly",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "full-throttle",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    },
+    {
+      "question": "Complete the lyrics: meet me at",
+      "options": [
+        {
+          "option": "2am",
+          "correct": false,
+          "position": 0
+        },
+        {
+          "option": "midnight",
+          "correct": true,
+          "position": 1
+        },
+        {
+          "option": "4am",
+          "correct": false,
+          "position": 2
+        },
+        {
+          "option": "the alcott",
+          "correct": false,
+          "position": 3
+        }
+      ],
+      "difficulty": 1
+    }
+  ]
+}

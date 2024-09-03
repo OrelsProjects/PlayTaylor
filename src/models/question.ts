@@ -7,21 +7,29 @@ export type QuestionsStatus = "idle" | "loading" | "succeeded" | "failed";
 
 export const allDifficulties: Difficulty[] = ["debut", "1989", "folklore"];
 
+export const numberToDifficulty = {
+  1: "debut",
+  2: "1989",
+  3: "folklore",
+};
+
+export interface QuestionOption {
+  questionId: QuestionId;
+  option: string;
+  correct: boolean;
+  position: number;
+}
+
 export interface Question {
   id: QuestionId;
-  title: string;
-  content: string;
-  image: string;
-  answer: string;
-  type: QuestionType;
+  question: string;
+  options: QuestionOption[];
   difficulty: Difficulty;
 }
 
 export interface QuestionResponse {
-  id: string;
+  userId?: string;
   questionId: string;
-  userId: string;
-  response: string;
-  isCorrect: boolean;
   answeredAt: Date;
+  response: QuestionOption;
 }

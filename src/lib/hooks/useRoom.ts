@@ -4,25 +4,19 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/../firebase.config";
 import { useAppDispatch, useAppSelector } from "./redux";
 import { setRoom, setUserParticipant } from "../features/room/roomSlice";
-import {
-  setPin,
-  setGameDifficulty,
-  setGameName,
-  setQuestions,
-  setParticipantsCount,
-  setQuestionsCount,
-} from "../features/game/gameSlice";
 import { Logger } from "../../logger";
-import { Difficulty } from "../../models/question";
 import { useRef, useState } from "react";
 import LoadingError from "../../models/errors/LoadingError";
-
-export type Stage = "name" | "participants" | "difficulty" | "question";
-
-export const LOCAL_STORAGE_PREFIX = "create_game_play_tayor";
-
-export const buildLocalSotrageKey = (key: string) =>
-  `${LOCAL_STORAGE_PREFIX}_${key}`;
+import { buildLocalSotrageKey } from "./_utils";
+import {
+  setGameDifficulty,
+  setGameName,
+  setParticipantsCount,
+  setPin,
+  setQuestions,
+  setQuestionsCount,
+} from "../features/game/gameSlice";
+import { Difficulty } from "../../models/question";
 
 const writeCodeToLocal = (pin: string) => {
   localStorage.setItem(buildLocalSotrageKey("pin"), pin);
@@ -77,8 +71,8 @@ export default function useRoom() {
 
   async function createRoom(room: CreateRoom): Promise<string> {
     try {
-      const response = await axios.post("/api/game/create", room);
-      dispatch(setPin(response.data.code));
+      const response = await axios.post<Room>("/api/game/create", room);
+      dispatch(setRoom(response.data));
       writeCodeToLocal(response.data.code);
       return response.data.code;
     } catch (error) {
@@ -90,7 +84,9 @@ export default function useRoom() {
   async function setPreviouslyCreatedRoom(code: string) {
     try {
       const room = await getRoom(code);
+      // This is for the game play
       dispatch(setRoom(room));
+      // This is for the game created
       dispatch(setPin(code));
       dispatch(setGameName(room.name));
       dispatch(setParticipantsCount(room.participants.length || 0));

@@ -1,5 +1,4 @@
-import { Question } from "@prisma/client";
-import { Difficulty } from "./question";
+import { QuestionResponse, Difficulty, Question } from "./question";
 import { GameStage } from "./gameStage";
 
 export const QUESTION_TIME = 20; // 20 seconds
@@ -7,7 +6,7 @@ export const QUESTION_ENDED_TIME = 3; // 3 seconds
 export const SHOW_LEADERBOARD_TIME = 7; // 7 seconds
 
 export interface Participant {
-  correctAnswers: number;
+  questionResponses?: QuestionResponse[];
   joinedAt: number;
   name: string;
   userId?: string | null;

@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { useAppSelector } from "@/lib/hooks/redux";
 import PlayerCard from "./playerCard";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
-import { cn } from "../../../../../lib/utils";
+import { cn } from "@/lib/utils";
 
 export default function LeaderboardPage({
   params,
@@ -27,14 +27,12 @@ export default function LeaderboardPage({
     >
       <div className="w-full flex flex-col gap-8 justify-center items-center">
         <span className="text-2xl font-semibold text-center">
-          {currentQuestion?.title || "What was Taylor’s debut single?"}
+          {currentQuestion?.question || "What was Taylor’s debut single?"}
         </span>
         <div className="w-full relative">
           <div className="w-full bg-question-correct flex justify-center items-center rounded-2xl py-5 z-20 relative">
             {/* Make a square with rounded-lg, rotate 90 deg and set absolute middle bottom*/}
-            <span className=" text-primary-foreground z-20">
-              Tim McGraw
-            </span>
+            <span className=" text-primary-foreground z-20">Tim McGraw</span>
             <div className="w-10 h-10 bg-question-correct rounded-[4px] transform rotate-45 absolute -bottom-2.5 left-1/2 -translate-x-1/2 z-10"></div>
           </div>
         </div>

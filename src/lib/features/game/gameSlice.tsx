@@ -6,7 +6,7 @@ import {
   QuestionResponse,
   QuestionsStatus,
 } from "@/models/question";
-import { Question } from "@prisma/client";
+import { Question } from "@/models/question";
 
 export interface GameState {
   gameName?: string;
@@ -75,6 +75,14 @@ const gameSlice = createSlice({
       state.questionsStatus = action.payload.status;
     },
     addQuestionResponse: (state, action: PayloadAction<QuestionResponse>) => {
+      if (
+        state.questionsResponses.find(
+          response => response.questionId === action.payload.questionId,
+        )
+      ) {
+        // user already answered this question
+        return;
+      }
       state.questionsResponses.push(action.payload);
     },
     updateQuestionResponse: (
@@ -82,12 +90,12 @@ const gameSlice = createSlice({
       action: PayloadAction<QuestionResponse>,
     ) => {
       state.questionsResponses = state.questionsResponses.map(response =>
-        response.id === action.payload.id ? action.payload : response,
+        response.questionId === action.payload.questionId ? action.payload : response,
       );
     },
-    removeQuestionResponse: (state, action: PayloadAction<{ id: string }>) => {
+    removeQuestionResponse: (state, action: PayloadAction<{ questionId: string }>) => {
       state.questionsResponses = state.questionsResponses.filter(
-        response => response.id !== action.payload.id,
+        response => response.questionId !== action.payload.questionId,
       );
     },
   },
