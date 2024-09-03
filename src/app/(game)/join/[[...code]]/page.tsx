@@ -1,45 +1,54 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Input } from "../../../../components/ui/input";
-import { Button } from "../../../../components/ui/button";
-import useRoom from "../../../../lib/hooks/useRoom";
-import { useAppDispatch, useAppSelector } from "../../../../lib/hooks/redux";
-import {
-  setRoom,
-  setUserParticipant,
-} from "../../../../lib/features/room/roomSlice";
-import Room from "../../../../models/room";
 import { useRouter } from "next/navigation";
-import { Logger } from "../../../../logger";
+import useGame from "@/lib/hooks/useGame";
+import { Logger } from "@/logger";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/redux";
+import { toast } from "react-toastify";
 
 type Stage = "pin" | "name";
 
 export default function Join({ params }: { params: { code?: string[] } }) {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const { getRoom, joinRoom, setPreviouslyJoinedRoom } = useRoom();
-  const { room } = useAppSelector(state => state.room);
+  const { getGame, joinGame, setPreviouslyJoinedGame } = useGame();
+  // const { room } = useAppSelector(state => state.room);
+  const { game } = useAppSelector(state => state.game);
 
-  const [pin, setPin] = useState("");
+  const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState<Stage>("pin");
 
+  const checkPreviouslyJoinedRoom = async (code: string): Promise<boolean> => {
+    try {
+      const gameSession = await setPreviouslyJoinedGame(code);
+      if (gameSession) {
+        const { game } = gameSession;
+        if (game.gameStartedAt) {
+          router.push("/lobby/" + code);
+        } else {
+          router.push("/waiting/" + code);
+        }
+        return true;
+      }
+      return false;
+    } catch (e: any) {
+      Logger.error(e);
+      return false;
+    }
+  };
+
   useEffect(() => {
-    if (params.code) {
-      const pin = params.code[0];
-      setPreviouslyJoinedRoom(pin)
-        .then(response => {
-          if (response) {
-            if (response.room.gameStartedAt) {
-              router.push("/lobby/" + pin);
-            } else {
-              router.push("/waiting/" + pin);
-            }
-          }
-        })
-        .catch(() => {});
+    if (params.code?.length) {
+      const code = params.code[0];
+      checkPreviouslyJoinedRoom(code).then(didJoinRoom => {
+        if (!didJoinRoom) {
+          setCode(code);
+        }
+      });
     }
   }, [params.code]);
 
@@ -48,27 +57,30 @@ export default function Join({ params }: { params: { code?: string[] } }) {
     setLoading(true);
     try {
       if (stage === "pin") {
-        const room: Room = await getRoom(pin);
-        if (room) {
-          dispatch(setRoom(room));
+        const didJoinRoom = await checkPreviouslyJoinedRoom(code);
+        if (didJoinRoom) return;
+        debugger;
+        const game = await getGame(code);
+        if (game) {
           setStage("name");
         }
       } else {
-        if (!room) {
-          Logger.error("Room not found");
+        if (!game) {
+          Logger.error("Game not found");
           return;
         }
-        const participant = await joinRoom(room, name);
-        if (participant) {
-          dispatch(setUserParticipant(participant));
-          if (room?.gameStartedAt) {
-            router.push("/lobby/" + pin);
-          } else {
-            router.push("/waiting/" + pin);
-          }
+        const GameSession = await joinGame(code, name);
+        if (GameSession?.game?.gameStartedAt) {
+          router.push("/lobby/" + code);
+        } else {
+          router.push("/waiting/" + code);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
+      debugger;
+      if (error.name === "NameTakenError") {
+        toast.error("Name taken"); // TODO: Copy
+      }
     } finally {
       setLoading(false);
     }
@@ -85,12 +97,12 @@ export default function Join({ params }: { params: { code?: string[] } }) {
             <Input
               type="text"
               placeholder={"Pin"}
-              value={pin}
+              value={code}
               maxLength={6}
               onChange={e => {
                 if (stage === "pin") {
                   const upperCasePin = e.target.value.toUpperCase();
-                  setPin(upperCasePin);
+                  setCode(upperCasePin);
                 }
               }}
             />

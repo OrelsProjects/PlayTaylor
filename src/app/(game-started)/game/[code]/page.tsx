@@ -4,14 +4,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { useRouter } from "next/navigation";
-import useRoom from "@/lib/hooks/useRoom";
 import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import RadialProgressBar from "@/components/ui/radialProgressBar";
-import { QUESTION_TIME, QuestionWithTimer } from "@/models/room";
+import { QuestionWithTimer } from "@/models/room";
 import useGame from "@/lib/hooks/useGame";
 import { QuestionOption } from "@/models/question";
+import { QUESTION_TIME } from "@/models/game";
+import { toast } from "react-toastify";
 
 const colors = [
   "hsla(37, 91%, 55%, 1)",
@@ -53,7 +54,8 @@ export default function Game({ params }: { params: { code: string } }) {
   const router = useRouter();
   const { user } = useAppSelector(state => state.auth);
   const { room } = useAppSelector(state => state.room);
-  const { setPreviouslyJoinedRoom, setPreviouslyCreatedRoom } = useRoom();
+  const { game } = useAppSelector(state => state.game);
+  const { setPreviouslyJoinedGame } = useGame();
   const { answerQuestion } = useGame();
 
   const [currentQuestion, setCurrentQuestion] =
@@ -62,16 +64,16 @@ export default function Game({ params }: { params: { code: string } }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!room) return;
+    if (!room || !game) return;
 
-    if (!room.gameStartedAt) {
+    if (!game.gameStartedAt) {
       if (room.createdBy === user?.userId) {
         router.push("/admin/room/" + room.code);
       } else {
         router.push("/waiting/" + room.code);
       }
     }
-    const currentQuestion = room.currentQuestion as QuestionWithTimer;
+    const currentQuestion = game.currentQuestion as QuestionWithTimer;
 
     setCountdown(currentQuestion.timer);
 
@@ -82,32 +84,20 @@ export default function Game({ params }: { params: { code: string } }) {
   useEffect(() => {
     if (!params.code) return;
 
-    if (room?.createdBy === user?.userId) {
-      setPreviouslyCreatedRoom(params.code)
-        .then(previouslyCreatedRoom => {
-          if (!previouslyCreatedRoom) {
-            router.push("/");
-          }
-        })
-        .catch(() => {
+    setPreviouslyJoinedGame(params.code)
+      .then(response => {
+        if (!response?.room) {
           router.push("/");
-        });
-    } else {
-      setPreviouslyJoinedRoom(params.code)
-        .then(response => {
-          if (!response?.room) {
-            router.push("/");
-          }
-        })
-        .catch(() => {
-          router.push("/");
-        });
-    }
+        }
+      })
+      .catch(() => {
+        router.push("/");
+      });
   }, [params.code]);
 
   const didAnswerCurrentQuestion = useMemo(() => {
-    if (!room || !user) return false;
-    const participant = room.participants.find(p => p.userId === user.userId);
+    if (!game || !user) return false;
+    const participant = game.participants.find(p => p.userId === user.userId);
     if (!participant) return false;
     return participant.questionResponses?.some(
       qr => qr.response.questionId === currentQuestion?.id,
@@ -116,7 +106,7 @@ export default function Game({ params }: { params: { code: string } }) {
 
   const canAnswer = useMemo(
     () =>
-      room?.stage === "playing" &&
+      game?.stage === "playing" &&
       currentQuestion !== null &&
       !didAnswerCurrentQuestion,
     [room],
@@ -128,7 +118,7 @@ export default function Game({ params }: { params: { code: string } }) {
       await answerQuestion(response, currentQuestion.id);
     } catch (error: any) {
       if (error.name === "AnsweredTooLateError") {
-        alert("You answered too late");
+        toast.error("You answered too late.. :("); // TODO: Copy
       }
       console.error(error);
     }

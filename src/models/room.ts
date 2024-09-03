@@ -10,12 +10,14 @@ export default interface Room {
   code: string;
   name: string;
   createdBy: string;
-  questions: Question[];
-}
-
-export type CreateRoom = {
-  name: string;
+  createdAt: number;
   questionsCount: number;
   participantsCount: number;
   difficulty: Difficulty;
-};
+  questions: Question[];
+}
+
+export type CreateRoom = Pick<
+  Room,
+  "name" | "difficulty" | "questionsCount" | "participantsCount"
+>;

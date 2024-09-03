@@ -11,12 +11,12 @@ export default function LeaderboardPage({
 }: {
   params: { code: string };
 }) {
-  const { room } = useAppSelector(state => state.room); // FOR NEXT - Change CODE params to search params and use useCUstomRouter form saas-template
+  const { game } = useAppSelector(state => state.game); // FOR NEXT - Change CODE params to search params and use useCUstomRouter form saas-template
 
   const currentQuestion = useMemo(() => {
-    if (!room) return null;
-    return room.currentQuestion;
-  }, [room]);
+    if (!game) return null;
+    return game.currentQuestion;
+  }, [game]);
 
   return (
     <div

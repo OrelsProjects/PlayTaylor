@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import RoomNameComponent from "../../components/roomName";
 import { cn } from "../../lib/utils";
 import { montserratAlternates } from "../../lib/utils/fontUtils";
 import { useAppSelector } from "../../lib/hooks/redux";
 import { PauseButton } from "./pauseButton";
 
-export default function LobbyLayout({
+export default function GameStartedLayout({
   children,
 }: {
   children: React.ReactNode;

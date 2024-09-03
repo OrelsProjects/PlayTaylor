@@ -1,16 +1,15 @@
-import { db } from "@/../firebase.config.admin";
-import { roomConverter } from "../../roomConverter";
-import { RoomDoesNotExistError } from "@/models/errors/RoomDoesNotExistError";
-import { Question } from "@prisma/client";
-import Room, {
+import { GameDoesNotExistError } from "@/models/errors/RoomDoesNotExistError";
+import {
+  Game,
   QUESTION_TIME,
   QUESTION_ENDED_TIME,
   SHOW_LEADERBOARD_TIME,
-} from "@/models/room";
-import { GamePausedError } from "../../../../../../models/errors/GamePausedError";
+} from "@/models/game";
+import { GamePausedError } from "@/models/errors/GamePausedError";
+import Room from "@/models/room";
+import { gameDocServer, gameSessionDocServer, roomDocServer } from "@/app/api/_db/firestoreServer";
 
-type RoomRef =
-  FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>;
+type GameRef = FirebaseFirestore.DocumentReference<Game, any>;
 
 /**
  * Start countdown of 20 seconds.
@@ -22,27 +21,21 @@ type RoomRef =
  */
 export async function runLogic(roomCode: string) {
   try {
-    const database = db();
-    const roomRef = database
-      .collection("rooms")
-      .doc(roomCode)
-      .withConverter(roomConverter);
-
-    const roomSnapshot = await roomRef.get();
-    const roomData = roomSnapshot.data();
-
-    if (!roomData) {
-      throw new RoomDoesNotExistError();
+    const gameSession = (await gameSessionDocServer(roomCode).get()).data();
+    if (!gameSession) {
+      throw new GameDoesNotExistError();
     }
+    const gameRef = gameDocServer(roomCode);
+    const { room, game } = gameSession;
 
-    await startQuestionCountdown(roomRef);
-    await startQuestionEnded(roomRef);
-    await startShowLeaderboard(roomRef, roomData);
-    const gameOver = await isGameOver(roomData);
+    await startQuestionCountdown(gameRef);
+    await startQuestionEnded(gameRef);
+    await startShowLeaderboard(gameRef, game);
+    const gameOver = await isLastQuestion(game, room);
     if (gameOver) {
-      await endGame(roomRef);
+      await endGame(gameRef);
     } else {
-      await updateQuestionNumber(roomRef, roomData);
+      await updateQuestionNumber(gameRef, game, room);
     }
   } catch (error: any) {
     if (error.name === "GamePausedError") {
@@ -57,23 +50,23 @@ export async function runLogic(roomCode: string) {
  * If the current stage was "paused", then resume the countdown from the time it was paused.
  * Otherwise, start the countdown from 20 seconds.
  */
-async function startQuestionCountdown(roomRef: RoomRef) {
+async function startQuestionCountdown(gameRef: GameRef) {
   await new Promise<void>((resolve, reject) => {
     // interval logic
     const interval = setInterval(() => {
-      roomRef.get().then(roomData => {
-        const room = roomData.data();
-        if (!room) {
-          reject(new RoomDoesNotExistError());
+      gameRef.get().then(gameData => {
+        const game = gameData.data();
+        if (!game) {
+          reject(new GameDoesNotExistError());
           clearInterval(interval);
           return;
         }
-        const currentStage = room.stage;
+        const currentStage = game.stage;
 
-        let questionTimer = room.currentQuestion.timer || QUESTION_TIME;
+        let questionTimer = game.currentQuestion.timer || QUESTION_TIME;
         // FOR NEXT DESIGN THE REST OF THE SCREENS AND SET THE LOGIC TO WORK WITH THEM (STAGE)
         if (currentStage === "paused") {
-          const currentTime = room.currentQuestion.timer;
+          const currentTime = game.currentQuestion.timer;
           questionTimer = currentTime;
           clearInterval(interval);
           reject(new GamePausedError());
@@ -81,9 +74,9 @@ async function startQuestionCountdown(roomRef: RoomRef) {
         }
 
         questionTimer -= 1;
-        roomRef
+        gameRef
           .update({
-            "currentQuestion.timer": questionTimer,
+            countdownCurrentTime: questionTimer,
           })
           .catch(error => {
             clearInterval(interval);
@@ -103,16 +96,16 @@ async function startQuestionCountdown(roomRef: RoomRef) {
  * Change the state to "question-ended".
  * Update countdownQuestionEnded to 3 and start the countdown with an interval of 1 second.
  */
-async function startQuestionEnded(roomRef: RoomRef) {
+async function startQuestionEnded(gameRef: GameRef) {
   let currentTime = QUESTION_ENDED_TIME - 1;
-  await roomRef.update({
+  await gameRef.update({
     stage: "question-ended",
     countdownQuestionEnded: currentTime,
   });
 
   await new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
-      roomRef
+      gameRef
         .update({
           countdownQuestionEnded: currentTime,
         })
@@ -135,16 +128,16 @@ async function startQuestionEnded(roomRef: RoomRef) {
  * Change the state to "show-leaderboard".
  * Update countdownShowLeaderboard to 7 and start the countdown with an interval of 1 second.
  */
-async function startShowLeaderboard(roomRef: RoomRef, room: Room) {
+async function startShowLeaderboard(gameRef: GameRef, game: Game) {
   let currentTime = SHOW_LEADERBOARD_TIME - 1;
-  await roomRef.update({
+  await gameRef.update({
     stage: "show-leaderboard",
     countdownShowLeaderboard: currentTime,
   });
 
   await new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
-      roomRef
+      gameRef
         .update({
           countdownShowLeaderboard: currentTime,
         })
@@ -166,11 +159,11 @@ async function startShowLeaderboard(roomRef: RoomRef, room: Room) {
  *
  * MUST BE CALLED BEFORE updateQuestionNumber.
  */
-async function isGameOver(room: Room): Promise<boolean> {
-  const currentQuestionId = room.currentQuestion.id;
+async function isLastQuestion(game: Game, room: Room): Promise<boolean> {
+  const currentQuestionId = game.currentQuestion.id;
   const totalQuestions = room.questions.length;
   const questionIndex = room.questions.findIndex(
-    (question: Question) => question.id === currentQuestionId,
+    question => question.id === currentQuestionId,
   );
 
   return questionIndex === totalQuestions - 1;
@@ -180,22 +173,22 @@ async function isGameOver(room: Room): Promise<boolean> {
  * End the game.
  * Change the state to "game-ended".
  */
-async function endGame(roomRef: RoomRef) {
-  await roomRef.update({
+async function endGame(gameRef: GameRef) {
+  await gameRef.update({
     stage: "game-ended",
   });
 }
 
-async function updateQuestionNumber(roomRef: RoomRef, room: Room) {
-  const currentQuestionId = room.currentQuestion.id;
+async function updateQuestionNumber(gameRef: GameRef, game: Game, room: Room) {
+  const currentQuestionId = game.currentQuestion.id;
   const questionIndex = room.questions.findIndex(
-    (question: Question) => question.id === currentQuestionId,
+    question => question.id === currentQuestionId,
   );
 
   const nextQuestionIndex = questionIndex + 1;
   const nextQuestion = room.questions[nextQuestionIndex];
 
-  await roomRef.update({
+  await gameRef.update({
     currentQuestion: nextQuestion,
     stage: "playing",
   });

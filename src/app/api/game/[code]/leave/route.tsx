@@ -1,50 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
-import Logger from "../../../../../loggerServer";
-import { db } from "../../../../../../firebase.config.admin";
+import Logger from "@/loggerServer";
+import { participantDocServer } from "@/app/api/_db/firestoreServer";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth/authOptions";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { code: string } },
 ): Promise<any> {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
-    const { name } = await req.json();
+    const { userId } = session.user;
+    const participant = (
+      await participantDocServer(params.code, userId).get()
+    ).data();
 
-    const database = db();
-    const roomRef = database.collection("rooms").doc(params.code);
-    const roomSnapshot = await roomRef.get();
-
-    if (!roomSnapshot.exists) {
-      return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    }
-
-    let roomData = roomSnapshot.data();
-
-    if (!roomData || !roomData.participants) {
+    if (!participant) {
       return NextResponse.json(
-        { error: "No participants in the room" },
+        { error: "Participant not found" },
         { status: 404 },
       );
     }
 
-    let participants = roomData.participants;
-    const timestamp = Date.now();
-    const participantIndex = participants.findIndex(
-      (p: any) => p.name === name,
-    );
-
-    if (participantIndex === -1) {
-      return NextResponse.json(
-        { error: "Participant is not in the room" },
-        { status: 400 },
-      );
-    }
-
-    // Update the participant's leftAt time
-    participants[participantIndex].leftAt = timestamp;
-
-    // Update the participants array in Firestore
-    await roomRef.update({
-      participants: participants,
+    await participantDocServer(params.code, userId).update({
+      leftAt: new Date(),
     });
 
     return NextResponse.json({}, { status: 200 });

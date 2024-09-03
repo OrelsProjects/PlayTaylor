@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import Image from "next/image";
-import { Button } from "../../../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
 const Butterfly = ({ number }: { number: number }) => (

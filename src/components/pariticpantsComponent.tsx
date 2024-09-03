@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import useRoom from "../lib/hooks/useRoom";
-import Room, { Participant } from "../models/room";
-import { cn } from "../lib/utils";
-import { useAppSelector } from "../lib/hooks/redux";
+import Room from "@/models/room";
+import { Game, Participant } from "@/models/game";
+import { cn } from "@/lib/utils";
+import { useAppSelector } from "@/lib/hooks/redux";
 
 const MAX_PARTICIPANTS_UI = 4;
 
@@ -36,23 +36,18 @@ const ParticipantComponent = ({
 export default function ParticipantsComponent({
   code,
   className,
-  onCountdownStarted,
 }: {
   code: string;
   className?: string;
-  onCountdownStarted: (room: Room) => void;
 }) {
-  const { room } = useAppSelector(state => state.room);
+  const { game } = useAppSelector(state => state.game);
   const [participants, setParticipants] = useState<Participant[]>([]);
 
   useEffect(() => {
-    if (room) {
-      if (room.countdownStartedAt) {
-        onCountdownStarted(room);
-      }
-      setParticipants(room.participants);
+    if (game) {
+      setParticipants(game.participants);
     }
-  }, [room]);
+  }, [game]);
 
   return (
     participants.length > 0 && (

@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Logger from "@/loggerServer";
-import { db } from "@/../firebase.config.admin";
-import { roomConverter } from "../roomConverter";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../../../auth/authOptions";
+import { authOptions } from "@/auth/authOptions";
+import { gameDocServer, gameSessionDocServer } from "../../../_db/firestoreServer";
 
 export async function POST(
   req: NextRequest,
@@ -15,19 +14,13 @@ export async function POST(
   }
   const { user } = session;
   try {
-    const database = db();
-    const roomRef = database
-      .collection("rooms")
-      .doc(params.code)
-      .withConverter(roomConverter);
-    const roomSnapshot = await roomRef.get();
-    const roomData = roomSnapshot.data();
+    const gameData = (await gameSessionDocServer(params.code).get()).data();
 
-    if (!roomData) {
+    if (!gameData) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    const creator = roomData.createdBy;
+    const creator = gameData.room.createdBy;
 
     if (user.userId !== creator) {
       return NextResponse.json(
@@ -35,12 +28,12 @@ export async function POST(
         { status: 401 },
       );
     } else {
-      await roomRef.update({
+      await gameDocServer(params.code).update({
         stage: "paused",
       });
     }
 
-    return NextResponse.json(roomData, { status: 200 });
+    return NextResponse.json(gameData, { status: 200 });
   } catch (error: any) {
     Logger.error("Error in finding the room", "unknown", {
       error,

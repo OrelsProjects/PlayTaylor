@@ -2,9 +2,8 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/auth/authOptions";
 import { isOwnerOfRoom } from "../../_utils";
-import { roomConverter } from "../../roomConverter";
-import { db } from "@/../firebase.config.admin";
 import { runLogic } from "./questionLogic";
+import { roomDocServer } from "@/app/api/_db/firestoreServer";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -20,13 +19,7 @@ export async function POST(
   try {
     const { user } = session;
 
-    const database = db();
-    const roomRef = database
-      .collection("rooms")
-      .doc(params.code)
-      .withConverter(roomConverter);
-
-    const isOwner = await isOwnerOfRoom(user.userId, params.code, roomRef);
+    const isOwner = await isOwnerOfRoom(user.userId, params.code);
     if (!isOwner) {
       return NextResponse.json(
         { error: "You are not authorized to resume the game" },

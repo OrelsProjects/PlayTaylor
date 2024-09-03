@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { AnimatePresence, motion } from "framer-motion";
-import useRoom from "@/lib/hooks/useRoom";
 import { useRouter } from "next/navigation";
-import { isGameStarted } from "@/models/gameStage";
 import { useAppSelector } from "@/lib/hooks/redux";
-import Room from "@/models/room";
+import { Game, isGameStarted } from "@/models/game";
+import useGame from "@/lib/hooks/useGame";
 
 const leftToRightAnimation = {
   initial: { x: "-100%", opacity: 0, transition: { duration: 0.3 } },
@@ -23,19 +22,20 @@ const Counter = ({
   code: string;
   onCountdownZero: () => void;
 }) => {
-  const { room } = useAppSelector(state => state.room);
+  const { game } = useAppSelector(state => state.game);
 
-  const { setPreviouslyJoinedRoom } = useRoom();
+  const { setPreviouslyJoinedGame } = useGame();
   const [count, setCount] = useState(1);
 
-  const handleNewCounter = (newCount?: number | null, newRoom?: Room) => {
-    if (!room && !newRoom) return;
+  const handleNewCounter = (newCount?: number | null, newGame?: Game) => {
+    if (!game && !newGame) return;
 
-    const validCount = newCount === null || newCount === undefined ? 4 : newCount;
+    const validCount =
+      newCount === null || newCount === undefined ? 4 : newCount;
 
     setCount(validCount);
 
-    const validRoom = (newRoom ? newRoom : room) as Room;
+    const validRoom = (newGame ? newGame : game) as Game;
 
     if (isGameStarted(validRoom.stage)) {
       if (validCount <= 1) {
@@ -44,18 +44,18 @@ const Counter = ({
     }
   };
   useEffect(() => {
-    setPreviouslyJoinedRoom(code).then(response => {
-      if (!response) return;
-      const { room: newRoom } = response;
-      handleNewCounter(newRoom.countdownCurrentTime, newRoom);
+    setPreviouslyJoinedGame(code).then(gameSession => {
+      if (!gameSession) return;
+      const { game: newGame } = gameSession;
+      handleNewCounter(newGame.countdownCurrentTime, newGame);
     });
   }, [code]);
 
   useEffect(() => {
-    if (room) {
-      handleNewCounter(room.countdownCurrentTime);
+    if (game) {
+      handleNewCounter(game.countdownCurrentTime);
     }
-  }, [room]);
+  }, [game]);
 
   const countText = useMemo(() => (count <= 4 ? count : null), [count]);
 

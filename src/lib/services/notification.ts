@@ -74,6 +74,5 @@ export async function getToken(): Promise<string | undefined> {
 
   const token = await getUserToken();
 
-  console.log(token);
   return token;
 }

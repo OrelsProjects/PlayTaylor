@@ -2,9 +2,9 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import loggerServer from "@/loggerServer";
 import { authOptions } from "@/auth/authOptions";
-import { db } from "@/../firebase.config.admin";
 import { QuestionResponse } from "@/models/question";
-import { roomConverter } from "../../../roomConverter";
+import { gameSessionDocServer, participantDocServer } from "@/app/api/_db/firestoreServer";
+import { GameSession } from "@/models/game";
 import { AnsweredTooLateError } from "@/models/errors/AnsweredTooLateError";
 
 export async function POST(
@@ -19,53 +19,42 @@ export async function POST(
   },
 ) {
   const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
-    const {
-      response,
-      participantName,
-    }: { response: QuestionResponse; participantName: string } =
-      await req.json();
-    const database = db();
-    const roomRef = database
-      .collection("rooms")
-      .doc(params.code)
-      .withConverter(roomConverter);
-    const roomSnapshot = await roomRef.get();
-    const room = roomSnapshot.data();
-    if (!room) {
+    const { response }: { response: QuestionResponse } = await req.json();
+    const gameSessionRef = gameSessionDocServer(params.code);
+    const gameSessionSnapshot = await gameSessionRef.get();
+    const gameSession: GameSession | undefined = gameSessionSnapshot.data();
+
+    if (!gameSession) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    // if (room.stage !== "playing") {
-    //   return NextResponse.json(
-    //     { error: AnsweredTooLateError },
-    //     { status: 400 },
-    //   );
-    // }
+    const { game, participants } = gameSession;
 
-    const { participants } = room;
+    if (game.stage !== "playing" && game.stage !== "paused") {
+      return NextResponse.json(
+        { error: AnsweredTooLateError },
+        { status: 400 },
+      );
+    }
 
-    const participantIndex = participants.findIndex(
-      (p: any) => p.name === participantName,
+    const participant = participants.find(
+      p => p.userId === session.user.userId,
     );
 
-    if (participantIndex === -1) {
+    if (!participant) {
       return NextResponse.json(
         { error: "Participant not found" },
         { status: 404 },
       );
     }
-// So in order to avoid race to the same resource(participants in rooms), we need to avoid updating the whole participants array in the room document. Instead, we should update only the participant that we want to update.
-// To do this, we need to:
-// 1. Find the participant in the participants array.
-// 2. Update the participant in the participants array.
-// 3. Update the room document with the updated participants array.
-// So, we need to create a collection for each participant in the room/participants array.
-// This way, we can update the participant without updating the whole participants array.
-    participants[participantIndex].questionResponses?.push(response);
 
     // update participant in index participantIndex
-    await roomRef.update({ participants });
+    const participantRef = participantDocServer(params.code, participant.userId);
+    await participantRef.update({ ...participant, response });
   } catch (error: any) {
     loggerServer.error(
       "Error in finding the room",
