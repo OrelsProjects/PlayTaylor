@@ -29,10 +29,9 @@ export async function DELETE(
   }
 
   try {
-    await prisma.question.update({
+    await prisma.question.delete({
       where: { id: params.id },
-      data: { isDeleted: true },
-    }); 
+    });
     return NextResponse.json({}, { status: 200 });
   } catch (error: any) {
     Logger.error(

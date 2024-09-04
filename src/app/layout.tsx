@@ -1,18 +1,19 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import "../../firebase.config.admin";
-import StoreProvider from "./providers/StoreProvider";
-import { ThemeProvider } from "./providers/ThemeProvider";
-import SessionWrapper from "./providers/SessionWrapper";
-import React from "react";
-import AuthProvider from "./providers/AuthProvider";
+import "@/../firebase.config.admin";
+import StoreProvider from "@/app/providers/StoreProvider";
+import { ThemeProvider } from "@/app/providers/ThemeProvider";
+import SessionWrapper from "@/app/providers/SessionWrapper";
+import React, { Suspense } from "react";
+import AuthProvider from "@/app/providers/AuthProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
-import TopLoaderProvider from "./providers/TopLoaderProvider";
+import TopLoaderProvider from "@/app/providers/TopLoaderProvider";
 import Script from "next/script";
-import BackgroundProvider from "./providers/BackgroundProvider";
-import LoggersProvider from "./providers/LoggersProvider";
-import RoomListenerProvider from "./providers/RoomListenerProvider";
+import BackgroundProvider from "@/app/providers/BackgroundProvider";
+import LoggersProvider from "@/app/providers/LoggersProvider";
+import GameListenerProvider from "@/app/providers/GameListenerProvider";
+import Loading from "@/components/ui/loading";
 
 const APP_NAME = "Play Taylor";
 const APP_DEFAULT_TITLE = "Play Taylor";
@@ -79,22 +80,28 @@ export default function Layout({ children }: RootLayoutProps) {
         ></Script>
       </head>
       <body className="!overscroll-none">
-        <StoreProvider>
-          <SessionWrapper>
-            <ThemeProvider>
-              <AuthProvider>
-                <TopLoaderProvider />
-                <LoggersProvider />
-                <RoomListenerProvider />
-                <BackgroundProvider className="w-full h-svh flex flex-col">
-                  {children}
-                </BackgroundProvider>
-                <SpeedInsights />
-                <Analytics />
-              </AuthProvider>
-            </ThemeProvider>
-          </SessionWrapper>
-        </StoreProvider>
+        <Suspense
+          fallback={
+            <Loading spinnerClassName="absolute top-1/2 left-1/2 h-10 w-10" />
+          }
+        >
+          <StoreProvider>
+            <SessionWrapper>
+              <ThemeProvider>
+                <AuthProvider>
+                  <TopLoaderProvider />
+                  <LoggersProvider />
+                  <GameListenerProvider />
+                  <BackgroundProvider className="w-full h-svh flex flex-col">
+                    {children}
+                  </BackgroundProvider>
+                  <SpeedInsights />
+                  <Analytics />
+                </AuthProvider>
+              </ThemeProvider>
+            </SessionWrapper>
+          </StoreProvider>
+        </Suspense>
       </body>
     </html>
   );

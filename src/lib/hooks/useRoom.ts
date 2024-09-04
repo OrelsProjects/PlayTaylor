@@ -1,80 +1,29 @@
 import axios from "axios";
-import Room, { CreateRoom, Participant } from "../../models/room";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "@/../firebase.config";
-import { useAppDispatch, useAppSelector } from "./redux";
-import { setRoom, setUserParticipant } from "../features/room/roomSlice";
-import { Logger } from "../../logger";
-import { useRef, useState } from "react";
-import LoadingError from "../../models/errors/LoadingError";
-import { buildLocalSotrageKey } from "./_utils";
+import Room, { CreateRoom } from "@/models/room";
+import { onSnapshot } from "firebase/firestore";
+import { useAppDispatch } from "@/lib/hooks/redux";
 import {
   setGameDifficulty,
   setGameName,
   setParticipantsCount,
-  setPin,
-  setQuestions,
   setQuestionsCount,
-} from "../features/game/gameSlice";
-import { Difficulty } from "../../models/question";
-
-const writeCodeToLocal = (pin: string) => {
-  localStorage.setItem(buildLocalSotrageKey("pin"), pin);
-};
-
-const readCodeFromLocal = () => {
-  return localStorage.getItem(buildLocalSotrageKey("pin"));
-};
+  setRoom,
+} from "@/lib/features/room/roomSlice";
+import { Logger } from "@/logger";
+import { Difficulty } from "@/models/question";
+import { roomDocClient } from "@/lib/utils/firestoreClient";
+import { GameSession } from "../../models/game";
 
 export type Unsubscribe = () => void;
 
-type Rooms = {
-  participant: Participant;
-  code: string;
-}[];
-
-const getRoomsJoined = (): Rooms => {
-  const rooms = localStorage.getItem("rooms") || "[]";
-  return JSON.parse(rooms);
-};
-
-const saveRoomJoined = (code: string, participant: Participant) => {
-  let rooms = getRoomsJoined();
-  const joinedRoom = rooms.find(room => room.code === code);
-  if (joinedRoom) {
-    // update participant
-    joinedRoom.participant = participant;
-    rooms = rooms.map(room => (room.code === code ? joinedRoom : room));
-  } else {
-    rooms.push({ code, participant });
-  }
-  localStorage.setItem("rooms", JSON.stringify(rooms));
-};
-
-const getRoomJoinedParticipant = (code: string): Participant | null => {
-  const rooms = getRoomsJoined();
-  const room = rooms.find(room => room.code === code);
-  return room?.participant || null;
-};
-
-const removeRoomJoined = (code: string) => {
-  let rooms = getRoomsJoined();
-  rooms = rooms.filter(room => room.code !== code);
-  localStorage.setItem("rooms", JSON.stringify(rooms));
-};
-
 export default function useRoom() {
   const dispatch = useAppDispatch();
-  const { room, userParticipant } = useAppSelector(state => state.room);
-  const loadingCountdown = useRef(false);
-  const [loadingGameState, setLoadingGameState] = useState(false);
 
   async function createRoom(room: CreateRoom): Promise<string> {
     try {
-      const response = await axios.post<Room>("/api/game/create", room);
-      dispatch(setRoom(response.data));
-      writeCodeToLocal(response.data.code);
-      return response.data.code;
+      const response = await axios.post<GameSession>("/api/game/create", room);
+      dispatch(setRoom(response.data.room));
+      return response.data.room.code;
     } catch (error) {
       console.error(error);
       throw error;
@@ -84,77 +33,52 @@ export default function useRoom() {
   async function setPreviouslyCreatedRoom(code: string) {
     try {
       const room = await getRoom(code);
-      // This is for the game play
-      dispatch(setRoom(room));
-      // This is for the game created
-      dispatch(setPin(code));
-      dispatch(setGameName(room.name));
-      dispatch(setParticipantsCount(room.participants.length || 0));
-      dispatch(setQuestionsCount(room.questions.length));
-      dispatch(
-        setGameDifficulty(
-          (room.questions?.[0]?.difficulty as Difficulty) || "debut",
-        ),
-      );
-      dispatch(setQuestions(room.questions || []));
-
-      return room;
+      dispatch(setRoom({ ...room, code, questions: room.questions || [] }));
     } catch (error: any) {
       Logger.error(error);
       throw error;
     }
   }
 
-  async function setPreviouslyJoinedRoom(
-    code: string,
-  ): Promise<{ room: Room; participant: Participant } | null> {
-    try {
-      if (room?.code === code && userParticipant) {
-        return { room, participant: userParticipant };
-      }
-      const participant = getRoomJoinedParticipant(code);
-      if (participant) {
-        const room = await getRoom(code);
-        dispatch(setUserParticipant(participant));
-        dispatch(setRoom(room));
-        return { room, participant };
-      }
-      return null;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
+  // async function joinRoom(room: Room, name: string): Promise<Participant> {
+  //   try {
+  //     const joinRoomResponse = await axios.post<Participant>(
+  //       `/api/game/${room.code}/join`,
+  //       {
+  //         name,
+  //       },
+  //     );
+  //     const participant = joinRoomResponse.data;
+  //     dispatch(setUserParticipant(participant));
+  //     dispatch(setRoom(room));
+  //     saveRoomJoined(room.code, participant);
 
-  async function joinRoom(room: Room, name: string): Promise<Participant> {
-    try {
-      const joinRoomResponse = await axios.post<Participant>(
-        `/api/game/${room.code}/join`,
-        {
-          name,
-        },
-      );
-      const participant = joinRoomResponse.data;
-      dispatch(setUserParticipant(participant));
-      dispatch(setRoom(room));
-      saveRoomJoined(room.code, participant);
+  //     return participant;
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw error;
+  //   }
+  // }
 
-      return participant;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
+  const updateRoom = (room: Room) => {
+    dispatch(setRoom(room));
+  };
 
-  async function leaveRoom(code: string, name: string) {
-    try {
-      await axios.post(`/api/game/${code}/leave`, { name });
-      removeRoomJoined(name);
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
+  const updateGameName = (name: string) => {
+    dispatch(setGameName(name));
+  };
+
+  const updateParticipants = (participants: number) => {
+    dispatch(setParticipantsCount(participants));
+  };
+
+  const updateDifficulty = (difficulty: Difficulty) => {
+    dispatch(setGameDifficulty(difficulty));
+  };
+
+  const updateQuestionsCount = (count: number) => {
+    dispatch(setQuestionsCount(count));
+  };
 
   async function getRoom(code: string): Promise<Room> {
     try {
@@ -163,59 +87,6 @@ export default function useRoom() {
     } catch (error) {
       console.error(error);
       throw error;
-    }
-  }
-
-  async function startGame(code: string) {
-    if (loadingCountdown.current) {
-      throw new LoadingError("Loading countdown");
-    }
-    loadingCountdown.current = true;
-    try {
-      await axios.post(`/api/game/${code}/startCountdown`);
-      await axios.post(`/api/game/${code}/start`);
-      axios.post(`/api/game/${code}/question/run`).catch(error => {
-        console.error("Failed to start question", error);
-        Logger.error(error);
-      });
-      return;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    } finally {
-      loadingCountdown.current = false;
-    }
-  }
-
-  async function pauseGame(code: string) {
-    if (loadingGameState) {
-      throw new LoadingError("Loading pause");
-    }
-    setLoadingGameState(true);
-    try {
-      await axios.post(`/api/game/${code}/pause`);
-      return;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    } finally {
-      setLoadingGameState(false);
-    }
-  }
-
-  async function resumeGame(code: string) {
-    if (loadingGameState) {
-      throw new LoadingError("Loading pause");
-    }
-    setLoadingGameState(true);
-    try {
-      await axios.post(`/api/game/${code}/resume`);
-      return;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    } finally {
-      setLoadingGameState(false);
     }
   }
 
@@ -231,38 +102,33 @@ export default function useRoom() {
     onError?: (error: any) => void,
   ): Unsubscribe => {
     let unsubscribe = () => {};
-    if (db) {
-      const roomRef = doc(db, "rooms", code);
+    const roomRef = roomDocClient(code);
+    if (roomRef) {
       unsubscribe = onSnapshot(
         roomRef,
         snapshot => {
           onChange(snapshot.data() as Room);
         },
         (error: any) => {
-          if (!onError) {
-            console.log("Failed to subscribe to room updates:", error);
-          }
           Logger.error(error);
           onError?.(error);
         },
       );
     }
+
     return unsubscribe;
   };
 
   return {
-    createRoom,
-    joinRoom,
-    leaveRoom,
-    startGame,
-    pauseGame,
-    resumeGame,
     getRoom,
-    loadingGameState,
-    loadingCountdown: loadingCountdown.current,
+    createRoom,
     listenDefaults,
+    updateRoom,
+    updateGameName,
+    updateParticipants,
+    updateQuestionsCount,
+    updateDifficulty,
     listenToRoomChanges,
-    setPreviouslyJoinedRoom,
     setPreviouslyCreatedRoom,
   };
 }

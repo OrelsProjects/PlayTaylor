@@ -1,14 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "../components/ui/button";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { cn } from "../lib/utils";
-import { LOCAL_STORAGE_PREFIX } from "../lib/hooks/useRoom";
-import QuestionResultsComponent from "../components/questionResultsComponent";
+import { LOCAL_STORAGE_PREFIX } from "../lib/hooks/_utils";
+import { useCustomRouter } from "../lib/hooks/useCustomRouter";
 
 export default function Home() {
-  const router = useRouter();
+  const router = useCustomRouter();
 
   return (
     <main

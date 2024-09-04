@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import Logger from "@/loggerServer";
-import { db } from "@/../firebase.config.admin";
-import { roomConverter } from "../roomConverter";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../../../auth/authOptions";
+import { authOptions } from "@/auth/authOptions";
 import { isOwnerOfRoom } from "../_utils";
 import { runLogic } from "../question/run/questionLogic";
+import { gameDocServer } from "@/app/api/_db/firestoreServer";
 
 export async function POST(
   req: NextRequest,
@@ -17,13 +16,7 @@ export async function POST(
   }
   const { user } = session;
   try {
-    const database = db();
-    const roomRef = database
-      .collection("rooms")
-      .doc(params.code)
-      .withConverter(roomConverter);
-
-    const isOwner = isOwnerOfRoom(user.userId, params.code, roomRef);
+    const isOwner = isOwnerOfRoom(user.userId, params.code);
     if (!isOwner) {
       return NextResponse.json(
         { error: "You are not authorized to resume the game" },
@@ -31,28 +24,24 @@ export async function POST(
       );
     }
 
-    const roomSnapshot = await roomRef.get();
+    const gameRef = gameDocServer(params.code);
+
+    const roomSnapshot = await gameRef.get();
     const roomData = roomSnapshot.data();
 
     if (!roomData) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    const creator = roomData.createdBy;
-
-    if (user.userId !== creator) {
-      return NextResponse.json(
-        { error: "You are notauthorized to start the game" },
-        { status: 401 },
-      );
-    } else {
-      await roomRef.update({
+    await gameRef.update(
+      {
         stage: "playing",
-      });
-      runLogic(params.code);
-    }
+      },
+      { merge: true },
+    );
+    runLogic(params.code);
 
-    return NextResponse.json(roomData, { status: 200 });
+    return NextResponse.json({}, { status: 200 });
   } catch (error: any) {
     Logger.error("Error in finding the room", "unknown", {
       error,

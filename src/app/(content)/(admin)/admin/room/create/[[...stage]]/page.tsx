@@ -1,19 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { motion } from "framer-motion";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Difficulty } from "@/models/question";
-import DifficultyComponent from "./difficultyComponent";
 import useRoom from "@/lib/hooks/useRoom";
 import { Logger } from "@/logger";
 import { Stage } from "@/lib/hooks/_utils";
-import useGame from "@/lib/hooks/useGame";
+import { useAppSelector } from "@/lib/hooks/redux";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import DifficultyComponent from "./difficultyComponent";
+import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
 const StageComponent = ({
   title,
@@ -46,33 +47,31 @@ const StageComponent = ({
 };
 
 export default function RoomPage({ params }: { params: { stage: string } }) {
-  const router = useRouter();
+  const router = useCustomRouter();
   const pathname = usePathname();
-  const { createRoom } = useRoom();
+  const { room } = useAppSelector(state => state.room);
   const {
-    initGameFromLocal,
     updateDifficulty,
     updateGameName,
-    writeStageToLocal,
     updateParticipants,
     updateQuestionsCount,
-    clearLocalGame,
-  } = useGame();
+    createRoom,
+  } = useRoom();
   const [stage, setStage] = useState<Stage>("name");
-  const [name, setName] = useState("");
+  const [name, setName] = useState<string | undefined>();
   const [participants, setParticipants] = useState<number>(2);
   const [difficulty, setDifficulty] = useState<Difficulty>("debut");
   const [questionsCount, setQuestionsCount] = useState<number | undefined>();
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
-    const { name, participants, difficulty, questionsCount } =
-      initGameFromLocal();
-    setName(name || "");
-    setParticipants(participants || 2);
-    setDifficulty(difficulty || "debut");
-    setQuestionsCount(questionsCount || undefined);
-  }, []);
+    // const { name, participants, difficulty, questionsCount } =
+    //   initGameFromLocal();
+    // setName(name || "");
+    // setParticipants(participants || 2);
+    // setDifficulty(difficulty || "debut");
+    // setQuestionsCount(questionsCount || undefined);
+  }, [name]);
 
   useEffect(() => {
     const paramsStage = params.stage?.[0] as Stage;
@@ -91,7 +90,12 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
   }, [pathname]);
 
   const handleCreateRoom = async () => {
-    if (!questionsCount || !name || !participants || !difficulty) {
+    if (
+      !room.questionsCount ||
+      !room.name ||
+      !room.participantsCount ||
+      !room.difficulty
+    ) {
       toast.error("Please fill all the fields");
       return;
     }
@@ -100,13 +104,12 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
     const toastId = toast.loading("Creating room...");
     try {
       const code = await createRoom({
-        name,
-        participantsCount: participants,
-        difficulty,
-        questionsCount: questionsCount!,
+        name: room.name,
+        participantsCount: room.participantsCount,
+        difficulty: room.difficulty,
+        questionsCount: room.questionsCount,
       });
       router.push("/admin/room/" + code);
-      clearLocalGame();
     } catch (error: any) {
       Logger.error(error);
       toast.error("Something went wrong... try again :)");
@@ -128,22 +131,25 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
       return;
     }
     router.push(`/admin/room/create/${newStage}`);
-    writeStageToLocal(newStage);
+    // writeStageToLocal(newStage);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     setName(name);
+    updateGameName(name);
   };
 
   const handleParticipantChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     const clampedValue = Math.min(10, Math.max(2, value));
     setParticipants(clampedValue);
+    updateParticipants(clampedValue);
   };
 
   const handleDifficultyChange = (difficulty: Difficulty) => {
     setDifficulty(difficulty);
+    updateDifficulty(difficulty);
   };
 
   const handleQuestionsCountChange = (
@@ -152,6 +158,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
     const value = parseInt(e.target.value);
     const clampedValue = Math.min(100, Math.max(1, value));
     setQuestionsCount(clampedValue);
+    updateQuestionsCount(clampedValue);
   };
 
   const handleNewNameSet = () => {
@@ -159,6 +166,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
       toast.error("Please enter a name");
       return;
     }
+    setName(name);
     updateGameName(name);
     nextStage();
   };

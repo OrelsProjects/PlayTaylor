@@ -2,27 +2,24 @@
 
 import React, { useEffect } from "react";
 import ParticipantsComponent from "@/components/pariticpantsComponent";
-import useRoom from "@/lib/hooks/useRoom";
-import { db } from "@/../firebase.config";
-import { doc, onSnapshot } from "firebase/firestore";
-import Room from "@/models/room";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/lib/hooks/redux";
+import useGame from "@/lib/hooks/useGame";
+import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
 export default function AdminRoomPage({
   params,
 }: {
   params: { code: string };
 }) {
-  const router = useRouter();
-  const { room } = useAppSelector(state => state.room);
-  const { startGame, setPreviouslyCreatedRoom } = useRoom();
+  const router = useCustomRouter();
+  const { game } = useAppSelector(state => state.game);
+  const { startGame, setPreviouslyJoinedGame } = useGame();
 
   const initRoom = async () => {
     try {
-      await setPreviouslyCreatedRoom(params.code);
+      await setPreviouslyJoinedGame(params.code);
     } catch (error) {
       console.error(error);
     }
@@ -33,10 +30,10 @@ export default function AdminRoomPage({
   }, [params.code]);
 
   useEffect(() => {
-    if (room?.gameStartedAt) {
+    if (game?.gameStartedAt) {
       router.push(`/game/${params.code}`);
     }
-  }, [room]);
+  }, [game]);
 
   const handleStartGame = async () => {
     const toastId = toast.loading("Starting game...");
@@ -53,11 +50,7 @@ export default function AdminRoomPage({
 
   return (
     <div className="w-full h-full flex flex-col gap-8 justify-center items-center mt-11">
-      <ParticipantsComponent
-        code={params.code}
-        onCountdownStarted={() => {}}
-        className=""
-      />
+      <ParticipantsComponent />
       <Button
         onClick={() => {
           handleStartGame();

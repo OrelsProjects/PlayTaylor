@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Logger from "@/loggerServer";
-import { db } from "@/../firebase.config.admin";
-import { roomConverter } from "../roomConverter";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../../../auth/authOptions";
+import { authOptions } from "@/auth/authOptions";
 import { isOwnerOfRoom } from "../_utils";
+import { gameDocServer, roomDocServer } from "@/app/api/_db/firestoreServer";
 
 export async function POST(
   req: NextRequest,
@@ -16,13 +15,10 @@ export async function POST(
   }
   const { user } = session;
   try {
-    const database = db();
-    const roomRef = database
-      .collection("rooms")
-      .doc(params.code)
-      .withConverter(roomConverter);
+    const gameRef = gameDocServer(params.code);
+    const roomRef = roomDocServer(params.code);
 
-    const isOwner = isOwnerOfRoom(user.userId, params.code, roomRef);
+    const isOwner = isOwnerOfRoom(user.userId, params.code);
     if (!isOwner) {
       return NextResponse.json(
         { error: "You are not authorized to start the game" },
@@ -47,11 +43,14 @@ export async function POST(
     } else {
       const timestamp = Date.now();
       const question = roomData.questions[0];
-      await roomRef.update({
-        gameStartedAt: timestamp,
-        currentQuestion: question,
-        stage: "playing",
-      });
+      await gameRef.update(
+        {
+          gameStartedAt: timestamp,
+          currentQuestion: question,
+          stage: "playing",
+        },
+        { merge: true },
+      );
     }
 
     return NextResponse.json(roomData, { status: 200 });

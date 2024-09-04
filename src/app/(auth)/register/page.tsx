@@ -1,16 +1,11 @@
 "use client";
 
-import GoogleLogin from "../../../components/auth/googleLogin";
-import AppleLogin from "../../../components/auth/appleLogin";
-import { Button } from "../../../components/ui/button";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import GoogleLogin from "@/components/auth/googleLogin";
+import AppleLogin from "@/components/auth/appleLogin";
+import { Button } from "@/components/ui/button";
+import CustomLink from "@/components/customLink";
 
 const RegisterPage = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
   return (
     <div className="h-screen w-screen flex flex-col justify-center items-center text-center overflow-hidden px-6 lg:px-0 ">
       <div className="w-full flex flex-col gap-3 lg:max-w-[420px] rounded-xl p-8 bg-card">
@@ -26,7 +21,7 @@ const RegisterPage = () => {
           className="text-base underline text-muted-foreground !p-0"
           asChild
         >
-          <Link href="/login">Login</Link>
+          <CustomLink href="/login">Login</CustomLink>
         </Button>
       </div>
     </div>

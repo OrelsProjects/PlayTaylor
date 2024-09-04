@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { Button } from "./button";
-import Link from "next/link";
 import { Icons } from "./icons";
 import { Gif } from "@giphy/react-components";
 import { GiphyFetch } from "@giphy/js-fetch-api";
 import { Logger } from "../../logger";
+import CustomLink from "../customLink";
 
 interface GameFinishedComponentProps {
   questionsCount?: number;
@@ -66,13 +66,13 @@ const GameFinishedComponent: React.FC<GameFinishedComponentProps> = () => {
       </div>
       <div className="flex flex-col justify-center items-center gap-2">
         <Button asChild>
-          <Link href={`/home`}>Next game</Link>
+          <CustomLink href={`/home`}>Next game</CustomLink>
         </Button>
         <Button variant="outline" asChild>
-          <Link href={`/home`} className="flex flex-row gap-2">
+          <CustomLink href={`/home`} className="flex flex-row gap-2">
             <Icons.Redo className="fill-primary h-4 w-4" />
             <span className="text-primary">Redo</span>
-          </Link>
+          </CustomLink>
         </Button>
       </div>
     </div>

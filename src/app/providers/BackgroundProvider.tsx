@@ -1,6 +1,6 @@
 "use client";
 import { motion, useAnimation } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { cn } from "../../lib/utils";
 
 const gradients = [
@@ -39,6 +39,7 @@ export default function BackgroundProvider({
   const [currentGradient, setCurrentGradient] = useState(0);
   const controls = useAnimation();
 
+  // We want the user to see the background before the page is loaded
   useEffect(() => {
     const cycleGradients = async () => {
       while (true) {

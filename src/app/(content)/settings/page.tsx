@@ -29,13 +29,6 @@ const SettingsScreen: React.FC<SettingsProps> = () => {
 
   const changeNotificationTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const isNotificationsGranted =
-    canUseNotifications() && Notification.permission === "granted";
-
-  useEffect(() => {
-    console.log(settings);
-  }, [settings]);
-
   useEffect(() => {
     if (user) {
       setSettings(user?.settings);

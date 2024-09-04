@@ -1,32 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
-import Logger from "../../../../../loggerServer";
-import { db } from "../../../../../../firebase.config.admin";
+import Logger from "@/loggerServer";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../../../auth/authOptions";
-import { Participant } from "../../../../../models/room";
+import { authOptions } from "@/auth/authOptions";
+import { Participant } from "@/models/game";
+import {
+  gameSessionDocServer,
+  getGameSession,
+  participantDocServer,
+  participantsColServer,
+} from "@/app/api/_db/firestoreServer";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { code: string } },
 ): Promise<any> {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
-    const session = await getServerSession(authOptions);
-
     const { name } = await req.json();
 
-    const database = db();
-    const roomRef = database.collection("rooms").doc(params.code);
-    const roomSnapshot = await roomRef.get();
-    const roomData = roomSnapshot.data();
+    const gameSession = await getGameSession(params.code);
 
-    if (!roomSnapshot.exists || !roomData) {
-      return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    if (!gameSession) {
+      return NextResponse.json({ error: "Game not found" }, { status: 404 });
     }
 
-    const roomKey = roomSnapshot.id; // The document ID of the room
-    const timestamp = Date.now();
-    const participants = roomData.participants || [];
-
+    const participants = gameSession.participants || [];
     const existingParticipant = participants.find((p: any) => p.name === name);
     let newParticipant: Participant | null = null;
 
@@ -38,30 +39,35 @@ export async function POST(
         );
       } else {
         existingParticipant.leftAt = null;
-        await database
-          .collection("rooms")
-          .doc(roomKey)
-          .update({ participants });
+        await participantDocServer(
+          params.code,
+          existingParticipant.userId,
+        ).update(
+          {
+            leftAt: null,
+          },
+          { merge: true },
+        );
         newParticipant = existingParticipant;
       }
     } else {
-      const userId: string | null = session?.user?.userId || null;
+      const { userId } = session.user;
+      const timestamp = Date.now();
 
       newParticipant = {
         name,
-        correctAnswers: 0,
+        questionResponses: [],
         joinedAt: timestamp,
         userId,
         leftAt: null,
       };
 
-      participants.push(newParticipant);
-      await database.collection("rooms").doc(roomKey).update({ participants });
+      await participantsColServer(params.code).doc(userId).set(newParticipant);
     }
 
     return NextResponse.json(newParticipant, { status: 200 });
   } catch (error: any) {
-    Logger.error("Error initializing logger", "unknown", { error });
+    Logger.error("Error joining to room", session.user.userId, { error });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
