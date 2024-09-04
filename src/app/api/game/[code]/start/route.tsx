@@ -43,11 +43,14 @@ export async function POST(
     } else {
       const timestamp = Date.now();
       const question = roomData.questions[0];
-      await gameRef.update({
-        gameStartedAt: timestamp,
-        currentQuestion: question,
-        stage: "playing",
-      });
+      await gameRef.update(
+        {
+          gameStartedAt: timestamp,
+          currentQuestion: question,
+          stage: "playing",
+        },
+        { merge: true },
+      );
     }
 
     return NextResponse.json(roomData, { status: 200 });

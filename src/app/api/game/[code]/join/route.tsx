@@ -5,6 +5,7 @@ import { authOptions } from "@/auth/authOptions";
 import { Participant } from "@/models/game";
 import {
   gameSessionDocServer,
+  getGameSession,
   participantDocServer,
   participantsColServer,
 } from "@/app/api/_db/firestoreServer";
@@ -20,7 +21,7 @@ export async function POST(
   try {
     const { name } = await req.json();
 
-    const gameSession = (await gameSessionDocServer(params.code).get()).data();
+    const gameSession = await getGameSession(params.code);
 
     if (!gameSession) {
       return NextResponse.json({ error: "Game not found" }, { status: 404 });
@@ -38,9 +39,15 @@ export async function POST(
         );
       } else {
         existingParticipant.leftAt = null;
-        await participantDocServer(params.code, existingParticipant.userId).update({
-          leftAt: null,
-        });
+        await participantDocServer(
+          params.code,
+          existingParticipant.userId,
+        ).update(
+          {
+            leftAt: null,
+          },
+          { merge: true },
+        );
         newParticipant = existingParticipant;
       }
     } else {

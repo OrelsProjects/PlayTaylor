@@ -16,6 +16,7 @@ export const initialState: RoomState = {
     name: "",
     createdBy: "",
     participantsCount: 0,
+    createdAt: 0,
     questions: [],
   },
 };

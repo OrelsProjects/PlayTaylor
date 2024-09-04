@@ -34,23 +34,14 @@ const ParticipantComponent = ({
 );
 
 export default function ParticipantsComponent({
-  code,
   className,
 }: {
-  code: string;
   className?: string;
 }) {
-  const { game } = useAppSelector(state => state.game);
-  const [participants, setParticipants] = useState<Participant[]>([]);
-
-  useEffect(() => {
-    if (game) {
-      setParticipants(game.participants);
-    }
-  }, [game]);
+  const { participants } = useAppSelector(state => state.game);
 
   return (
-    participants.length > 0 && (
+    participants?.length > 0 && (
       <div
         className={cn(
           "w-full h-full flex flex-col gap-8 justify-center items-center",

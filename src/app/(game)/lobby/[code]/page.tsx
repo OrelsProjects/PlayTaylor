@@ -4,10 +4,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { Game, isGameStarted } from "@/models/game";
 import useGame from "@/lib/hooks/useGame";
+import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
 const leftToRightAnimation = {
   initial: { x: "-100%", opacity: 0, transition: { duration: 0.3 } },
@@ -28,6 +28,8 @@ const Counter = ({
   const [count, setCount] = useState(1);
 
   const handleNewCounter = (newCount?: number | null, newGame?: Game) => {
+    console.log("newCount", newCount);
+    
     if (!game && !newGame) return;
 
     const validCount =
@@ -43,6 +45,7 @@ const Counter = ({
       }
     }
   };
+
   useEffect(() => {
     setPreviouslyJoinedGame(code).then(gameSession => {
       if (!gameSession) return;
@@ -73,7 +76,7 @@ const Counter = ({
 };
 
 export default function Lobby({ params }: { params: { code: string } }) {
-  const router = useRouter();
+  const router = useCustomRouter();
   const [countdownZero, setCountdownZero] = useState(false);
 
   const title = useMemo(

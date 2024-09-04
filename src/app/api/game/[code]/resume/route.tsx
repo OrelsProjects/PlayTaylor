@@ -33,9 +33,12 @@ export async function POST(
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    await gameRef.update({
-      stage: "playing",
-    });
+    await gameRef.update(
+      {
+        stage: "playing",
+      },
+      { merge: true },
+    );
     runLogic(params.code);
 
     return NextResponse.json({}, { status: 200 });

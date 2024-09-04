@@ -1,12 +1,11 @@
 import { Game, UserIdOrName, Participant } from "@/models/game";
 import Room from "@/models/room";
 import {
+  roomConverter,
   gameConverter,
   gameSessionConverter,
-  manyParticipantsConverter,
   participantConverter,
-  roomConverter,
-} from "@/lib/utils/roomConverter";
+} from "@/lib/utils/converters";
 
 /**
  * gameSessions -> [codes] -> ((session -> room, game), (participants-> [userId]))
@@ -14,15 +13,16 @@ import {
 export interface DbGameSession {
   session: {
     room: Room;
-    game: Game;
+    game: Omit<Game, "participants">;
   };
   participants: {
     [identifier: UserIdOrName]: Participant;
   };
+  code: string;
 }
 
 export const getGameSessionCollection = (db: any) =>
-  db().collection("gameSessions").withConverter(gameSessionConverter);
+  db().collection("gameSessions");
 
 export const getGameSessionDoc = (db: any, code: string) =>
   getGameSessionCollection(db).doc(code).withConverter(gameSessionConverter);
@@ -39,10 +39,17 @@ export const getGameDoc = (db: any, code: string) =>
     .doc("game")
     .withConverter(gameConverter);
 
-export const getParticipantsCol = (db: any, code: string) =>
+export const getParticipantsCol = (
+  db: any,
+  code: string,
+  withConverter?: boolean,
+) =>
   getGameSessionDoc(db, code)
     .collection("participants")
-    .withConverter(manyParticipantsConverter);
+    .withConverter(withConverter ? participantConverter : undefined);
 
 export const getParticipantDoc = (db: any, code: string, userId: string) =>
-    getParticipantsCol(db, code).doc(userId).withConverter(participantConverter);
+  getGameSessionDoc(db, code)
+    .collection("participants")
+    .doc(userId)
+    .withConverter(participantConverter);

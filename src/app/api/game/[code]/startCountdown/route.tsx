@@ -3,20 +3,24 @@ import Logger from "@/loggerServer";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/authOptions";
 import { isOwnerOfRoom } from "../_utils";
-import { roomDocServer } from "@/app/api/_db/firestoreServer";
+import { getGameDoc } from "@/lib/utils/firestore";
+import { db } from "@/../firebase.config.admin";
 
 // This function couts down from 4 to 0 and every second updates the room's countdownStartedAt
 const startCountdown = async (code: string): Promise<void> => {
   return new Promise<void>(resolve => {
-    const gameRef = roomDocServer(code);
+    const gameRef = getGameDoc(db, code);
 
     let countdown = 4;
     gameRef
-      .update({
-        countdownStartedAt: Date.now(),
-        countdownCurrentTime: countdown,
-        stage: "countdown",
-      })
+      .update(
+        {
+          countdownStartedAt: Date.now(),
+          countdownCurrentTime: countdown,
+          stage: "countdown",
+        },
+        { merge: true },
+      )
       .catch((error: any) => {
         Logger.error("Firestore update failed", "unknown", { error });
         resolve(); // Resolve to avoid hanging the promise
@@ -25,9 +29,12 @@ const startCountdown = async (code: string): Promise<void> => {
     const interval = setInterval(() => {
       countdown -= 1;
       gameRef
-        .update({
-          countdownCurrentTime: countdown,
-        })
+        .update(
+          {
+            countdownCurrentTime: countdown,
+          },
+          { merge: true },
+        )
         .catch((error: any) => {
           Logger.error("Firestore update failed", "unknown", { error });
           clearInterval(interval);

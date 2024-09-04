@@ -25,9 +25,12 @@ export async function POST(
       );
     }
 
-    await participantDocServer(params.code, userId).update({
-      leftAt: new Date(),
-    });
+    await participantDocServer(params.code, userId).update(
+      {
+        leftAt: new Date(),
+      },
+      { merge: true },
+    );
 
     return NextResponse.json({}, { status: 200 });
   } catch (error: any) {

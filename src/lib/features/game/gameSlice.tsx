@@ -20,7 +20,7 @@ const gameSlice = createSlice({
       state.game = action.payload;
     },
     setParticipants: (state, action: PayloadAction<Participant[]>) => {
-      state.participants = action.payload;
+      state.participants = action.payload || [];
     },
     addParticipant: (state, action: PayloadAction<Participant>) => {
       const existingParticipant = state.participants.find(

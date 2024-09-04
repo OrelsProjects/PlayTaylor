@@ -12,6 +12,7 @@ import {
 import { Logger } from "@/logger";
 import { Difficulty } from "@/models/question";
 import { roomDocClient } from "@/lib/utils/firestoreClient";
+import { GameSession } from "../../models/game";
 
 export type Unsubscribe = () => void;
 
@@ -20,9 +21,9 @@ export default function useRoom() {
 
   async function createRoom(room: CreateRoom): Promise<string> {
     try {
-      const response = await axios.post<Room>("/api/game/create", room);
-      dispatch(setRoom(response.data));
-      return response.data.code;
+      const response = await axios.post<GameSession>("/api/game/create", room);
+      dispatch(setRoom(response.data.room));
+      return response.data.room.code;
     } catch (error) {
       console.error(error);
       throw error;
@@ -58,6 +59,10 @@ export default function useRoom() {
   //     throw error;
   //   }
   // }
+
+  const updateRoom = (room: Room) => {
+    dispatch(setRoom(room));
+  };
 
   const updateGameName = (name: string) => {
     dispatch(setGameName(name));
@@ -118,6 +123,7 @@ export default function useRoom() {
     getRoom,
     createRoom,
     listenDefaults,
+    updateRoom,
     updateGameName,
     updateParticipants,
     updateQuestionsCount,

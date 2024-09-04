@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { motion } from "framer-motion";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Difficulty } from "@/models/question";
 import useRoom from "@/lib/hooks/useRoom";
 import { Logger } from "@/logger";
@@ -14,6 +14,7 @@ import { useAppSelector } from "@/lib/hooks/redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import DifficultyComponent from "./difficultyComponent";
+import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
 const StageComponent = ({
   title,
@@ -46,7 +47,7 @@ const StageComponent = ({
 };
 
 export default function RoomPage({ params }: { params: { stage: string } }) {
-  const router = useRouter();
+  const router = useCustomRouter();
   const pathname = usePathname();
   const { room } = useAppSelector(state => state.room);
   const {
@@ -70,7 +71,6 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
     // setParticipants(participants || 2);
     // setDifficulty(difficulty || "debut");
     // setQuestionsCount(questionsCount || undefined);
-    console.log("Name: ", name);
   }, [name]);
 
   useEffect(() => {
@@ -136,18 +136,20 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
-    console.log("About to set name: ", name);
     setName(name);
+    updateGameName(name);
   };
 
   const handleParticipantChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     const clampedValue = Math.min(10, Math.max(2, value));
     setParticipants(clampedValue);
+    updateParticipants(clampedValue);
   };
 
   const handleDifficultyChange = (difficulty: Difficulty) => {
     setDifficulty(difficulty);
+    updateDifficulty(difficulty);
   };
 
   const handleQuestionsCountChange = (
@@ -156,6 +158,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
     const value = parseInt(e.target.value);
     const clampedValue = Math.min(100, Math.max(1, value));
     setQuestionsCount(clampedValue);
+    updateQuestionsCount(clampedValue);
   };
 
   const handleNewNameSet = () => {
@@ -163,7 +166,6 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
       toast.error("Please enter a name");
       return;
     }
-    console.log("About to set name: ", name);
     setName(name);
     updateGameName(name);
     nextStage();

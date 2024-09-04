@@ -1,19 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import useGame from "@/lib/hooks/useGame";
 import { Logger } from "@/logger";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks/redux";
+import { useAppSelector } from "@/lib/hooks/redux";
 import { toast } from "react-toastify";
+import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
 type Stage = "pin" | "name";
 
 export default function Join({ params }: { params: { code?: string[] } }) {
-  const router = useRouter();
-  const { getGame, joinGame, setPreviouslyJoinedGame } = useGame();
+  const router = useCustomRouter();
+  const { getGameSession, joinGame, setPreviouslyJoinedGame, updateGame } =
+    useGame();
   // const { room } = useAppSelector(state => state.room);
   const { game } = useAppSelector(state => state.game);
 
@@ -59,10 +60,11 @@ export default function Join({ params }: { params: { code?: string[] } }) {
       if (stage === "pin") {
         const didJoinRoom = await checkPreviouslyJoinedRoom(code);
         if (didJoinRoom) return;
-        debugger;
-        const game = await getGame(code);
-        if (game) {
+
+        const gameSession = await getGameSession(code);
+        if (gameSession) {
           setStage("name");
+          updateGame(gameSession.game);
         }
       } else {
         if (!game) {
@@ -77,7 +79,6 @@ export default function Join({ params }: { params: { code?: string[] } }) {
         }
       }
     } catch (error: any) {
-      debugger;
       if (error.name === "NameTakenError") {
         toast.error("Name taken"); // TODO: Copy
       }

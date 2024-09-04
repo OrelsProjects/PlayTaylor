@@ -2,10 +2,12 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import loggerServer from "@/loggerServer";
 import { authOptions } from "@/auth/authOptions";
-import { QuestionResponse } from "@/models/question";
-import { gameSessionDocServer, participantDocServer } from "@/app/api/_db/firestoreServer";
-import { GameSession } from "@/models/game";
+import {
+  getGameSession,
+  participantDocServer,
+} from "@/app/api/_db/firestoreServer";
 import { AnsweredTooLateError } from "@/models/errors/AnsweredTooLateError";
+import { QuestionOption } from "@/models/question";
 
 export async function POST(
   req: NextRequest,
@@ -23,10 +25,8 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    const { response }: { response: QuestionResponse } = await req.json();
-    const gameSessionRef = gameSessionDocServer(params.code);
-    const gameSessionSnapshot = await gameSessionRef.get();
-    const gameSession: GameSession | undefined = gameSessionSnapshot.data();
+    const { response }: { response: QuestionOption } = await req.json();
+    const gameSession = await getGameSession(params.code);
 
     if (!gameSession) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
@@ -41,7 +41,7 @@ export async function POST(
       );
     }
 
-    const participant = participants.find(
+    const participant = participants?.find(
       p => p.userId === session.user.userId,
     );
 
@@ -52,9 +52,21 @@ export async function POST(
       );
     }
 
+    const questionResponses = participant.questionResponses || [];
+
+    if (questionResponses.some(r => r.questionId === params.questionId)) {
+      return NextResponse.json({ error: "Already answered" }, { status: 400 });
+    }
+    questionResponses.push(response);
     // update participant in index participantIndex
-    const participantRef = participantDocServer(params.code, participant.userId);
-    await participantRef.update({ ...participant, response });
+    const participantRef = participantDocServer(
+      params.code,
+      participant.userId,
+    );
+    await participantRef.update(
+      { ...participant, questionResponses },
+      { merge: true },
+    );
   } catch (error: any) {
     loggerServer.error(
       "Error in finding the room",

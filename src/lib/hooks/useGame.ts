@@ -44,15 +44,16 @@ export default function useGame() {
   const { game } = useAppSelector(state => state.game);
   const [loadingGameState, setLoadingGameState] = useState(false);
   const loadingCountdown = useRef(false);
+  const loadingAnswer = useRef(false);
 
-  const getGame = async (code: string) => {
+  const getGameSession = async (code: string) => {
     try {
-      const gameResponse = await axios.get(`/api/game/${code}`);
-      debugger;
+      const gameResponse = await axios.get<GameSession>(
+        `/api/game/${code}/session`,
+      );
       const gameSession = gameResponse.data;
       return gameSession;
     } catch (error) {
-      debugger;
       console.error(error);
       throw error;
     }
@@ -69,7 +70,7 @@ export default function useGame() {
       const gameSession = joinRoomResponse.data;
       dispatch(setRoom(gameSession.room));
       dispatch(setGame(gameSession.game));
-      dispatch(setParticipants(gameSession.participants));
+      dispatch(setParticipants(gameSession.participants || []));
       writeGameJoinedToLocalStorage(code, gameSession.participants);
 
       return gameSession;
@@ -82,16 +83,25 @@ export default function useGame() {
     }
   };
 
+  const updateGame = (newGame: Game) => dispatch(setGame(newGame));
+  const updateParticipants = (participants: Participant[]) =>
+    dispatch(setParticipants(participants));
+
   async function setPreviouslyJoinedGame(
     code: string,
   ): Promise<GameSession | null> {
     try {
-      const gameSession = await getGame(code);
-      if (gameSession) {
-        dispatch(setRoom(gameSession.room));
-        dispatch(setGame(gameSession.game));
-        dispatch(setParticipants(gameSession.participants));
-        return gameSession;
+      const gameSession = await getGameSession(code);
+      const isOwner = gameSession.room.createdBy === user?.userId;
+
+      const participants = gameSession?.participants || [];
+      if (isOwner || participants.find(p => p.userId === user?.userId)) {
+        if (gameSession) {
+          dispatch(setRoom(gameSession.room));
+          dispatch(setGame(gameSession.game));
+          dispatch(setParticipants(gameSession.participants || []));
+          return gameSession;
+        }
       }
       return null;
     } catch (error) {
@@ -102,8 +112,26 @@ export default function useGame() {
 
   const answerQuestion = async (
     response: QuestionOption,
+    code: string,
     questionId: string,
-  ) => {};
+  ) => {
+    if (loadingAnswer.current) {
+      throw new LoadingError("Loading answer");
+    }
+    loadingAnswer.current = true;
+    try {
+      await axios.post(`/api/game/${code}/question/${questionId}/answer`, {
+        response: { ...response, answerAt: Date.now() },
+        questionId,
+      });
+      return;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
+      loadingAnswer.current = false;
+    }
+  };
 
   async function startGame(code: string) {
     if (loadingCountdown.current) {
@@ -141,7 +169,9 @@ export default function useGame() {
     }
     setLoadingGameState(true);
     try {
-      await axios.post(`/api/game/${code}/pause`);
+      await axios.post(`/api/game/${code}/pause`, {
+        pausedAt: Date.now(),
+      });
       return;
     } catch (error) {
       console.error(error);
@@ -201,6 +231,7 @@ export default function useGame() {
       unsubscribe = onSnapshot(
         roomRef,
         snapshot => {
+          debugger;
           onChange(snapshot.docs.map(doc => doc.data() as Participant));
         },
         (error: any) => {
@@ -215,13 +246,15 @@ export default function useGame() {
 
   const userParticipant = useMemo(() => {
     if (!game || !user) return null;
-    return game.participants.find(p => p.userId === user.userId);
+    return game.participants?.find(p => p.userId === user.userId);
   }, [game, user]);
 
   return {
     userParticipant,
 
-    getGame,
+    updateGame,
+    updateParticipants,
+    getGameSession,
     joinGame,
     startGame,
     leaveGame,
@@ -233,6 +266,7 @@ export default function useGame() {
     listenToGameChanges,
     setPreviouslyJoinedGame,
     listenToParticipantsChanges,
+    loadingAnswer: loadingAnswer.current,
     loadingCountdown: loadingCountdown.current,
   };
 }

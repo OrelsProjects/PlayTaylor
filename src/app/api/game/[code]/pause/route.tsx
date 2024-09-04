@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Logger from "@/loggerServer";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/authOptions";
-import { gameDocServer, gameSessionDocServer } from "../../../_db/firestoreServer";
+import { gameDocServer, getGameSession } from "@/app/api/_db/firestoreServer";
+import { QUESTION_TIME } from "../../../../../models/game";
+
+type ISOString = string;
 
 export async function POST(
   req: NextRequest,
@@ -14,7 +17,8 @@ export async function POST(
   }
   const { user } = session;
   try {
-    const gameData = (await gameSessionDocServer(params.code).get()).data();
+    const gameData = await getGameSession(params.code);
+    const { pausedAt }: { pausedAt: number } = await req.json();
 
     if (!gameData) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
@@ -28,9 +32,26 @@ export async function POST(
         { status: 401 },
       );
     } else {
-      await gameDocServer(params.code).update({
-        stage: "paused",
-      });
+      const now = Date.now();
+
+      let secondsPassed = (now - pausedAt) / 1000;
+      if (secondsPassed < 1) {
+        secondsPassed = 0;
+      } else {
+        secondsPassed = Math.floor(secondsPassed);
+      }
+      const timeLeft =
+        (gameData.game.currentQuestion?.timer || QUESTION_TIME) + secondsPassed;
+      await gameDocServer(params.code).update(
+        {
+          stage: "paused",
+          currentQuestion: {
+            ...gameData.game.currentQuestion,
+            timer: timeLeft,
+          },
+        },
+        { merge: true },
+      );
     }
 
     return NextResponse.json(gameData, { status: 200 });

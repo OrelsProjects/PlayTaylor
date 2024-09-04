@@ -6,22 +6,19 @@ import { useSelector } from "react-redux";
 import {
   selectAuth,
   setUser as setUserAction,
-} from "../../lib/features/auth/authSlice";
-import { usePathname, useRouter } from "next/navigation";
+} from "@/lib/features/auth/authSlice";
 import Loading from "@/components/ui/loading";
-import { setUserEventTracker } from "../../eventTracker";
-import { setUserLogger } from "../../logger";
+import { setUserEventTracker } from "@/eventTracker";
+import { setUserLogger } from "@/logger";
 import { useSession } from "next-auth/react";
-import AppUser from "../../models/appUser";
-import { useAppDispatch } from "../../lib/hooks/redux";
+import AppUser from "@/models/appUser";
+import { useAppDispatch } from "@/lib/hooks/redux";
 
 export default function AuthProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
   const dispatch = useAppDispatch();
   const { user: currentUser } = useSelector(selectAuth);
   const { data: session, status } = useSession();

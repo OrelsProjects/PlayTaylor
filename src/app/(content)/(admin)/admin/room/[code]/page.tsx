@@ -4,16 +4,16 @@ import React, { useEffect } from "react";
 import ParticipantsComponent from "@/components/pariticpantsComponent";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/lib/hooks/redux";
 import useGame from "@/lib/hooks/useGame";
+import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
 export default function AdminRoomPage({
   params,
 }: {
   params: { code: string };
 }) {
-  const router = useRouter();
+  const router = useCustomRouter();
   const { game } = useAppSelector(state => state.game);
   const { startGame, setPreviouslyJoinedGame } = useGame();
 
@@ -50,7 +50,7 @@ export default function AdminRoomPage({
 
   return (
     <div className="w-full h-full flex flex-col gap-8 justify-center items-center mt-11">
-      <ParticipantsComponent code={params.code} />
+      <ParticipantsComponent />
       <Button
         onClick={() => {
           handleStartGame();

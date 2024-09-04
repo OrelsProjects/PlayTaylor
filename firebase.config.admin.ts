@@ -19,6 +19,7 @@ try {
     credential: admin.credential.cert(serviceAccount as ServiceAccount),
     databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
   });
+  admin.firestore().settings({ ignoreUndefinedProperties: true }); 
 } catch (e) {}
 
 // const storage = admin.storage();

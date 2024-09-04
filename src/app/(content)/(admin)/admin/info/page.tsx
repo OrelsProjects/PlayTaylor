@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
 const Butterfly = ({ number }: { number: number }) => (
   <div className="w-10 h-[30px] relative flex flex-shrink-0 mt-1">
@@ -34,7 +34,7 @@ const InfoComponent = ({ number, text }: { number: number; text: string }) => {
 };
 
 export default function RoomPage() {
-  const router = useRouter();
+  const router = useCustomRouter();
 
   return (
     <div className="pt-[88px] px-[40px] flex flex-col gap-7">

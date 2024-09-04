@@ -23,7 +23,7 @@ const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
         <toast.ToastContainer
           stacked
           newestOnTop
-          theme={theme === "system" ? "light" : theme}
+          theme={"light"}
           autoClose={2500}
           draggablePercent={60}
           className="!mb-16 z-[51]"

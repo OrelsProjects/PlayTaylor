@@ -6,8 +6,14 @@ import crypto from "crypto";
 import prisma from "@/app/api/_db/db";
 import { CreateRoom } from "@/models/room";
 import { Difficulty } from "@/models/question";
-import { gameSessionDocServer } from "@/app/api/_db/firestoreServer";
+import {
+  gameDocServer,
+  gameSessionDocServer,
+  participantsColServer,
+  roomDocServer,
+} from "@/app/api/_db/firestoreServer";
 import { GameSession } from "@/models/game";
+import { DbGameSession } from "../../../../lib/utils/firestore";
 
 export async function POST(
   req: NextRequest,
@@ -29,22 +35,24 @@ export async function POST(
       .substring(0, 6)
       .toLocaleUpperCase();
 
-    const gameSession: GameSession = {
-      room: {
-        code: code,
-        name: createRoom.name,
-        createdBy: user.userId,
-        createdAt: Date.now(),
-        questionsCount: createRoom.questionsCount,
-        participantsCount: createRoom.participantsCount,
-        difficulty: createRoom.difficulty,
-        questions: [],
+    const gameSession: DbGameSession = {
+      session: {
+        room: {
+          code: code,
+          name: createRoom.name,
+          createdBy: user.userId,
+          createdAt: Date.now(),
+          questionsCount: createRoom.questionsCount,
+          participantsCount: createRoom.participantsCount,
+          difficulty: createRoom.difficulty,
+          questions: [],
+        },
+        game: {
+          stage: "lobby",
+        },
       },
-      game: {
-        stage: "lobby",
-        participants: [],
-      },
-      participants: [],
+      participants: {},
+      code: code,
     };
 
     const questions = await prisma.question.findMany({
@@ -60,7 +68,7 @@ export async function POST(
       .sort(() => Math.random() - 0.5)
       .slice(0, createRoom.questionsCount);
 
-    gameSession.room.questions = randomOrderQuestions.map(
+    gameSession.session.room.questions = randomOrderQuestions.map(
       ({ id, question, options, difficulty }) => ({
         id,
         question,
@@ -74,15 +82,34 @@ export async function POST(
       }),
     );
 
-    await gameSessionDocServer(code).set(gameSession);
+    // Need to match converter
+    await gameSessionDocServer(code).set({
+      game: {},
+      room: {
+        code,
+      },
+    });
+    await roomDocServer(code).set(gameSession.session.room);
+    await gameDocServer(code).set(gameSession.session.game);
+    await participantsColServer(code);
 
     const participants =
       Object.keys(gameSession.participants).length > 0
         ? Object.values(gameSession.participants)
         : [];
-// WHEN CREATING THE SESSION IS NOT CREATED AS A COLLECTION, BUT AS PART OF THE OBJECT. 
-// TOMORROW MAKE SURE IT'S CREATED AS A COLLECTION.
-    return NextResponse.json({ ...gameSession, participants }, { status: 200 });
+
+    const gameSessionData: GameSession = {
+      game: {
+        ...gameSession.session.game,
+        participants,
+      },
+      room: gameSession.session.room,
+      participants,
+    };
+
+    // WHEN CREATING THE SESSION IS NOT CREATED AS A COLLECTION, BUT AS PART OF THE OBJECT.
+    // TOMORROW MAKE SURE IT'S CREATED AS A COLLECTION.
+    return NextResponse.json(gameSessionData, { status: 200 });
   } catch (error: any) {
     Logger.error("Error creating a room", user?.userId || "unknown", {
       error,

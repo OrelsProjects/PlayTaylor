@@ -3,7 +3,7 @@
  * The data here is dynamic and changes based on the game state and the actions of the participants.
  */
 
-import { QuestionResponse, QuestionWithTimer } from "./question";
+import { QuestionOption, QuestionWithTimer } from "./question";
 import Room from "./room";
 
 export const QUESTION_TIME = 20; // 20 seconds
@@ -14,7 +14,7 @@ export const SHOW_LEADERBOARD_TIME = 7; // 7 seconds
 
 export interface Game {
   stage: GameStage;
-  participants: Participant[];
+  participants?: Participant[];
   currentQuestion?: QuestionWithTimer;
 
   gameStartedAt?: number | null;
@@ -35,7 +35,7 @@ export type GameStage =
   | "show-leaderboard"
   | "game-ended";
 
-export const isGameStarted = (stage: GameStage) =>
+export const isGameStarted = (stage?: GameStage) => 
   stage === "playing" ||
   stage === "question-ended" ||
   stage === "paused" ||
@@ -52,7 +52,7 @@ export interface Participant {
   joinedAt: number;
   userId: string;
   leftAt?: number | null;
-  questionResponses?: QuestionResponse[];
+  questionResponses?: QuestionOption[];
 }
 
 // Game Session
@@ -67,5 +67,5 @@ export type UserIdOrName = string;
 export type GameSession = {
   room: Room; // Static data
   game: Game; // Dynamic data
-  participants: Participant[]; // Dynamic data
+  participants?: Participant[]; // Dynamic data
 };

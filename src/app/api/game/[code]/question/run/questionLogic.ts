@@ -7,7 +7,7 @@ import {
 } from "@/models/game";
 import { GamePausedError } from "@/models/errors/GamePausedError";
 import Room from "@/models/room";
-import { gameDocServer, gameSessionDocServer, roomDocServer } from "@/app/api/_db/firestoreServer";
+import { gameDocServer, getGameSession } from "@/app/api/_db/firestoreServer";
 
 type GameRef = FirebaseFirestore.DocumentReference<Game, any>;
 
@@ -21,21 +21,23 @@ type GameRef = FirebaseFirestore.DocumentReference<Game, any>;
  */
 export async function runLogic(roomCode: string) {
   try {
-    const gameSession = (await gameSessionDocServer(roomCode).get()).data();
+    const gameSession = await getGameSession(roomCode);
+
     if (!gameSession) {
       throw new GameDoesNotExistError();
     }
-    const gameRef = gameDocServer(roomCode);
     const { room, game } = gameSession;
 
-    await startQuestionCountdown(gameRef);
-    await startQuestionEnded(gameRef);
-    await startShowLeaderboard(gameRef, game);
+    const { code } = room;
+
+    await startQuestionCountdown(code);
+    await startQuestionEnded(code);
+    await startShowLeaderboard(code);
     const gameOver = await isLastQuestion(game, room);
     if (gameOver) {
-      await endGame(gameRef);
+      await endGame(code);
     } else {
-      await updateQuestionNumber(gameRef, game, room);
+      await updateQuestionNumber(game, room);
     }
   } catch (error: any) {
     if (error.name === "GamePausedError") {
@@ -50,44 +52,54 @@ export async function runLogic(roomCode: string) {
  * If the current stage was "paused", then resume the countdown from the time it was paused.
  * Otherwise, start the countdown from 20 seconds.
  */
-async function startQuestionCountdown(gameRef: GameRef) {
+async function startQuestionCountdown(roomCode: string) {
   await new Promise<void>((resolve, reject) => {
     // interval logic
     const interval = setInterval(() => {
-      gameRef.get().then(gameData => {
-        const game = gameData.data();
-        if (!game) {
-          reject(new GameDoesNotExistError());
-          clearInterval(interval);
-          return;
-        }
-        const currentStage = game.stage;
-
-        let questionTimer = game.currentQuestion.timer || QUESTION_TIME;
-        // FOR NEXT DESIGN THE REST OF THE SCREENS AND SET THE LOGIC TO WORK WITH THEM (STAGE)
-        if (currentStage === "paused") {
-          const currentTime = game.currentQuestion.timer;
-          questionTimer = currentTime;
-          clearInterval(interval);
-          reject(new GamePausedError());
-          return;
-        }
-
-        questionTimer -= 1;
-        gameRef
-          .update({
-            countdownCurrentTime: questionTimer,
-          })
-          .catch(error => {
+      gameDocServer(roomCode)
+        .get()
+        .then((gameData: any) => {
+          const game = gameData.data();
+          if (!game) {
+            reject(new GameDoesNotExistError());
             clearInterval(interval);
-            reject(error);
-          });
+            return;
+          }
+          const currentStage = game.stage;
 
-        if (questionTimer === 0) {
-          clearInterval(interval);
-          resolve();
-        }
-      });
+          let questionTimer =
+            game.currentQuestion?.timer === undefined
+              ? QUESTION_TIME
+              : game.currentQuestion.timer;
+          // FOR NEXT DESIGN THE REST OF THE SCREENS AND SET THE LOGIC TO WORK WITH THEM (STAGE)
+          if (currentStage === "paused") {
+            clearInterval(interval);
+            reject(new GamePausedError());
+            return;
+          }
+
+          questionTimer -= 1;
+
+          gameDocServer(roomCode)
+            .update(
+              {
+                currentQuestion: {
+                  ...game.currentQuestion,
+                  timer: questionTimer,
+                },
+              },
+              { merge: true },
+            )
+            .catch((error: any) => {
+              clearInterval(interval);
+              reject(error);
+            });
+
+          if (questionTimer === 0) {
+            clearInterval(interval);
+            resolve();
+          }
+        });
     }, 1000);
   });
 }
@@ -96,30 +108,50 @@ async function startQuestionCountdown(gameRef: GameRef) {
  * Change the state to "question-ended".
  * Update countdownQuestionEnded to 3 and start the countdown with an interval of 1 second.
  */
-async function startQuestionEnded(gameRef: GameRef) {
-  let currentTime = QUESTION_ENDED_TIME - 1;
-  await gameRef.update({
-    stage: "question-ended",
-    countdownQuestionEnded: currentTime,
-  });
+async function startQuestionEnded(code: string) {
+  let currentTime = QUESTION_ENDED_TIME;
+  await gameDocServer(code).update(
+    {
+      stage: "question-ended",
+      countdownQuestionEnded: currentTime,
+    },
+    { merge: true },
+  );
 
   await new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
-      gameRef
-        .update({
-          countdownQuestionEnded: currentTime,
+      gameDocServer(code)
+        .get()
+        .then((doc: any) => {
+          const gameData = doc.data();
+          if (!gameData) {
+            clearInterval(interval);
+            reject(new GameDoesNotExistError());
+            return;
+          }
+
+          currentTime = gameData.countdownQuestionEnded;
+          currentTime -= 1;
+
+          gameDocServer(code)
+            .update({
+              countdownQuestionEnded: currentTime,
+            })
+            .catch((error: any) => {
+              clearInterval(interval);
+              reject(error);
+            })
+            .then(() => {
+              if (currentTime === 0) {
+                clearInterval(interval);
+                resolve();
+              }
+            });
         })
-        .catch(error => {
+        .catch((error: any) => {
           clearInterval(interval);
           reject(error);
         });
-
-      currentTime = currentTime - 1;
-
-      if (currentTime < 0) {
-        clearInterval(interval);
-        resolve();
-      }
     }, 1000);
   });
 }
@@ -128,28 +160,36 @@ async function startQuestionEnded(gameRef: GameRef) {
  * Change the state to "show-leaderboard".
  * Update countdownShowLeaderboard to 7 and start the countdown with an interval of 1 second.
  */
-async function startShowLeaderboard(gameRef: GameRef, game: Game) {
-  let currentTime = SHOW_LEADERBOARD_TIME - 1;
-  await gameRef.update({
-    stage: "show-leaderboard",
-    countdownShowLeaderboard: currentTime,
-  });
+async function startShowLeaderboard(code: string) {
+  let currentTime = SHOW_LEADERBOARD_TIME;
+  await gameDocServer(code).update(
+    {
+      stage: "show-leaderboard",
+      countdownShowLeaderboard: currentTime,
+    },
+    { merge: true },
+  );
 
   await new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
-      gameRef
-        .update({
-          countdownShowLeaderboard: currentTime,
-        })
-        .catch(error => {
+      currentTime = currentTime - 1;
+      gameDocServer(code)
+        .update(
+          {
+            countdownShowLeaderboard: currentTime,
+          },
+          { merge: true },
+        )
+        .catch((error: any) => {
           clearInterval(interval);
           reject(error);
+        })
+        .then(() => {
+          if (currentTime === 0) {
+            clearInterval(interval);
+            resolve();
+          }
         });
-      currentTime = currentTime - 1;
-      if (currentTime === 0) {
-        clearInterval(interval);
-        resolve();
-      }
     }, 1000);
   });
 }
@@ -160,12 +200,14 @@ async function startShowLeaderboard(gameRef: GameRef, game: Game) {
  * MUST BE CALLED BEFORE updateQuestionNumber.
  */
 async function isLastQuestion(game: Game, room: Room): Promise<boolean> {
-  const currentQuestionId = game.currentQuestion.id;
+  const currentQuestionId = game.currentQuestion?.id;
   const totalQuestions = room.questions.length;
   const questionIndex = room.questions.findIndex(
     question => question.id === currentQuestionId,
   );
-
+  if (questionIndex === -1) {
+    throw new Error("Question not found");
+  }
   return questionIndex === totalQuestions - 1;
 }
 
@@ -173,23 +215,33 @@ async function isLastQuestion(game: Game, room: Room): Promise<boolean> {
  * End the game.
  * Change the state to "game-ended".
  */
-async function endGame(gameRef: GameRef) {
-  await gameRef.update({
-    stage: "game-ended",
-  });
+async function endGame(code: string) {
+  await gameDocServer(code).update(
+    {
+      stage: "game-ended",
+    },
+    { merge: true },
+  );
 }
 
-async function updateQuestionNumber(gameRef: GameRef, game: Game, room: Room) {
-  const currentQuestionId = game.currentQuestion.id;
+async function updateQuestionNumber(game: Game, room: Room) {
+  const currentQuestionId = game.currentQuestion?.id;
   const questionIndex = room.questions.findIndex(
     question => question.id === currentQuestionId,
   );
 
+  if (questionIndex === -1) {
+    throw new Error("Question not found");
+  }
+
   const nextQuestionIndex = questionIndex + 1;
   const nextQuestion = room.questions[nextQuestionIndex];
 
-  await gameRef.update({
-    currentQuestion: nextQuestion,
-    stage: "playing",
-  });
+  await gameDocServer(room.code).update(
+    {
+      currentQuestion: nextQuestion,
+      stage: "playing",
+    },
+    { merge: true },
+  );
 }

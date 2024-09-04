@@ -6,7 +6,7 @@ import {
   manyParticipantsConverter,
   participantConverter,
   roomConverter,
-} from "./roomConverter";
+} from "./converters";
 
 export const gameSessionCollectionClient = db
   ? collection(db, "gameSessions")
@@ -34,7 +34,7 @@ export const gameDocClient = (code: string) =>
 export const participantsColClient = (code: string) =>
   db && code
     ? collection(db, "gameSessions", code, "participants").withConverter(
-        manyParticipantsConverter,
+        participantConverter,
       )
     : null;
 

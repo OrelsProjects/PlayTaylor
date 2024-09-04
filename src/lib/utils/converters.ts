@@ -1,13 +1,16 @@
 // firebase room converter
 
-
 import { GameSession, Participant, Game } from "@/models/game";
 import Room from "@/models/room";
 import { DbGameSession } from "@/lib/utils/firestore";
 
 export const gameSessionConverter = {
-  toFirestore: (room: GameSession): DbGameSession => {
-    const participantsIdToParticipant = room.participants.reduce(
+  toFirestore: (
+    gameSession: GameSession,
+  ): {
+    code: string;
+  } => {
+    const participantsIdToParticipant = gameSession.participants?.reduce(
       (acc: any, participant) => {
         acc[participant.userId || participant.name] = participant;
         return acc;
@@ -16,11 +19,7 @@ export const gameSessionConverter = {
     );
 
     return {
-      session: {
-        room: room.room,
-        game: room.game,
-      },
-      participants: participantsIdToParticipant,
+      code: gameSession.room.code,
     };
   },
   fromFirestore: (snapshot: any): GameSession => {
@@ -35,10 +34,12 @@ export const gameSessionConverter = {
       };
     });
 
+    const participants = Object.values(data.participants) || [];
+
     return {
       room: data.session.room,
-      game: data.session.game,
-      participants: Object.values(data.participants),
+      game: { ...data.session.game, participants },
+      participants,
     };
   },
 };
@@ -95,11 +96,13 @@ export const participantConverter = {
 
 export const manyParticipantsConverter = {
   toFirestore: (participants: any): { [key: string]: Participant }[] => {
-    return participants.map((participant: Participant) => {
-      return {
-        [participant.userId]: participant,
-      };
-    });
+    return (
+      participants?.map((participant: Participant) => {
+        return {
+          [participant.userId]: participant,
+        };
+      }) || []
+    );
   },
   fromFirestore: (snapshot: any): Participant[] => {
     const data = snapshot.data() as { [key: string]: Participant };

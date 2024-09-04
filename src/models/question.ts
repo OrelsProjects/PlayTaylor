@@ -20,6 +20,7 @@ export interface QuestionOption {
   option: string;
   correct: boolean;
   position: number;
+  answeredAt?: number;
 }
 
 export interface Question {
@@ -27,11 +28,4 @@ export interface Question {
   question: string;
   options: QuestionOption[];
   difficulty: Difficulty;
-}
-
-export interface QuestionResponse {
-  userId?: string;
-  questionId: string;
-  answeredAt: Date;
-  response: QuestionOption;
 }
