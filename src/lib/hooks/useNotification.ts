@@ -1,12 +1,15 @@
 "use client";
 
 import { toast } from "react-toastify";
-import { getUserToken, initMessaging } from "../../../firebase.config";
-import { Logger } from "../../logger";
-import { canUseNotifications, isMobilePhone } from "../utils/notificationUtils";
-import { NotificationData } from "../../models/notification";
+import { getUserToken, initMessaging } from "@/../firebase.config";
+import { Logger } from "@/logger";
+import {
+  canUseNotifications,
+  isMobilePhone,
+} from "@/lib/utils/notificationUtils";
+import { NotificationData } from "@/models/notification";
 import axios from "axios";
-import NotificationComponent from "../../components/ui/notification";
+import NotificationComponent from "@/components/ui/notification";
 
 export default function useNotification() {
   const showNotification = async (notification: NotificationData) => {

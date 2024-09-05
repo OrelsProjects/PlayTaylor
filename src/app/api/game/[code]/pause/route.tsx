@@ -40,8 +40,12 @@ export async function POST(
       } else {
         secondsPassed = Math.floor(secondsPassed);
       }
-      const timeLeft =
+      let timeLeft =
         (gameData.game.currentQuestion?.timer || QUESTION_TIME) + secondsPassed;
+
+      // time left min 0 max QUESTION_TIME
+      timeLeft = Math.min(QUESTION_TIME, Math.max(0, timeLeft || 0));
+
       await gameDocServer(params.code).update(
         {
           stage: "paused",

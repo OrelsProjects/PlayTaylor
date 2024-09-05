@@ -19,7 +19,9 @@ type GameRef = FirebaseFirestore.DocumentReference<Game, any>;
  * If the game is not over, update to the next question number and change the stage to "playing".
  * Else, change the stage to "game-ended".
  */
-export async function runLogic(roomCode: string) {
+export async function runLogic(
+  roomCode: string,
+): Promise<{ gameOver: boolean }> {
   try {
     const gameSession = await getGameSession(roomCode);
 
@@ -36,12 +38,14 @@ export async function runLogic(roomCode: string) {
     const gameOver = await isLastQuestion(game, room);
     if (gameOver) {
       await endGame(code);
+      return { gameOver: true };
     } else {
       await updateQuestionNumber(game, room);
     }
+    return { gameOver: false };
   } catch (error: any) {
     if (error.name === "GamePausedError") {
-      return;
+      return { gameOver: false };
     }
     throw error;
   }

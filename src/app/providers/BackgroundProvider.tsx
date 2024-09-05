@@ -43,11 +43,16 @@ export default function BackgroundProvider({
   useEffect(() => {
     const cycleGradients = async () => {
       while (true) {
-        await controls.start({
-          background: `linear-gradient(to bottom right, ${gradients[currentGradient][0]}, ${gradients[currentGradient][1]}, ${gradients[currentGradient][2]}, ${gradients[currentGradient][3]})`,
-          transition: { duration: 3 },
-        });
-        setCurrentGradient(prev => (prev + 1) % gradients.length);
+        try {
+          await controls.start({
+            background: `linear-gradient(to bottom right, ${gradients[currentGradient][0]}, ${gradients[currentGradient][1]}, ${gradients[currentGradient][2]}, ${gradients[currentGradient][3]})`,
+            transition: { duration: 3 },
+          });
+          setCurrentGradient(prev => (prev + 1) % gradients.length);
+        } catch (e) {
+          break;
+          //  controls.start() should only be called after a component has mounted. Consider calling within a useEffect hook.
+        }
       }
     };
     cycleGradients();

@@ -35,7 +35,9 @@ export type GameStage =
   | "show-leaderboard"
   | "game-ended";
 
-export const isGameStarted = (stage?: GameStage) => 
+export const isInLobby = (stage?: GameStage) => stage === "lobby";
+
+export const isGameRunning = (stage?: GameStage) =>
   stage === "playing" ||
   stage === "question-ended" ||
   stage === "paused" ||
@@ -43,7 +45,7 @@ export const isGameStarted = (stage?: GameStage) =>
   stage === "show-leaderboard" ||
   stage === "countdown";
 
-export const isGameEnded = (stage: GameStage) => stage === "game-ended";
+export const isGameEnded = (stage?: GameStage) => stage === "game-ended";
 
 // Participant
 

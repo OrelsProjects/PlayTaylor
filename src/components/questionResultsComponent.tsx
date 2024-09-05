@@ -3,13 +3,11 @@ import { Dialog, DialogContent } from "./ui/dialog";
 import { cn } from "../lib/utils";
 import BackgroundProvider from "../app/providers/BackgroundProvider";
 import Image from "next/image";
+import { useAppSelector } from "../lib/hooks/redux";
+import useGame from "../lib/hooks/useGame";
 
 export interface QuestionResultsProps {
-  isCorrectAnswer?: boolean;
   className?: string;
-  timer?: number;
-  open?: boolean;
-  onClose?: () => void;
 }
 
 interface ProgressBorderProps {
@@ -40,12 +38,20 @@ const ProgressBorder: React.FC<ProgressBorderProps> = ({
 };
 
 export default function QuestionResultsComponent({
-  isCorrectAnswer,
   className,
-  timer,
-  open,
-  onClose,
 }: QuestionResultsProps) {
+  const { isCurrentQuestionAnsweredCorrectly, getStage } = useGame();
+
+  const isQuestionEndedStage = useMemo(
+    () => getStage() === "question-ended",
+    [getStage],
+  );
+
+  const isCorrectAnswer = useMemo(
+    () => isQuestionEndedStage && isCurrentQuestionAnsweredCorrectly(),
+    [isQuestionEndedStage],
+  );
+
   const Text = useCallback(() => {
     const classNameText = "text-2xl font-semibold text-center";
     if (isCorrectAnswer) {
@@ -74,15 +80,9 @@ export default function QuestionResultsComponent({
   }, [isCorrectAnswer]);
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={open => {
-        if (!open && onClose) {
-          onClose();
-        }
-      }}
-    >
+    <Dialog open={isQuestionEndedStage}>
       <DialogContent
+        closeOnOutsideClick={false}
         className={cn(
           "w-[90%] flex flex-col items-center justify-center !p-0 border-4 rounded-3xl",
           className,

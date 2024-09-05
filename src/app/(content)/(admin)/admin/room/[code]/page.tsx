@@ -40,7 +40,11 @@ export default function AdminRoomPage({
     try {
       await startGame(params.code);
       router.push(`/game/${params.code}`);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === "NoParticipantsError") {
+        toast.error("You need at least 1 participant to start the game");
+        return;
+      }
       console.error(error);
       toast.error("Failed to start game");
     } finally {

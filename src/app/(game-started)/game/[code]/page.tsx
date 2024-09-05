@@ -10,11 +10,12 @@ import RadialProgressBar from "@/components/ui/radialProgressBar";
 import { QuestionWithTimer } from "@/models/room";
 import useGame from "@/lib/hooks/useGame";
 import { QuestionOption } from "@/models/question";
-import { isGameStarted, QUESTION_TIME } from "@/models/game";
+import { isGameRunning, QUESTION_TIME } from "@/models/game";
 import { toast } from "react-toastify";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 import { BsFillPauseFill } from "react-icons/bs";
 import { AnimatePresence, motion } from "framer-motion";
+import QuestionResultsComponent from "@/components/questionResultsComponent";
 
 const colors = [
   "hsla(37, 91%, 55%, 1)",
@@ -56,7 +57,7 @@ export default function Game({ params }: { params: { code: string } }) {
   const router = useCustomRouter();
   const { user } = useAppSelector(state => state.auth);
   const { room } = useAppSelector(state => state.room);
-  const { game, participants } = useAppSelector(state => state.game);
+  const { game, currentParticipant } = useAppSelector(state => state.game);
   const { setPreviouslyJoinedGame, answerQuestion, loadingAnswer } = useGame();
 
   const [currentQuestion, setCurrentQuestion] =
@@ -87,7 +88,7 @@ export default function Game({ params }: { params: { code: string } }) {
   }, [room, game]);
 
   useEffect(() => {
-    if (!user || !params.code || isGameStarted(game?.stage)) return;
+    if (!user || !params.code || isGameRunning(game?.stage)) return;
     if (loadingJoinPreviousGame) return;
 
     setLoadingJoinPreviousGame(true);
@@ -109,21 +110,21 @@ export default function Game({ params }: { params: { code: string } }) {
 
   const answerSelected = useMemo((): string | null => {
     if (!game || !user) return null;
-    const participant = participants?.find(p => p.userId === user.userId);
-    if (!participant) return null;
-    const questionResponse = participant.questionResponses?.find(
+    if (!currentParticipant) return null;
+
+    const questionResponse = currentParticipant.questionResponses?.find(
       qr => qr.questionId === currentQuestion?.id,
     );
     if (!questionResponse) return null;
 
     return questionResponse?.option || null;
-  }, [participants, user, currentQuestion]);
+  }, [currentParticipant, user, currentQuestion]);
 
   const didAnswerCurrentQuestion = useMemo(() => {
     if (!game || !user) return false;
-    const participant = participants?.find(p => p.userId === user.userId);
-    if (!participant) return false;
-    return participant.questionResponses?.some(
+
+    if (!currentParticipant) return false;
+    return currentParticipant.questionResponses?.some(
       qr => qr.questionId === currentQuestion?.id,
     );
   }, [game, user, currentQuestion]);
@@ -214,6 +215,7 @@ export default function Game({ params }: { params: { code: string } }) {
             />
           ))}
       </div>
+      <QuestionResultsComponent />
     </div>
   );
 }

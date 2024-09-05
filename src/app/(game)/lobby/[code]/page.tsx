@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAppSelector } from "@/lib/hooks/redux";
-import { Game, isGameStarted } from "@/models/game";
+import { Game, isGameRunning } from "@/models/game";
 import useGame from "@/lib/hooks/useGame";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
@@ -28,10 +28,10 @@ const Counter = ({
   const [count, setCount] = useState(1);
 
   const handleNewCounter = (newCount?: number | null, newGame?: Game) => {
-    console.log("newCount", newCount);
-    
+    if (newCount === count) return;
     if (!game && !newGame) return;
 
+    console.log("newCount", newCount);
     const validCount =
       newCount === null || newCount === undefined ? 4 : newCount;
 
@@ -39,7 +39,7 @@ const Counter = ({
 
     const validRoom = (newGame ? newGame : game) as Game;
 
-    if (isGameStarted(validRoom.stage)) {
+    if (isGameRunning(validRoom.stage)) {
       if (validCount <= 1) {
         onCountdownZero();
       }

@@ -1,4 +1,4 @@
-import "../../firebase.config.admin";
+import "@/../firebase.config.admin";
 import slugify from "slugify";
 import admin from "firebase-admin";
 

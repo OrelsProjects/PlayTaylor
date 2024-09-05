@@ -5,15 +5,15 @@ import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import ParticipantsComponent from "@/components/pariticpantsComponent";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
-import { isGameStarted } from "@/models/game";
+import { isGameRunning } from "@/models/game";
 
 export default function Waiting({ params }: { params: { code?: string } }) {
   const router = useCustomRouter();
   const { game } = useAppSelector(state => state.game);
 
   useEffect(() => {
-    if (game && isGameStarted(game.stage)) {
-      router.push(`/lobby/${params.code}`);
+    if (game && isGameRunning(game.stage)) {
+      router.push(`/game/${params.code}`);
     }
   }, [game]);
 

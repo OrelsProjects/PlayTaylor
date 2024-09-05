@@ -66,7 +66,6 @@ export default function GameListenerProvider() {
       unsubscribeParticipants.current = listenToParticipantsChanges(
         code,
         participants => {
-          debugger;
           updateParticipants(participants);
         },
       );

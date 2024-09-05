@@ -5,7 +5,7 @@
  * It is used to update the game state, answer questions, and manage the game state in the local storage.
  */
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import axios from "axios";
 import { onSnapshot } from "firebase/firestore";
 import { Logger } from "@/logger";
@@ -13,14 +13,20 @@ import { QuestionOption } from "@/models/question";
 import { useAppDispatch, useAppSelector } from "./redux";
 import { buildLocalSotrageKey } from "@/lib/hooks/_utils";
 import LoadingError from "@/models/errors/LoadingError";
-import { Game, GameSession, Participant } from "@/models/game";
+import { Game, GameSession, isGameRunning, Participant } from "@/models/game";
 import { setRoom } from "@/lib/features/room/roomSlice";
-import { setGame, setParticipants } from "@/lib/features/game/gameSlice";
+import {
+  setGame,
+  setParticipants,
+  removeQuestionResponse,
+  addQuestionResponse,
+} from "@/lib/features/game/gameSlice";
 import { NameTakenError } from "@/models/errors/NameTakenError";
 import {
   gameDocClient,
   participantsColClient,
 } from "@/lib/utils/firestoreClient";
+import { NoParticipantsError } from "@/models/errors/NoParticipantsError";
 
 export type Unsubscribe = () => void;
 
@@ -41,10 +47,15 @@ const getGameJoinedFromLocalStorage = () =>
 export default function useGame() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector(state => state.auth);
-  const { game } = useAppSelector(state => state.game);
+  const { game, currentParticipant, participants } = useAppSelector(
+    state => state.game,
+  );
   const [loadingGameState, setLoadingGameState] = useState(false);
   const loadingCountdown = useRef(false);
   const loadingAnswer = useRef(false);
+  const didStartGame = useRef(false);
+
+  const getStage = useCallback(() => game?.stage, [game]);
 
   const getGameSession = async (code: string) => {
     try {
@@ -68,9 +79,15 @@ export default function useGame() {
         },
       );
       const gameSession = joinRoomResponse.data;
+      const participants = gameSession.participants || [];
       dispatch(setRoom(gameSession.room));
       dispatch(setGame(gameSession.game));
-      dispatch(setParticipants(gameSession.participants || []));
+      dispatch(
+        setParticipants({
+          participants,
+          currentUserId: user?.userId,
+        }),
+      );
       writeGameJoinedToLocalStorage(code, gameSession.participants);
 
       return gameSession;
@@ -85,7 +102,7 @@ export default function useGame() {
 
   const updateGame = (newGame: Game) => dispatch(setGame(newGame));
   const updateParticipants = (participants: Participant[]) =>
-    dispatch(setParticipants(participants));
+    dispatch(setParticipants({ participants, currentUserId: user?.userId }));
 
   async function setPreviouslyJoinedGame(
     code: string,
@@ -99,7 +116,9 @@ export default function useGame() {
         if (gameSession) {
           dispatch(setRoom(gameSession.room));
           dispatch(setGame(gameSession.game));
-          dispatch(setParticipants(gameSession.participants || []));
+          dispatch(
+            setParticipants({ participants, currentUserId: user?.userId }),
+          );
           return gameSession;
         }
       }
@@ -119,6 +138,7 @@ export default function useGame() {
       throw new LoadingError("Loading answer");
     }
     loadingAnswer.current = true;
+    dispatch(addQuestionResponse({ response })); // optimistic update
     try {
       await axios.post(`/api/game/${code}/question/${questionId}/answer`, {
         response: { ...response, answerAt: Date.now() },
@@ -127,6 +147,7 @@ export default function useGame() {
       return;
     } catch (error) {
       console.error(error);
+      dispatch(removeQuestionResponse({ questionId })); // rollback
       throw error;
     } finally {
       loadingAnswer.current = false;
@@ -137,20 +158,42 @@ export default function useGame() {
     if (loadingCountdown.current) {
       throw new LoadingError("Loading countdown");
     }
+    if (didStartGame.current) {
+      return;
+    }
+
+    if (participants?.length < 1) {
+      throw new NoParticipantsError("No participants");
+    }
+
     loadingCountdown.current = true;
     try {
       await axios.post(`/api/game/${code}/startCountdown`);
       await axios.post(`/api/game/${code}/start`);
-      axios.post(`/api/game/${code}/question/run`).catch(error => {
-        console.error("Failed to start question", error);
-        Logger.error(error);
-      });
+      loadingCountdown.current = false;
+      didStartGame.current = true;
+
+      let gameOver = false;
+      while (!gameOver) {
+        try {
+          const response = await axios.post<{ gameOver: boolean }>(
+            `/api/game/${code}/question/run`,
+          );
+          gameOver = response.data.gameOver && !isGameRunning(game?.stage);
+        } catch (error: any) {
+          Logger.error("Failed to start question", {
+            error,
+            data: { game, currentParticipant },
+          });
+        }
+      }
       return;
     } catch (error) {
       console.error(error);
       throw error;
     } finally {
       loadingCountdown.current = false;
+      didStartGame.current = false;
     }
   }
 
@@ -208,6 +251,7 @@ export default function useGame() {
       unsubscribe = onSnapshot(
         roomRef,
         snapshot => {
+          console.log("Game snapshot", snapshot.data());
           onChange(snapshot.data() as Game);
         },
         (error: any) => {
@@ -231,7 +275,10 @@ export default function useGame() {
       unsubscribe = onSnapshot(
         roomRef,
         snapshot => {
-          debugger;
+          console.log(
+            "Participants snapshot",
+            snapshot.docs.map(doc => doc.data()),
+          );
           onChange(snapshot.docs.map(doc => doc.data() as Participant));
         },
         (error: any) => {
@@ -244,14 +291,22 @@ export default function useGame() {
     return unsubscribe;
   };
 
-  const userParticipant = useMemo(() => {
-    if (!game || !user) return null;
-    return game.participants?.find(p => p.userId === user.userId);
-  }, [game, user]);
+  const isCurrentQuestionAnsweredCorrectly = () => {
+    if (!game || !user) return false;
+    if (!currentParticipant) return false;
+    const currentQuestion = game.currentQuestion;
+    if (!currentQuestion) return false;
+
+    const questionResponse = currentParticipant.questionResponses?.find(
+      qr => qr.questionId === currentQuestion.id,
+    );
+    if (!questionResponse) return false;
+    return questionResponse.correct;
+  };
 
   return {
-    userParticipant,
-
+    isCurrentQuestionAnsweredCorrectly,
+    getStage,
     updateGame,
     updateParticipants,
     getGameSession,

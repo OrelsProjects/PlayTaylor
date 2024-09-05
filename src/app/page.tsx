@@ -46,7 +46,6 @@ export default function Home() {
           Join Game
         </Button>
       </div>
-      {/* <QuestionResultsComponent isCorrectAnswer={false} open /> */}
     </main>
   );
 }

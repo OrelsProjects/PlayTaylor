@@ -67,6 +67,8 @@ export async function POST(
       { ...participant, questionResponses },
       { merge: true },
     );
+
+    return NextResponse.json({}, { status: 200 });
   } catch (error: any) {
     loggerServer.error(
       "Error in finding the room",

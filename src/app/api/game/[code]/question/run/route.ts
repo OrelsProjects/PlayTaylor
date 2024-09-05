@@ -27,9 +27,9 @@ export async function POST(
       );
     }
 
-    await runLogic(params.code);
+    const { gameOver } = await runLogic(params.code);
 
-    return NextResponse.json({ status: 200 });
+    return NextResponse.json({ gameOver }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { toast } from "react-toastify";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
+import { isGameRunning, isInLobby } from "../../../../models/game";
 
 type Stage = "pin" | "name";
 
@@ -28,7 +29,9 @@ export default function Join({ params }: { params: { code?: string[] } }) {
       const gameSession = await setPreviouslyJoinedGame(code);
       if (gameSession) {
         const { game } = gameSession;
-        if (game.gameStartedAt) {
+        if (isGameRunning(game?.stage)) {
+          router.push("/game/" + code);
+        } else if (isInLobby(game?.stage)) {
           router.push("/lobby/" + code);
         } else {
           router.push("/waiting/" + code);
@@ -73,7 +76,7 @@ export default function Join({ params }: { params: { code?: string[] } }) {
         }
         const GameSession = await joinGame(code, name);
         if (GameSession?.game?.gameStartedAt) {
-          router.push("/lobby/" + code);
+          router.push("/game/" + code);
         } else {
           router.push("/waiting/" + code);
         }

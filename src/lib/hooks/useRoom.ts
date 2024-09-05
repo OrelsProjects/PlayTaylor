@@ -12,7 +12,7 @@ import {
 import { Logger } from "@/logger";
 import { Difficulty } from "@/models/question";
 import { roomDocClient } from "@/lib/utils/firestoreClient";
-import { GameSession } from "../../models/game";
+import { GameSession } from "@/models/game";
 
 export type Unsubscribe = () => void;
 
@@ -39,26 +39,6 @@ export default function useRoom() {
       throw error;
     }
   }
-
-  // async function joinRoom(room: Room, name: string): Promise<Participant> {
-  //   try {
-  //     const joinRoomResponse = await axios.post<Participant>(
-  //       `/api/game/${room.code}/join`,
-  //       {
-  //         name,
-  //       },
-  //     );
-  //     const participant = joinRoomResponse.data;
-  //     dispatch(setUserParticipant(participant));
-  //     dispatch(setRoom(room));
-  //     saveRoomJoined(room.code, participant);
-
-  //     return participant;
-  //   } catch (error) {
-  //     console.error(error);
-  //     throw error;
-  //   }
-  // }
 
   const updateRoom = (room: Room) => {
     dispatch(setRoom(room));
@@ -107,6 +87,7 @@ export default function useRoom() {
       unsubscribe = onSnapshot(
         roomRef,
         snapshot => {
+          console.log("Room snapshot", snapshot.data());
           onChange(snapshot.data() as Room);
         },
         (error: any) => {

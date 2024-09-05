@@ -3,7 +3,6 @@ import { collection, doc } from "firebase/firestore";
 import {
   gameConverter,
   gameSessionConverter,
-  manyParticipantsConverter,
   participantConverter,
   roomConverter,
 } from "./converters";
