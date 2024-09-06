@@ -41,6 +41,7 @@ export const GameStateButton = () => {
 
   const handleButtonClick = async () => {
     try {
+      debugger;
       if (type === "restart") {
         await restartGame(code);
         return;

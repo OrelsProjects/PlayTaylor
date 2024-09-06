@@ -29,7 +29,6 @@ export default function Waiting({ params }: { params: { code?: string } }) {
           <ParticipantsComponent />
         </ul>
       </div>
-      <div>Waiting room</div>
     </div>
   );
 }

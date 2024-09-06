@@ -49,7 +49,7 @@ export default function useGame() {
   const { game, currentParticipant, participants } = useAppSelector(
     state => state.game,
   );
-  const [loadingGameState, setLoadingGameState] = useState(false);
+  const loadingGameState = useRef(false);
   const loadingCountdown = useRef(false);
   const loadingAnswer = useRef(false);
   const didStartGame = useRef(false);
@@ -137,6 +137,19 @@ export default function useGame() {
       throw new LoadingError("Loading answer");
     }
     loadingAnswer.current = true;
+
+    if (!currentParticipant) {
+      throw new Error("Participant not found");
+    }
+
+    if (
+      currentParticipant.questionResponses?.find(
+        qr => qr.questionId === questionId,
+      )
+    ) {
+      return;
+    }
+
     dispatch(addQuestionResponse({ response })); // optimistic update
     try {
       await axios.post(`/api/game/${code}/question/${questionId}/answer`, {
@@ -208,10 +221,11 @@ export default function useGame() {
   }
 
   async function pauseGame(code: string) {
-    if (loadingGameState) {
+    debugger;
+    if (loadingGameState.current) {
       throw new LoadingError("Loading pause");
     }
-    setLoadingGameState(true);
+    loadingGameState.current = true;
     try {
       const gameRef = gameDocClient(code);
       if (!gameRef) {
@@ -228,15 +242,15 @@ export default function useGame() {
       Logger.error(error);
       throw error;
     } finally {
-      setLoadingGameState(false);
+      loadingGameState.current = false;
     }
   }
 
   async function resumeGame(code: string) {
-    if (loadingGameState) {
+    if (loadingGameState.current) {
       throw new LoadingError("Loading pause");
     }
-    setLoadingGameState(true);
+    loadingGameState.current = true;
     try {
       const gameRef = gameDocClient(code);
       if (!gameRef) {
@@ -253,22 +267,22 @@ export default function useGame() {
       Logger.error(error);
       throw error;
     } finally {
-      setLoadingGameState(false);
+      loadingGameState.current = false;
     }
   }
   // api/game/[code]/restart
   const restartGame = async (code: string) => {
-    if (loadingGameState) {
+    if (loadingGameState.current) {
       throw new LoadingError("Loading pause");
     }
-    setLoadingGameState(true);
+    loadingGameState.current = true;
     try {
       await axios.post(`/api/game/${code}/restart`);
     } catch (error: any) {
       Logger.error(error);
       throw error;
     } finally {
-      setLoadingGameState(false);
+      loadingGameState.current = false;
     }
   };
 
@@ -350,11 +364,11 @@ export default function useGame() {
     restartGame,
     answerQuestion,
     clearLocalGame,
-    loadingGameState,
     listenToGameChanges,
     setPreviouslyJoinedGame,
     listenToParticipantsChanges,
     loadingAnswer: loadingAnswer.current,
     loadingCountdown: loadingCountdown.current,
+    loadingGameState: loadingGameState.current,
   };
 }

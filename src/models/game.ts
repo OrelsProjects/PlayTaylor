@@ -7,7 +7,7 @@ import { QuestionOption, QuestionWithTimer } from "./question";
 import Room from "./room";
 
 export const START_GAME_COUNTDOWN = 5; // 5 seconds
-export const QUESTION_TIME = 5; // 20 seconds
+export const QUESTION_TIME = 10; // 20 seconds
 export const QUESTION_ENDED_TIME = 3; // 3 seconds
 export const SHOW_LEADERBOARD_TIME = 3; // 7 seconds
 
