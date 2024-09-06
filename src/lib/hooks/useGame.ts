@@ -1,5 +1,4 @@
 "use client";
-
 /**
  * @file This file contains the useGame hook which is used to manage the game state.
  * It is used to update the game state, answer questions, and manage the game state in the local storage.
@@ -64,8 +63,8 @@ export default function useGame() {
       );
       const gameSession = gameResponse.data;
       return gameSession;
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      Logger.error(error);
       throw error;
     }
   };
@@ -95,7 +94,7 @@ export default function useGame() {
       if (error.response.status === 400) {
         throw new NameTakenError();
       }
-      console.error(error);
+      Logger.error(error);
       throw error;
     }
   };
@@ -123,8 +122,8 @@ export default function useGame() {
         }
       }
       return null;
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      Logger.error(error);
       throw error;
     }
   }
@@ -145,8 +144,8 @@ export default function useGame() {
         questionId,
       });
       return;
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      Logger.error(error);
       dispatch(removeQuestionResponse({ questionId })); // rollback
       throw error;
     } finally {
@@ -190,8 +189,8 @@ export default function useGame() {
         }
       }
       return;
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      Logger.error(error);
       throw error;
     } finally {
       loadingCountdown.current = false;
@@ -202,8 +201,8 @@ export default function useGame() {
   async function leaveGame(code: string, name: string) {
     try {
       await axios.post(`/api/game/${code}/leave`, { name });
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      Logger.error(error);
       throw error;
     }
   }
@@ -219,15 +218,14 @@ export default function useGame() {
         throw new Error("Game not found"); // You can create a custom error class for better error handling if needed
       }
 
-      await updateDoc(
-        gameRef,
-        { stage: "paused", previousStage: game?.stage },
-        { merge: true },
-      );
+      // await updateDoc(
+      //   gameRef,
+      //   { stage: "paused", previousStage: game?.stage },
+      //   { merge: true },
+      // );
       return;
-    } catch (error) {
-      debugger;
-      console.error(error);
+    } catch (error: any) {
+      Logger.error(error);
       throw error;
     } finally {
       setLoadingGameState(false);
@@ -244,20 +242,35 @@ export default function useGame() {
       if (!gameRef) {
         throw new Error("Game not found");
       }
-      await updateDoc(
-        gameRef,
-        { stage: game?.previousStage || "lobby", previousStage: "paused" },
-        { merge: true },
-      );
+      // await updateDoc(
+      //   gameRef,
+      //   { stage: game?.previousStage || "lobby", previousStage: "paused" },
+      //   { merge: true },
+      // );
 
       return;
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      Logger.error(error);
       throw error;
     } finally {
       setLoadingGameState(false);
     }
   }
+  // api/game/[code]/restart
+  const restartGame = async (code: string) => {
+    if (loadingGameState) {
+      throw new LoadingError("Loading pause");
+    }
+    setLoadingGameState(true);
+    try {
+      await axios.post(`/api/game/${code}/restart`);
+    } catch (error: any) {
+      Logger.error(error);
+      throw error;
+    } finally {
+      setLoadingGameState(false);
+    }
+  };
 
   const listenToGameChanges = (
     code: string,
@@ -334,6 +347,7 @@ export default function useGame() {
     leaveGame,
     pauseGame,
     resumeGame,
+    restartGame,
     answerQuestion,
     clearLocalGame,
     loadingGameState,

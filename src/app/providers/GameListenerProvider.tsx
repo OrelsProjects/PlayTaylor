@@ -121,6 +121,7 @@ export default function GameListenerProvider() {
             <p>Countdown Started At: {game.countdownStartedAt}</p>
           )}
           {game?.stage && <p>Stage: {game.stage}</p>}
+          {game?.previousStage && <p>Previous Stage: {game.previousStage}</p>}
           {game?.countdownCurrentTime && (
             <p>Countdown: {game.countdownCurrentTime}</p>
           )}

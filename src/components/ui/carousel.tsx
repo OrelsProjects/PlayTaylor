@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/utils";
 import OptimizedImage from "./optimizedImage";
 
 export interface CarouselItem {
@@ -29,17 +29,19 @@ const CarouselItemComponent = ({
   return (
     <div
       onClick={onClick}
-      className={cn("w-full h-[205px] z-20 relative min-w-14 hover:cursor-pointer", {
-        "animate-full-image": selected,
-        "animate-full-image-back": !selected,
-      })}
+      className={cn(
+        "w-full h-[205px] z-20 relative min-w-14 hover:cursor-pointer",
+        {
+          "animate-full-image": selected,
+          "animate-full-image-back": !selected,
+        },
+      )}
     >
       <OptimizedImage
         src={item.image}
         alt="carousel item"
         layout="fill"
-        objectFit="cover"
-        className={cn("!relative rounded-full ", {
+        className={cn("!relative rounded-full object-cover", {
           "rounded-[28px]": selected,
         })}
       />

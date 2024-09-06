@@ -5,7 +5,7 @@ import RoomNameComponent from "@/components/roomName";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { useAppSelector } from "@/lib/hooks/redux";
-import { PauseButton } from "./pauseButton";
+import { GameStateButton } from "./GameStateButton";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import useGame from "@/lib/hooks/useGame";
@@ -28,8 +28,15 @@ export default function GameStartedLayout({
   const router = useCustomRouter();
   const pathname = usePathname();
   const { room } = useAppSelector(state => state.room);
+  const { game } = useAppSelector(state => state.game);
   const { setPreviouslyJoinedGame } = useGame();
   const [loadingJoinPreviousGame, setLoadingJoinPreviousGame] = useState(false);
+
+  useEffect(() => {
+    if (game?.stage === "game-ended") {
+      router.push("/game/" + room.code + "/results");
+    }
+  }, [game]);
 
   useEffect(() => {
     if (!user || !room.code) return;
@@ -55,7 +62,7 @@ export default function GameStartedLayout({
   return (
     <motion.div
       key={pathname}
-      className="w-full h-svh flex flex-col"
+      className="w-full h-svh flex flex-col gap-6"
       variants={slideInAnimation}
       initial="initial"
       animate="animate"
@@ -70,11 +77,11 @@ export default function GameStartedLayout({
       >
         <RoomNameComponent name={room?.name || ""} type="compact" />
       </div>
-      <div className="h-full w-full flex justify-center items-center overflow-auto mt-6 mb-2">
+      <div className="h-full w-full flex justify-start items-center flex-col overflow-auto mt-5 mb-2 gap-6 px-4">
         {children}
-      </div>
-      <div className="w-full h-fit flex justify-center items-center py-2">
-        <PauseButton />
+        <div className="w-full h-fit flex justify-center items-center py-2 mt-auto">
+          <GameStateButton />
+        </div>
       </div>
     </motion.div>
   );

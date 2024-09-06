@@ -37,7 +37,7 @@
     --secondary-foreground: 0 0% 95%;
     --muted: 0 0% 15%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 12 6.5% 15.1%;
+    --accent: 324 100% 10%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 339 90% 51%;
@@ -127,5 +127,13 @@
 
   .gradient-purple {
     @apply bg-gradient-to-r from-[hsla(239,86%,74%,1)] to-[hsla(252,88%,74%,1)];
+  }
+
+  .gradient-purple-to-b {
+    @apply bg-gradient-to-b from-[hsla(239,86%,74%,1)] to-[hsla(252,88%,74%,1)];
+  }
+
+  .gradient-purple-to-b-80 {
+    @apply bg-gradient-to-b from-[hsla(239,86%,74%,0.8)] to-[hsla(252,88%,74%,0.8)];
   }
 }

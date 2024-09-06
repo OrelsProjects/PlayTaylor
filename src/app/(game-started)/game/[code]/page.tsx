@@ -157,8 +157,7 @@ export default function Game({ params }: { params: { code: string } }) {
             src="/Manuscript.png"
             alt="Manuscript"
             fill
-            objectFit="cover"
-            className="!relative rounded-full !h-40 !w-40 flex-shrink-0"
+            className="!relative rounded-full !h-40 !w-40 flex-shrink-0 object-cover"
           />
           <AnimatePresence>
             {game?.stage === "paused" && (

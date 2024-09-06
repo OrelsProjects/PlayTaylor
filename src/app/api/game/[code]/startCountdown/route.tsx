@@ -5,13 +5,14 @@ import { authOptions } from "@/auth/authOptions";
 import { isOwnerOfRoom } from "../_utils";
 import { getGameDoc } from "@/lib/utils/firestore";
 import { db } from "@/../firebase.config.admin";
+import { START_GAME_COUNTDOWN } from "@/models/game";
 
 // This function couts down from 4 to 0 and every second updates the room's countdownStartedAt
 const startCountdown = async (code: string): Promise<void> => {
   return new Promise<void>(resolve => {
     const gameRef = getGameDoc(db, code);
 
-    let countdown = 4;
+    let countdown = START_GAME_COUNTDOWN;
     gameRef
       .update(
         {

@@ -42,18 +42,18 @@ export default function BackgroundProvider({
   // We want the user to see the background before the page is loaded
   useEffect(() => {
     const cycleGradients = async () => {
-      while (true) {
-        try {
-          await controls.start({
-            background: `linear-gradient(to bottom right, ${gradients[currentGradient][0]}, ${gradients[currentGradient][1]}, ${gradients[currentGradient][2]}, ${gradients[currentGradient][3]})`,
-            transition: { duration: 3 },
-          });
-          setCurrentGradient(prev => (prev + 1) % gradients.length);
-        } catch (e) {
-          break;
-          //  controls.start() should only be called after a component has mounted. Consider calling within a useEffect hook.
-        }
-      }
+      // while (true) {
+      //   try {
+      //     await controls.start({
+      //       background: `linear-gradient(to bottom right, ${gradients[currentGradient][0]}, ${gradients[currentGradient][1]}, ${gradients[currentGradient][2]}, ${gradients[currentGradient][3]})`,
+      //       transition: { duration: 3 },
+      //     });
+      //     setCurrentGradient(prev => (prev + 1) % gradients.length);
+      //   } catch (e) {
+      //     break;
+      //     //  controls.start() should only be called after a component has mounted. Consider calling within a useEffect hook.
+      //   }
+      // }
     };
     cycleGradients();
   }, [controls, currentGradient]);
