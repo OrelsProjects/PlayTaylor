@@ -45,6 +45,9 @@ export default function AdminRoomPage({
         toast.error("You need at least 1 participant to start the game");
         return;
       }
+      if (error.name === "LoadingError") {
+        return;
+      }
       console.error(error);
       toast.error("Failed to start game");
     } finally {

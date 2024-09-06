@@ -20,7 +20,7 @@ export default function PlayerCard({
   return (
     <div
       className={cn(
-        "w-full h-full rounded-2xl flex items-center justify-start gap-3 px-4 py-[18.5px] text-primary-foreground",
+        "w-full h-16 rounded-2xl flex items-center justify-start gap-3 px-4 py-[18.5px] text-primary-foreground",
         { "bg-primary": isRankedFirst },
         { "gradient-purple": !isRankedFirst },
       )}

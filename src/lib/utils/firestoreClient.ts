@@ -1,11 +1,12 @@
 import { db } from "@/../firebase.config";
-import { collection, doc } from "firebase/firestore";
+import { collection, doc, DocumentReference } from "firebase/firestore";
 import {
   gameConverter,
   gameSessionConverter,
   participantConverter,
   roomConverter,
 } from "./converters";
+import { Game } from "@/models/game";
 
 export const gameSessionCollectionClient = db
   ? collection(db, "gameSessions")
@@ -23,7 +24,7 @@ export const roomDocClient = (code: string) =>
       )
     : null;
 
-export const gameDocClient = (code: string) =>
+export const gameDocClient = (code: string): DocumentReference<Game> | null =>
   db && code
     ? doc(db, "gameSessions", code, "session", "game").withConverter(
         gameConverter,

@@ -60,7 +60,7 @@ const Carousel: React.FC<CarouselProps> = ({
 }) => {
   const [currentItem, setCurrentItem] = React.useState(defaultSelected || 0);
 
-  if (items.length === 0) {
+  if (items.length <= 0) {
     return null;
   }
 

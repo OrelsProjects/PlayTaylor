@@ -5,6 +5,7 @@ import { useAppSelector } from "@/lib/hooks/redux";
 import { Button } from "@/components/ui/button";
 import { FaPlay } from "react-icons/fa";
 import useGame from "@/lib/hooks/useGame";
+import { canShowPauseButton, isPaused } from "@/models/game";
 
 export const PauseButton = () => {
   const { pauseGame, resumeGame, loadingGameState } = useGame();
@@ -21,20 +22,21 @@ export const PauseButton = () => {
   }, [game]);
 
   return (
+    canShowPauseButton(game?.stage) &&
     isOwner && (
       <Button
         className="h-fit w-fit px-3 py-3 self-center flex justify-center items-center"
         isLoading={loadingGameState}
         loadingClassName="w-7 h-7"
         onClick={() => {
-          if (game?.stage === "paused") {
+          if (isPaused(game?.stage)) {
             resumeGame(code);
           } else {
             pauseGame(code);
           }
         }}
       >
-        {game?.stage === "paused" ? (
+        {isPaused(game?.stage) ? (
           <FaPlay className="w-7 h-7" />
         ) : (
           <BsFillPauseFill className="w-7 h-7" />

@@ -42,7 +42,7 @@ export default function AppleLogin({
       className={`w-72 h-12 flex flex-row gap-2 bg-primary text-primary-foreground justify-center items-center rounded-lg hover:cursor-pointer ${className}`}
       onClick={handleAppleLogin}
     >
-      {loading && <Loading className="w-7 h-7" />}
+      {loading && <Loading className="w-7 h-7 fill-secondary" />}
       <FaApple className="w-[18px] h-[18px] fill-primary-foreground" />
       <span>{signInTextPrefix} Google</span>
     </div>

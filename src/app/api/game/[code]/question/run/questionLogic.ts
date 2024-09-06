@@ -29,8 +29,12 @@ export async function runLogic(
       throw new GameDoesNotExistError();
     }
     const { room, game } = gameSession;
-
     const { code } = room;
+    const stage = game.stage;
+
+    if (stage === "game-ended") {
+      return { gameOver: true };
+    }
 
     await startQuestionCountdown(code);
     await startQuestionEnded(code);
@@ -84,6 +88,10 @@ async function startQuestionCountdown(roomCode: string) {
 
           questionTimer -= 1;
 
+          if (questionTimer < 0) {
+            resolve();
+          }
+
           gameDocServer(roomCode)
             .update(
               {
@@ -99,7 +107,7 @@ async function startQuestionCountdown(roomCode: string) {
               reject(error);
             });
 
-          if (questionTimer === 0) {
+          if (questionTimer <= 0) {
             clearInterval(interval);
             resolve();
           }
@@ -137,6 +145,10 @@ async function startQuestionEnded(code: string) {
           currentTime = gameData.countdownQuestionEnded;
           currentTime -= 1;
 
+          if (currentTime < 0) {
+            resolve();
+          }
+
           gameDocServer(code)
             .update({
               countdownQuestionEnded: currentTime,
@@ -146,7 +158,7 @@ async function startQuestionEnded(code: string) {
               reject(error);
             })
             .then(() => {
-              if (currentTime === 0) {
+              if (currentTime <= 0) {
                 clearInterval(interval);
                 resolve();
               }
@@ -176,7 +188,12 @@ async function startShowLeaderboard(code: string) {
 
   await new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
-      currentTime = currentTime - 1;
+      currentTime -= 1;
+
+      if (currentTime < 0) {
+        resolve();
+      }
+
       gameDocServer(code)
         .update(
           {
@@ -189,7 +206,7 @@ async function startShowLeaderboard(code: string) {
           reject(error);
         })
         .then(() => {
-          if (currentTime === 0) {
+          if (currentTime <= 0) {
             clearInterval(interval);
             resolve();
           }

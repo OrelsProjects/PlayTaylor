@@ -8,12 +8,13 @@ import Room from "./room";
 
 export const QUESTION_TIME = 20; // 20 seconds
 export const QUESTION_ENDED_TIME = 3; // 3 seconds
-export const SHOW_LEADERBOARD_TIME = 7; // 7 seconds
+export const SHOW_LEADERBOARD_TIME = 3; // 7 seconds
 
 // Game
 
 export interface Game {
   stage: GameStage;
+  previousStage?: GameStage;
   participants?: Participant[];
   currentQuestion?: QuestionWithTimer;
 
@@ -36,6 +37,10 @@ export type GameStage =
   | "game-ended";
 
 export const isInLobby = (stage?: GameStage) => stage === "lobby";
+export const isPaused = (stage?: GameStage) => stage === "paused";
+
+export const canShowPauseButton = (stage?: GameStage) =>
+  stage === "playing" || stage === "paused" || stage === "question-ended";
 
 export const isGameRunning = (stage?: GameStage) =>
   stage === "playing" ||

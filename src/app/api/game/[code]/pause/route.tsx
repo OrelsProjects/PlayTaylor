@@ -3,9 +3,7 @@ import Logger from "@/loggerServer";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/authOptions";
 import { gameDocServer, getGameSession } from "@/app/api/_db/firestoreServer";
-import { QUESTION_TIME } from "../../../../../models/game";
-
-type ISOString = string;
+import { QUESTION_TIME } from "@/models/game";
 
 export async function POST(
   req: NextRequest,

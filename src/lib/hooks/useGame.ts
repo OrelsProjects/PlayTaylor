@@ -7,7 +7,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import axios from "axios";
-import { onSnapshot } from "firebase/firestore";
+import { onSnapshot, updateDoc } from "firebase/firestore";
 import { Logger } from "@/logger";
 import { QuestionOption } from "@/models/question";
 import { useAppDispatch, useAppSelector } from "./redux";
@@ -168,8 +168,10 @@ export default function useGame() {
 
     loadingCountdown.current = true;
     try {
-      await axios.post(`/api/game/${code}/startCountdown`);
-      await axios.post(`/api/game/${code}/start`);
+      if (game?.stage === "lobby") {
+        await axios.post(`/api/game/${code}/startCountdown`);
+        await axios.post(`/api/game/${code}/start`);
+      }
       loadingCountdown.current = false;
       didStartGame.current = true;
 
@@ -212,11 +214,19 @@ export default function useGame() {
     }
     setLoadingGameState(true);
     try {
-      await axios.post(`/api/game/${code}/pause`, {
-        pausedAt: Date.now(),
-      });
+      const gameRef = gameDocClient(code);
+      if (!gameRef) {
+        throw new Error("Game not found"); // You can create a custom error class for better error handling if needed
+      }
+
+      await updateDoc(
+        gameRef,
+        { stage: "paused", previousStage: game?.stage },
+        { merge: true },
+      );
       return;
     } catch (error) {
+      debugger;
       console.error(error);
       throw error;
     } finally {
@@ -230,7 +240,16 @@ export default function useGame() {
     }
     setLoadingGameState(true);
     try {
-      await axios.post(`/api/game/${code}/resume`);
+      const gameRef = gameDocClient(code);
+      if (!gameRef) {
+        throw new Error("Game not found");
+      }
+      await updateDoc(
+        gameRef,
+        { stage: game?.previousStage || "lobby", previousStage: "paused" },
+        { merge: true },
+      );
+
       return;
     } catch (error) {
       console.error(error);

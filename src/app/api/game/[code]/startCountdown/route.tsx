@@ -41,7 +41,7 @@ const startCountdown = async (code: string): Promise<void> => {
           resolve(); // Resolve to avoid hanging the promise
         });
 
-      if (countdown === 0) {
+      if (countdown <= 0) {
         clearInterval(interval);
         resolve();
       }

@@ -10,7 +10,7 @@ import RadialProgressBar from "@/components/ui/radialProgressBar";
 import { QuestionWithTimer } from "@/models/room";
 import useGame from "@/lib/hooks/useGame";
 import { QuestionOption } from "@/models/question";
-import { isGameRunning, QUESTION_TIME } from "@/models/game";
+import { QUESTION_TIME } from "@/models/game";
 import { toast } from "react-toastify";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 import { BsFillPauseFill } from "react-icons/bs";
@@ -58,13 +58,12 @@ export default function Game({ params }: { params: { code: string } }) {
   const { user } = useAppSelector(state => state.auth);
   const { room } = useAppSelector(state => state.room);
   const { game, currentParticipant } = useAppSelector(state => state.game);
-  const { setPreviouslyJoinedGame, answerQuestion, loadingAnswer } = useGame();
+  const { answerQuestion, loadingAnswer } = useGame();
 
   const [currentQuestion, setCurrentQuestion] =
     useState<QuestionWithTimer | null>(null);
   const [countdown, setCountdown] = useState<number | null>(QUESTION_TIME);
   const [loading, setLoading] = useState(true);
-  const [loadingJoinPreviousGame, setLoadingJoinPreviousGame] = useState(false);
 
   useEffect(() => {
     if (!room || !game) return;
@@ -74,6 +73,10 @@ export default function Game({ params }: { params: { code: string } }) {
         router.push("/admin/room/" + room.code);
       } else {
         router.push("/waiting/" + room.code);
+      }
+    } else {
+      if (game.stage === "show-leaderboard") {
+        router.push("/game/" + room.code + "/leader-board");
       }
     }
     const currentQuestion = game.currentQuestion as
@@ -86,27 +89,6 @@ export default function Game({ params }: { params: { code: string } }) {
     }
     setLoading(false);
   }, [room, game]);
-
-  useEffect(() => {
-    if (!user || !params.code || isGameRunning(game?.stage)) return;
-    if (loadingJoinPreviousGame) return;
-
-    setLoadingJoinPreviousGame(true);
-    setPreviouslyJoinedGame(params.code)
-      .then(response => {
-        if (!response) {
-          router.push("/");
-        } else {
-          router.cancelRoute();
-        }
-      })
-      .catch(() => {
-        router.push("/");
-      })
-      .finally(() => {
-        setLoadingJoinPreviousGame(false);
-      });
-  }, [params.code, user, game]);
 
   const answerSelected = useMemo((): string | null => {
     if (!game || !user) return null;
@@ -155,7 +137,7 @@ export default function Game({ params }: { params: { code: string } }) {
   return (
     <div
       className={cn(
-        "w-full h-full flex flex-col gap-6 justify-start items-center",
+        "w-full h-fit flex flex-col gap-6 justify-start items-center",
         montserratAlternates.className,
       )}
     >
