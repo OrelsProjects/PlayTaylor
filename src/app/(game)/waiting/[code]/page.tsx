@@ -5,15 +5,27 @@ import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import ParticipantsComponent from "@/components/pariticpantsComponent";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
-import { isGameRunning } from "@/models/game";
+import { isCountdown, isGameRunning } from "@/models/game";
+import useGame from "@/lib/hooks/useGame";
 
 export default function Waiting({ params }: { params: { code?: string } }) {
   const router = useCustomRouter();
   const { game } = useAppSelector(state => state.game);
 
+  const { fetchParticipants } = useGame();
+
   useEffect(() => {
-    if (game && isGameRunning(game.stage)) {
-      router.push(`/game/${params.code}`);
+    if (game) {
+      
+      if (isCountdown(game.stage)) {
+        router.push(`/lobby/${params.code}`);
+      } else if (isGameRunning(game.stage)) {
+        router.push(`/game/${params.code}`);
+      }
+    } else if (params.code) {
+      fetchParticipants(params.code).catch(() => {
+        console.error("Failed to fetch participants");
+      });
     }
   }, [game]);
 

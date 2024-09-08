@@ -9,7 +9,7 @@ import axios from "axios";
 import { canUseNotifications } from "../../../lib/utils/notificationUtils";
 import useNotification from "../../../lib/hooks/useNotification";
 import { updateUserSettings } from "../../../lib/features/auth/authSlice";
-import { ThemeToggle } from "../../../components/themeToggle";
+import { ThemeToggle } from "@/components/themeToggle";
 import { cn } from "../../../lib/utils";
 
 interface SettingsProps {}

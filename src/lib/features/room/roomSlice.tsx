@@ -15,6 +15,7 @@ export const initialState: RoomState = {
     code: "",
     name: "",
     createdBy: "",
+    isAdmin: false,
     participantsCount: 0,
     createdAt: 0,
     questions: [],
@@ -25,8 +26,9 @@ const roomSlice = createSlice({
   name: "room",
   initialState,
   reducers: {
-    setRoom: (state, action: PayloadAction<Room>) => {
+    setRoom: (state, action: PayloadAction<Room & { userId: string }>) => {
       state.room = action.payload;
+      state.room.isAdmin = action.payload.createdBy === action.payload.userId;
     },
 
     setGameName: (state, action: PayloadAction<string>) => {

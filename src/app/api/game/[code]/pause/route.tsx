@@ -3,7 +3,7 @@ import Logger from "@/loggerServer";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/authOptions";
 import { gameDocServer, getGameSession } from "@/app/api/_db/firestoreServer";
-import { QUESTION_TIME } from "@/models/game";
+import { CURRENT_QUESTION_TIME } from "@/models/game";
 
 export async function POST(
   req: NextRequest,
@@ -39,10 +39,14 @@ export async function POST(
         secondsPassed = Math.floor(secondsPassed);
       }
       let timeLeft =
-        (gameData.game.currentQuestion?.timer || QUESTION_TIME) + secondsPassed;
+        gameData.counters.currentQuestion === undefined
+          ? CURRENT_QUESTION_TIME
+          : gameData.counters.currentQuestion;
 
-      // time left min 0 max QUESTION_TIME
-      timeLeft = Math.min(QUESTION_TIME, Math.max(0, timeLeft || 0));
+      timeLeft += secondsPassed;
+
+      // time left min 0 max CURRENT_QUESTION_TIME
+      timeLeft = Math.min(CURRENT_QUESTION_TIME, Math.max(0, timeLeft || 0));
 
       await gameDocServer(params.code).update(
         {

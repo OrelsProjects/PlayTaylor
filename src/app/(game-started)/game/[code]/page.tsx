@@ -7,10 +7,9 @@ import Loading from "@/components/ui/loading";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import RadialProgressBar from "@/components/ui/radialProgressBar";
-import { QuestionWithTimer } from "@/models/room";
 import useGame from "@/lib/hooks/useGame";
-import { QuestionOption } from "@/models/question";
-import { QUESTION_TIME } from "@/models/game";
+import { Question, QuestionOption } from "@/models/question";
+import { CURRENT_QUESTION_TIME } from "@/models/game";
 import { toast } from "react-toastify";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 import { BsFillPauseFill } from "react-icons/bs";
@@ -57,16 +56,21 @@ export default function Game({ params }: { params: { code: string } }) {
   const router = useCustomRouter();
   const { user } = useAppSelector(state => state.auth);
   const { room } = useAppSelector(state => state.room);
-  const { game, currentParticipant } = useAppSelector(state => state.game);
+  const { game, counters, currentParticipant } = useAppSelector(
+    state => state.game,
+  );
   const { answerQuestion, loadingAnswer } = useGame();
-
-  const [currentQuestion, setCurrentQuestion] =
-    useState<QuestionWithTimer | null>(null);
-  const [countdown, setCountdown] = useState<number | null>(QUESTION_TIME);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<
+    Question | undefined
+  >();
+  const [countdown, setCountdown] = useState<number | null>(
+    CURRENT_QUESTION_TIME,
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!room || !game) return;
+    if (!game) return;
 
     if (!game.gameStartedAt) {
       if (room.createdBy === user?.userId) {
@@ -79,28 +83,24 @@ export default function Game({ params }: { params: { code: string } }) {
         router.push("/game/" + room.code + "/leader-board");
       }
     }
-    const currentQuestion = game.currentQuestion as
-      | QuestionWithTimer
-      | undefined;
-    if (currentQuestion) {
-      setCountdown(currentQuestion.timer);
-
-      setCurrentQuestion(currentQuestion);
+    if (counters.currentQuestion) {
+      setCountdown(counters.currentQuestion);
+      setCurrentQuestion(game.currentQuestion);
     }
     setLoading(false);
-  }, [room, game]);
+  }, [counters, game]);
 
-  const answerSelected = useMemo((): string | null => {
-    if (!game || !user) return null;
-    if (!currentParticipant) return null;
+  // const answerSelected = useMemo((): string | null => {
+  //   if (!game || !user) return null;
+  //   if (!currentParticipant) return null;
 
-    const questionResponse = currentParticipant.questionResponses?.find(
-      qr => qr.questionId === currentQuestion?.id,
-    );
-    if (!questionResponse) return null;
+  //   const questionResponse = currentParticipant.questionResponses?.find(
+  //     qr => qr.questionId === currentQuestion?.id,
+  //   );
+  //   if (!questionResponse) return null;
 
-    return questionResponse?.option || null;
-  }, [currentParticipant, user, currentQuestion]);
+  //   return questionResponse?.option || null;
+  // }, [currentParticipant, user, currentQuestion]);
 
   const didAnswerCurrentQuestion = useMemo(() => {
     if (!game || !user) return false;
@@ -112,23 +112,21 @@ export default function Game({ params }: { params: { code: string } }) {
   }, [game, user, currentQuestion]);
 
   const canAnswer = useMemo(
-    () =>
-      game?.stage === "playing" &&
-      currentQuestion !== null &&
-      !didAnswerCurrentQuestion &&
-      !loadingAnswer,
+    () => game?.stage === "playing",
     [game, currentQuestion, didAnswerCurrentQuestion],
   );
 
   const handleQuestionResponse = async (response: QuestionOption) => {
     try {
       if (!currentQuestion) return;
+      setSelectedAnswer(response.option);
       await answerQuestion(response, room.code, currentQuestion.id);
     } catch (error: any) {
       if (error.name === "AnsweredTooLateError") {
         toast.error("You answered too late.. :("); // TODO: Copy
       }
       console.error(error);
+      setSelectedAnswer(null);
     }
   };
 
@@ -145,8 +143,8 @@ export default function Game({ params }: { params: { code: string } }) {
         progress={
           ((countdown !== undefined && countdown !== null
             ? countdown
-            : QUESTION_TIME) /
-            QUESTION_TIME) *
+            : CURRENT_QUESTION_TIME) /
+            CURRENT_QUESTION_TIME) *
           100
         }
         radius={90}
@@ -184,19 +182,18 @@ export default function Game({ params }: { params: { code: string } }) {
             <AnswerComponent
               key={option.option}
               disabled={
-                !canAnswer &&
-                answerSelected !== null &&
-                answerSelected !== option.option
+                selectedAnswer !== null && selectedAnswer !== option.option
               }
               index={option.position}
               answer={option.option}
               onClick={() => {
+                if (selectedAnswer) return;
                 handleQuestionResponse(option);
               }}
             />
           ))}
       </div>
-      <QuestionResultsComponent />
+      {!room.isAdmin && <QuestionResultsComponent />}
     </div>
   );
 }

@@ -4,7 +4,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/authOptions";
 import { Participant } from "@/models/game";
 import {
-  gameSessionDocServer,
   getGameSession,
   participantDocServer,
   participantsColServer,

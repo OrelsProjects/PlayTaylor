@@ -4,28 +4,37 @@
  * It is used to update the game state, answer questions, and manage the game state in the local storage.
  */
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import axios from "axios";
-import { onSnapshot, updateDoc } from "firebase/firestore";
+import { getDocs, onSnapshot, updateDoc } from "firebase/firestore";
 import { Logger } from "@/logger";
 import { QuestionOption } from "@/models/question";
 import { useAppDispatch, useAppSelector } from "./redux";
 import { buildLocalSotrageKey } from "@/lib/hooks/_utils";
 import LoadingError from "@/models/errors/LoadingError";
-import { Game, GameSession, isGameRunning, Participant } from "@/models/game";
+import {
+  Counters,
+  Game,
+  GameSession,
+  isGameRunning,
+  Participant,
+} from "@/models/game";
 import { setRoom } from "@/lib/features/room/roomSlice";
 import {
   setGame,
   setParticipants,
   removeQuestionResponse,
   addQuestionResponse,
+  setCounters,
 } from "@/lib/features/game/gameSlice";
 import { NameTakenError } from "@/models/errors/NameTakenError";
 import {
+  countersDocClient,
   gameDocClient,
   participantsColClient,
 } from "@/lib/utils/firestoreClient";
 import { NoParticipantsError } from "@/models/errors/NoParticipantsError";
+import Room from "@/models/room";
 
 export type Unsubscribe = () => void;
 
@@ -49,6 +58,7 @@ export default function useGame() {
   const { game, currentParticipant, participants } = useAppSelector(
     state => state.game,
   );
+  const loadingFetchPreviousGame = useRef(false);
   const loadingGameState = useRef(false);
   const loadingCountdown = useRef(false);
   const loadingAnswer = useRef(false);
@@ -77,10 +87,12 @@ export default function useGame() {
           name,
         },
       );
+
       const gameSession = joinRoomResponse.data;
       const participants = gameSession.participants || [];
-      dispatch(setRoom(gameSession.room));
-      dispatch(setGame(gameSession.game));
+      dispatch(setRoom({ ...gameSession.room, userId: user?.userId || "" }));
+      updateGame(gameSession.game);
+      updateCounters(gameSession.counters);
       dispatch(
         setParticipants({
           participants,
@@ -100,24 +112,32 @@ export default function useGame() {
   };
 
   const updateGame = (newGame: Game) => dispatch(setGame(newGame));
+
+  const updateCounters = (counters: Counters) =>
+    dispatch(setCounters(counters));
+
   const updateParticipants = (participants: Participant[]) =>
     dispatch(setParticipants({ participants, currentUserId: user?.userId }));
 
   async function setPreviouslyJoinedGame(
     code: string,
+    userId: string,
   ): Promise<GameSession | null> {
     try {
-      const gameSession = await getGameSession(code);
-      const isOwner = gameSession.room.createdBy === user?.userId;
+      if (loadingFetchPreviousGame.current) {
+        return null;
+      }
+      loadingFetchPreviousGame.current = true;
 
-      const participants = gameSession?.participants || [];
-      if (isOwner || participants.find(p => p.userId === user?.userId)) {
-        if (gameSession) {
-          dispatch(setRoom(gameSession.room));
-          dispatch(setGame(gameSession.game));
-          dispatch(
-            setParticipants({ participants, currentUserId: user?.userId }),
-          );
+      const gameSession = await getGameSession(code);
+      if (gameSession) {
+        const participants = gameSession?.participants || [];
+        const isRoomOwner = gameSession?.room.createdBy === userId;
+        if (isRoomOwner || participants.find(p => p.userId === userId)) {
+          dispatch(setRoom({ ...gameSession.room, userId }));
+          updateGame(gameSession.game);
+          updateCounters(gameSession.counters);
+          dispatch(setParticipants({ participants, currentUserId: userId }));
           return gameSession;
         }
       }
@@ -125,6 +145,8 @@ export default function useGame() {
     } catch (error: any) {
       Logger.error(error);
       throw error;
+    } finally {
+      loadingFetchPreviousGame.current = false;
     }
   }
 
@@ -173,6 +195,7 @@ export default function useGame() {
     if (didStartGame.current) {
       return;
     }
+    const x = participants;
 
     if (participants?.length < 1) {
       throw new NoParticipantsError("No participants");
@@ -221,7 +244,6 @@ export default function useGame() {
   }
 
   async function pauseGame(code: string) {
-    debugger;
     if (loadingGameState.current) {
       throw new LoadingError("Loading pause");
     }
@@ -232,11 +254,12 @@ export default function useGame() {
         throw new Error("Game not found"); // You can create a custom error class for better error handling if needed
       }
 
-      // await updateDoc(
-      //   gameRef,
-      //   { stage: "paused", previousStage: game?.stage },
-      //   { merge: true },
-      // );
+      const newGame: Partial<Game> = {
+        stage: "paused",
+        previousStage: game?.stage,
+      };
+
+      await updateDoc(gameRef, newGame);
       return;
     } catch (error: any) {
       Logger.error(error);
@@ -256,11 +279,13 @@ export default function useGame() {
       if (!gameRef) {
         throw new Error("Game not found");
       }
-      // await updateDoc(
-      //   gameRef,
-      //   { stage: game?.previousStage || "lobby", previousStage: "paused" },
-      //   { merge: true },
-      // );
+
+      const newGame: Partial<Game> = {
+        stage: game?.previousStage || "lobby",
+        previousStage: "paused",
+      };
+
+      await updateDoc(gameRef, newGame);
 
       return;
     } catch (error: any) {
@@ -321,10 +346,6 @@ export default function useGame() {
       unsubscribe = onSnapshot(
         roomRef,
         snapshot => {
-          console.log(
-            "Participants snapshot",
-            snapshot.docs.map(doc => doc.data()),
-          );
           onChange(snapshot.docs.map(doc => doc.data() as Participant));
         },
         (error: any) => {
@@ -335,6 +356,45 @@ export default function useGame() {
     }
 
     return unsubscribe;
+  };
+
+  const listenToCountersChanges = (
+    code: string,
+    onChange: (counters: Counters) => void,
+    onError?: (error: any) => void,
+  ): Unsubscribe => {
+    let unsubscribe = () => {};
+    const countersRef = countersDocClient(code);
+    if (countersRef) {
+      unsubscribe = onSnapshot(
+        countersRef,
+        snapshot => {
+          console.log("Counters snapshot", snapshot.data());
+          onChange(snapshot.data() as Counters);
+        },
+        (error: any) => {
+          Logger.error(error);
+          onError?.(error);
+        },
+      );
+    }
+
+    return unsubscribe;
+  };
+
+  const fetchParticipants = async (code: string) => {
+    try {
+      const participantsRef = participantsColClient(code);
+      if (!participantsRef) {
+        throw new Error("Participants not found");
+      }
+      const response = await getDocs(participantsRef);
+      const participants = response.docs.map(doc => doc.data() as Participant);
+      updateParticipants(participants);
+    } catch (error: any) {
+      Logger.error(error);
+      throw error;
+    }
   };
 
   const isCurrentQuestionAnsweredCorrectly = () => {
@@ -354,7 +414,9 @@ export default function useGame() {
     isCurrentQuestionAnsweredCorrectly,
     getStage,
     updateGame,
+    updateCounters,
     updateParticipants,
+    fetchParticipants,
     getGameSession,
     joinGame,
     startGame,
@@ -365,6 +427,7 @@ export default function useGame() {
     answerQuestion,
     clearLocalGame,
     listenToGameChanges,
+    listenToCountersChanges,
     setPreviouslyJoinedGame,
     listenToParticipantsChanges,
     loadingAnswer: loadingAnswer.current,

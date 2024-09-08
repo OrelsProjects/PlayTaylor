@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { toast } from "react-toastify";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
-import { isGameRunning, isInLobby } from "../../../../models/game";
+import { isGameRunning, isCountdown } from "@/models/game";
 
 type Stage = "pin" | "name";
 
@@ -16,7 +16,7 @@ export default function Join({ params }: { params: { code?: string[] } }) {
   const router = useCustomRouter();
   const { getGameSession, joinGame, setPreviouslyJoinedGame, updateGame } =
     useGame();
-  // const { room } = useAppSelector(state => state.room);
+  const { user } = useAppSelector(state => state.auth);
   const { game } = useAppSelector(state => state.game);
 
   const [code, setCode] = useState("");
@@ -24,14 +24,18 @@ export default function Join({ params }: { params: { code?: string[] } }) {
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState<Stage>("pin");
 
-  const checkPreviouslyJoinedRoom = async (code: string): Promise<boolean> => {
+  const checkPreviouslyJoinedRoom = async (
+    code: string,
+    userId: string,
+  ): Promise<boolean> => {
     try {
-      const gameSession = await setPreviouslyJoinedGame(code);
+      const gameSession = await setPreviouslyJoinedGame(code, userId);
       if (gameSession) {
         const { game } = gameSession;
+
         if (isGameRunning(game?.stage)) {
           router.push("/game/" + code);
-        } else if (isInLobby(game?.stage)) {
+        } else if (isCountdown(game?.stage)) {
           router.push("/lobby/" + code);
         } else {
           router.push("/waiting/" + code);
@@ -46,22 +50,22 @@ export default function Join({ params }: { params: { code?: string[] } }) {
   };
 
   useEffect(() => {
-    if (params.code?.length) {
+    if (params.code?.length && user) {
       const code = params.code[0];
-      checkPreviouslyJoinedRoom(code).then(didJoinRoom => {
+      checkPreviouslyJoinedRoom(code, user.userId).then(didJoinRoom => {
         if (!didJoinRoom) {
           setCode(code);
         }
       });
     }
-  }, [params.code]);
+  }, [params.code, user]);
 
   const handleSubmit = async () => {
     if (loading) return;
     setLoading(true);
     try {
-      if (stage === "pin") {
-        const didJoinRoom = await checkPreviouslyJoinedRoom(code);
+      if (stage === "pin" && user) {
+        const didJoinRoom = await checkPreviouslyJoinedRoom(code, user.userId);
         if (didJoinRoom) return;
 
         const gameSession = await getGameSession(code);
@@ -102,6 +106,7 @@ export default function Join({ params }: { params: { code?: string[] } }) {
               type="text"
               placeholder={"Pin"}
               value={code}
+              autoFocus
               maxLength={6}
               onChange={e => {
                 if (stage === "pin") {
@@ -117,6 +122,7 @@ export default function Join({ params }: { params: { code?: string[] } }) {
               placeholder={"Swiftie Doe"}
               value={name}
               maxLength={20}
+              autoFocus
               onChange={e => {
                 setName(e.target.value);
               }}

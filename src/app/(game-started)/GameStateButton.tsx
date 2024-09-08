@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { BsFillPauseFill } from "react-icons/bs";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,12 @@ export type GameStateButtonType = "pause" | "restart";
 
 export const GameStateButton = () => {
   const { pauseGame, resumeGame, loadingGameState, restartGame } = useGame();
-  const { user } = useAppSelector(state => state.auth);
   const { game } = useAppSelector(state => state.game);
   const { room } = useAppSelector(state => state.room);
 
-  const isOwner = useMemo(() => {
-    return room?.createdBy === user?.userId;
-  }, [game, user]);
+  useEffect(() => {
+    console.log("loadingGameState", loadingGameState);
+  }, [loadingGameState]);
 
   const code = useMemo(() => {
     return room?.code || "";
@@ -30,18 +29,17 @@ export const GameStateButton = () => {
   }, [game]);
 
   const canShowButton = useMemo(() => {
-    if (!isOwner) return false;
+    if (!room.isAdmin) return false;
     if (type === "pause") {
       return canShowPauseButton(game?.stage);
     } else if (type === "restart") {
       return game?.stage === "game-ended";
     }
     return false;
-  }, [game, isOwner, type]);
+  }, [game, room.isAdmin, type]);
 
   const handleButtonClick = async () => {
     try {
-      debugger;
       if (type === "restart") {
         await restartGame(code);
         return;

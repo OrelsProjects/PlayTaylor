@@ -3,51 +3,50 @@ import Logger from "@/loggerServer";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/authOptions";
 import { isOwnerOfRoom } from "../_utils";
-import { getGameDoc } from "@/lib/utils/firestore";
-import { db } from "@/../firebase.config.admin";
-import { START_GAME_COUNTDOWN } from "@/models/game";
+import { Counters, Game, START_GAME_COUNTDOWN } from "@/models/game";
+import {
+  countersDocServer,
+  gameDocServer,
+} from "@/app/api/_db/firestoreServer";
 
 // This function couts down from 4 to 0 and every second updates the room's countdownStartedAt
 const startCountdown = async (code: string): Promise<void> => {
-  return new Promise<void>(resolve => {
-    const gameRef = getGameDoc(db, code);
-
+  try {
+    const gameRef = gameDocServer(code);
+    const countersRef = countersDocServer(code);
+    const now = Date.now();
     let countdown = START_GAME_COUNTDOWN;
-    gameRef
-      .update(
-        {
-          countdownStartedAt: Date.now(),
-          countdownCurrentTime: countdown,
-          stage: "countdown",
-        },
-        { merge: true },
-      )
-      .catch((error: any) => {
-        Logger.error("Firestore update failed", "unknown", { error });
-        resolve(); // Resolve to avoid hanging the promise
-      });
+    const game: Partial<Game> = {
+      countdownStartedAt: now,
+      stage: "countdown",
+      gameStartedAt: now,
+    };
+    await gameRef.update(game, { merge: true });
 
-    const interval = setInterval(() => {
-      countdown -= 1;
-      gameRef
-        .update(
-          {
-            countdownCurrentTime: countdown,
-          },
-          { merge: true },
-        )
-        .catch((error: any) => {
+    return new Promise<void>((resolve, reject) => {
+      const interval = setInterval(() => {
+        countdown -= 1;
+        const counters: Partial<Counters> = {
+          startGame: countdown,
+        };
+        countersRef.update(counters, { merge: true }).catch((error: any) => {
           Logger.error("Firestore update failed", "unknown", { error });
           clearInterval(interval);
-          resolve(); // Resolve to avoid hanging the promise
+          reject(error);
         });
 
-      if (countdown <= 0) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 1000);
-  });
+        if (countdown <= 0) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 1000);
+    });
+  } catch (error: any) {
+    Logger.error("Error in starting the countdown", "unknown", {
+      error,
+    });
+    throw error;
+  }
 };
 
 export async function POST(
@@ -60,7 +59,7 @@ export async function POST(
   }
   const { user } = session;
   try {
-    const isOwner = isOwnerOfRoom(user.userId, params.code);
+    const isOwner = await isOwnerOfRoom(user.userId, params.code);
     if (!isOwner) {
       return NextResponse.json(
         { error: "You are not authorized to start the countdown" },

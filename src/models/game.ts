@@ -3,27 +3,29 @@
  * The data here is dynamic and changes based on the game state and the actions of the participants.
  */
 
-import { QuestionOption, QuestionWithTimer } from "./question";
+import { Question, QuestionOption } from "./question";
 import Room from "./room";
 
 export const START_GAME_COUNTDOWN = 5; // 5 seconds
-export const QUESTION_TIME = 10; // 20 seconds
+export const CURRENT_QUESTION_TIME = 5; // 20 seconds
 export const QUESTION_ENDED_TIME = 3; // 3 seconds
-export const SHOW_LEADERBOARD_TIME = 3; // 7 seconds
+export const SHOW_LEADERBOARD_TIME = 70; // 7 seconds
 
 // Game
 
 export interface Game {
   stage: GameStage;
   previousStage?: GameStage;
-  participants?: Participant[];
-  currentQuestion?: QuestionWithTimer;
-
-  gameStartedAt?: number | null;
+  currentQuestion?: Question;
   countdownStartedAt?: number | null;
-  countdownCurrentTime?: number | null;
-  countdownQuestionEnded?: number | null;
-  countdownShowLeaderboard?: number | null;
+  gameStartedAt?: number | null;
+}
+
+export interface Counters {
+  currentQuestion?: number;
+  startGame?: number;
+  questionEnded?: number;
+  showLeaderboard?: number;
 }
 
 // Game Stage
@@ -37,11 +39,12 @@ export type GameStage =
   | "show-leaderboard"
   | "game-ended";
 
-export const isInLobby = (stage?: GameStage) => stage === "lobby";
 export const isPaused = (stage?: GameStage) => stage === "paused";
 
 export const canShowPauseButton = (stage?: GameStage) =>
   stage === "playing" || stage === "paused" || stage === "question-ended";
+
+export const isCountdown = (stage?: GameStage) => stage === "countdown";
 
 export const isGameRunning = (stage?: GameStage) =>
   stage === "playing" ||
@@ -76,4 +79,5 @@ export type GameSession = {
   room: Room; // Static data
   game: Game; // Dynamic data
   participants?: Participant[]; // Dynamic data
+  counters: Counters; // Dynamic data
 };

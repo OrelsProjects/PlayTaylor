@@ -1,15 +1,11 @@
 // firebase room converter
 
-import { GameSession, Participant, Game } from "@/models/game";
+import { GameSession, Participant, Game, Counters } from "@/models/game";
 import Room from "@/models/room";
 import { DbGameSession } from "@/lib/utils/firestore";
 
 export const gameSessionConverter = {
-  toFirestore: (
-    gameSession: GameSession,
-  ): {
-    code: string;
-  } => {
+  toFirestore: (gameSession: GameSession): DbGameSession => {
     const participantsIdToParticipant = gameSession.participants?.reduce(
       (acc: any, participant) => {
         acc[participant.userId || participant.name] = participant;
@@ -19,6 +15,12 @@ export const gameSessionConverter = {
     );
 
     return {
+      session: {
+        room: gameSession.room,
+        game: gameSession.game,
+        counters: gameSession.counters,
+      },
+      participants: participantsIdToParticipant,
       code: gameSession.room.code,
     };
   },
@@ -26,7 +28,7 @@ export const gameSessionConverter = {
     const data = snapshot.data() as DbGameSession;
     let questions = data.session.room.questions;
     questions = questions.map((question: any) => {
-      const createdAtSeconds = question.createdAt.seconds;
+      const createdAtSeconds = question.createdAt;
       const createdAtDate = new Date(createdAtSeconds * 1000);
       return {
         ...question,
@@ -38,7 +40,8 @@ export const gameSessionConverter = {
 
     return {
       room: data.session.room,
-      game: { ...data.session.game, participants },
+      game: data.session.game,
+      counters: data.session.counters,
       participants,
     };
   },
@@ -118,6 +121,18 @@ export const gameConverter = {
   },
   fromFirestore: (snapshot: any): Game => {
     const data = snapshot.data() as Game;
+    return data;
+  },
+};
+
+export const countersConverter = {
+  toFirestore: (counters: Counters): any => {
+    return {
+      ...counters,
+    };
+  },
+  fromFirestore: (snapshot: any): Counters => {
+    const data = snapshot.data() as Counters;
     return data;
   },
 };

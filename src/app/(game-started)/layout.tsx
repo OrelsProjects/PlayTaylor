@@ -9,7 +9,6 @@ import { GameStateButton } from "./GameStateButton";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import useGame from "@/lib/hooks/useGame";
-import { isGameRunning } from "@/models/game";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
 //framer-motion
@@ -40,10 +39,11 @@ export default function GameStartedLayout({
 
   useEffect(() => {
     if (!user || !room.code) return;
+    if (game) return;
     if (loadingJoinPreviousGame) return;
 
     setLoadingJoinPreviousGame(true);
-    setPreviouslyJoinedGame(room.code)
+    setPreviouslyJoinedGame(room.code, user.userId)
       .then(response => {
         if (!response) {
           router.push("/");

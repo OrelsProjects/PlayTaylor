@@ -14,6 +14,7 @@ import BackgroundProvider from "@/app/providers/BackgroundProvider";
 import LoggersProvider from "@/app/providers/LoggersProvider";
 import GameListenerProvider from "@/app/providers/GameListenerProvider";
 import Loading from "@/components/ui/loading";
+import ShowGameDataProvider from "@/app/providers/ShowGameDataProvider";
 
 const APP_NAME = "Play Taylor";
 const APP_DEFAULT_TITLE = "Play Taylor";
@@ -92,6 +93,7 @@ export default function Layout({ children }: RootLayoutProps) {
                   <TopLoaderProvider />
                   <LoggersProvider />
                   <GameListenerProvider />
+                  <ShowGameDataProvider />
                   <BackgroundProvider className="w-full h-svh flex flex-col">
                     {children}
                   </BackgroundProvider>

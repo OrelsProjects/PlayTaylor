@@ -1,13 +1,21 @@
 import { GameDoesNotExistError } from "@/models/errors/RoomDoesNotExistError";
 import {
   Game,
-  QUESTION_TIME,
+  CURRENT_QUESTION_TIME,
   QUESTION_ENDED_TIME,
   SHOW_LEADERBOARD_TIME,
+  Counters,
+  GameSession,
 } from "@/models/game";
 import { GamePausedError } from "@/models/errors/GamePausedError";
 import Room from "@/models/room";
-import { gameDocServer, getGameSession } from "@/app/api/_db/firestoreServer";
+import {
+  countersDocServer,
+  gameDocServer,
+  gameSessionDocServer,
+  getGameSession,
+} from "@/app/api/_db/firestoreServer";
+import { CountersDoNotExistError } from "@/models/errors/CountersDoNotExistError";
 
 type GameRef = FirebaseFirestore.DocumentReference<Game, any>;
 
@@ -66,51 +74,65 @@ async function startQuestionCountdown(roomCode: string) {
     const interval = setInterval(() => {
       gameDocServer(roomCode)
         .get()
-        .then((gameData: any) => {
-          const game = gameData.data();
-          if (!game) {
+        .then((doc: any) => {
+          const newGame = doc.data() as Game;
+          if (!newGame) {
             reject(new GameDoesNotExistError());
             clearInterval(interval);
             return;
           }
-          const currentStage = game.stage;
+          const currentStage = newGame.stage;
 
-          let questionTimer =
-            game.currentQuestion?.timer === undefined
-              ? QUESTION_TIME
-              : game.currentQuestion.timer;
-          // FOR NEXT DESIGN THE REST OF THE SCREENS AND SET THE LOGIC TO WORK WITH THEM (STAGE)
           if (currentStage === "paused") {
             clearInterval(interval);
             reject(new GamePausedError());
             return;
           }
+          countersDocServer(roomCode)
+            .get()
+            .then((doc: any) => {
+              const counters = doc.data() as Counters;
+              if (!counters) {
+                reject(new CountersDoNotExistError());
+                clearInterval(interval);
+                return;
+              }
+              let questionTimer =
+                !counters.currentQuestion || counters.currentQuestion <= 0
+                  ? CURRENT_QUESTION_TIME
+                  : counters.currentQuestion;
+              // FOR NEXT DESIGN THE REST OF THE SCREENS AND SET THE LOGIC TO WORK WITH THEM (STAGE)
 
-          questionTimer -= 1;
+              questionTimer -= 1;
 
-          if (questionTimer < 0) {
-            resolve();
-          }
+              if (questionTimer < 0) {
+                resolve();
+              }
+              const newCounters: Counters = {
+                ...counters,
+                currentQuestion: questionTimer,
+              };
 
-          gameDocServer(roomCode)
-            .update(
-              {
-                currentQuestion: {
-                  ...game.currentQuestion,
-                  timer: questionTimer,
-                },
-              },
-              { merge: true },
-            )
+              countersDocServer(roomCode)
+                .update(newCounters, { merge: true })
+                .catch((error: any) => {
+                  clearInterval(interval);
+                  reject(error);
+                });
+
+              if (questionTimer <= 0) {
+                clearInterval(interval);
+                resolve();
+              }
+            })
             .catch((error: any) => {
               clearInterval(interval);
               reject(error);
             });
-
-          if (questionTimer <= 0) {
-            clearInterval(interval);
-            resolve();
-          }
+        })
+        .catch((error: any) => {
+          clearInterval(interval);
+          reject(error);
         });
     }, 1000);
   });
@@ -118,41 +140,53 @@ async function startQuestionCountdown(roomCode: string) {
 
 /**
  * Change the state to "question-ended".
- * Update countdownQuestionEnded to 3 and start the countdown with an interval of 1 second.
+ * Update questionEnded to 3 and start the countdown with an interval of 1 second.
  */
 async function startQuestionEnded(code: string) {
   let currentTime = QUESTION_ENDED_TIME;
-  await gameDocServer(code).update(
-    {
-      stage: "question-ended",
-      countdownQuestionEnded: currentTime,
-    },
-    { merge: true },
-  );
+  const game: Partial<Game> = {
+    stage: "question-ended",
+  };
+
+  const counters: Partial<Counters> = {
+    questionEnded: currentTime,
+  };
+
+  const initUpdates: Promise<any>[] = [
+    gameDocServer(code).update(game, { merge: true }),
+    await countersDocServer(code).update(counters, { merge: true }),
+  ];
+
+  await Promise.all(initUpdates);
 
   await new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
-      gameDocServer(code)
+      countersDocServer(code)
         .get()
         .then((doc: any) => {
-          const gameData = doc.data();
-          if (!gameData) {
+          const countersData = doc.data() as Counters;
+          if (!countersData) {
             clearInterval(interval);
-            reject(new GameDoesNotExistError());
+            reject(new CountersDoNotExistError());
             return;
           }
 
-          currentTime = gameData.countdownQuestionEnded;
+          currentTime = countersData.questionEnded || QUESTION_ENDED_TIME;
           currentTime -= 1;
 
-          if (currentTime < 0) {
+          // current time is minimum between currentTime and QUESTION_ENDED_TIME, and above 0
+          currentTime = Math.max(0, Math.min(currentTime, QUESTION_ENDED_TIME));
+          if (currentTime <= 0) {
             resolve();
           }
 
-          gameDocServer(code)
-            .update({
-              countdownQuestionEnded: currentTime,
-            })
+          const newCounters: Counters = {
+            ...countersData,
+            questionEnded: currentTime,
+          };
+
+          countersDocServer(code)
+            .update(newCounters, { merge: true })
             .catch((error: any) => {
               clearInterval(interval);
               reject(error);
@@ -174,17 +208,23 @@ async function startQuestionEnded(code: string) {
 
 /**
  * Change the state to "show-leaderboard".
- * Update countdownShowLeaderboard to 7 and start the countdown with an interval of 1 second.
+ * Update showLeaderboard to 7 and start the countdown with an interval of 1 second.
  */
 async function startShowLeaderboard(code: string) {
   let currentTime = SHOW_LEADERBOARD_TIME;
-  await gameDocServer(code).update(
-    {
-      stage: "show-leaderboard",
-      countdownShowLeaderboard: currentTime,
-    },
-    { merge: true },
-  );
+  const game: Partial<Game> = {
+    stage: "show-leaderboard",
+  };
+  const counters: Partial<Counters> = {
+    showLeaderboard: currentTime,
+  };
+
+  const initUpdates: Promise<any>[] = [
+    gameDocServer(code).update(game, { merge: true }),
+    countersDocServer(code).update(counters, { merge: true }),
+  ];
+
+  await Promise.all(initUpdates);
 
   await new Promise<void>((resolve, reject) => {
     const interval = setInterval(() => {
@@ -193,14 +233,16 @@ async function startShowLeaderboard(code: string) {
       if (currentTime < 0) {
         resolve();
       }
+      const newCounters: Partial<Counters> = {
+        showLeaderboard: currentTime,
+      };
 
-      gameDocServer(code)
-        .update(
-          {
-            countdownShowLeaderboard: currentTime,
-          },
-          { merge: true },
-        )
+      countersDocServer(code)
+        .update(newCounters, { merge: true })
+        .catch((error: any) => {
+          clearInterval(interval);
+          reject(error);
+        })
         .catch((error: any) => {
           clearInterval(interval);
           reject(error);
@@ -237,12 +279,10 @@ async function isLastQuestion(game: Game, room: Room): Promise<boolean> {
  * Change the state to "game-ended".
  */
 async function endGame(code: string) {
-  await gameDocServer(code).update(
-    {
-      stage: "game-ended",
-    },
-    { merge: true },
-  );
+  const game: Partial<Game> = {
+    stage: "game-ended",
+  };
+  await gameDocServer(code).update(game, { merge: true });
 }
 
 async function updateQuestionNumber(game: Game, room: Room) {
@@ -258,11 +298,10 @@ async function updateQuestionNumber(game: Game, room: Room) {
   const nextQuestionIndex = questionIndex + 1;
   const nextQuestion = room.questions[nextQuestionIndex];
 
-  await gameDocServer(room.code).update(
-    {
-      currentQuestion: nextQuestion,
-      stage: "playing",
-    },
-    { merge: true },
-  );
+  const newGame: Partial<Game> = {
+    currentQuestion: nextQuestion,
+    stage: "playing",
+  };
+
+  await gameDocServer(room.code).update(newGame, { merge: true });
 }

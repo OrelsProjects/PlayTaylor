@@ -1,16 +1,18 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "@/lib/store";
-import { Game, Participant } from "@/models/game";
+import { Counters, Game, Participant } from "@/models/game";
 import { QuestionOption } from "@/models/question";
 
 export interface GameState {
   game?: Game;
+  counters: Counters;
   participants: Participant[];
   currentParticipant?: Participant;
 }
 
 export const initialState: GameState = {
   game: undefined,
+  counters: {},
   participants: [],
 };
 
@@ -21,6 +23,9 @@ const gameSlice = createSlice({
     setGame: (state, action: PayloadAction<Game>) => {
       state.game = action.payload;
     },
+    setCounters: (state, action: PayloadAction<Counters>) => {
+      state.counters = action.payload;
+    },
     setParticipants: (
       state,
       action: PayloadAction<{
@@ -29,6 +34,7 @@ const gameSlice = createSlice({
       }>,
     ) => {
       state.participants = action.payload.participants;
+
       state.currentParticipant = action.payload.participants.find(
         participant => participant.userId === action.payload.currentUserId,
       );
@@ -79,6 +85,7 @@ const gameSlice = createSlice({
 
 export const {
   setGame,
+  setCounters,
   setParticipants,
   addQuestionResponse,
   removeQuestionResponse,

@@ -3,7 +3,7 @@ import Logger from "@/loggerServer";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/authOptions";
 import { gameDocServer, getGameSession } from "@/app/api/_db/firestoreServer";
-import { START_GAME_COUNTDOWN } from "@/models/game";
+import { Game, START_GAME_COUNTDOWN } from "@/models/game";
 
 export async function POST(
   req: NextRequest,
@@ -36,17 +36,13 @@ export async function POST(
         );
       }
 
-      await gameDocServer(params.code).update(
-        {
-          stage: "countdown",
-          currentQuestion: undefined,
-          countdownStartedAt: START_GAME_COUNTDOWN,
-          countdownCurrentTime: undefined,
-          countdownQuestionEnded: undefined,
-          countdownShowLeaderboard: undefined,
-        },
-        { merge: true },
-      );
+      const newGame: Game = {
+        stage: "countdown",
+        currentQuestion: undefined,
+        countdownStartedAt: START_GAME_COUNTDOWN,
+      };
+
+      await gameDocServer(params.code).update(newGame, { merge: true });
     }
 
     return NextResponse.json(gameData, { status: 200 });

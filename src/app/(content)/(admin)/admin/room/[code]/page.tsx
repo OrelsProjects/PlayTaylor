@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import ParticipantsComponent from "@/components/pariticpantsComponent";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
@@ -14,29 +14,41 @@ export default function AdminRoomPage({
   params: { code: string };
 }) {
   const router = useCustomRouter();
-  const { game } = useAppSelector(state => state.game);
+  const { user } = useAppSelector(state => state.auth);
+  const { game, counters } = useAppSelector(state => state.game);
   const { startGame, setPreviouslyJoinedGame } = useGame();
+  const startGameToastId = useRef<number | string>(-1);
 
   const initRoom = async () => {
     try {
-      await setPreviouslyJoinedGame(params.code);
+      if (!user) return;
+      await setPreviouslyJoinedGame(params.code, user.userId);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    initRoom();
-  }, [params.code]);
+    // update toast text based on counter
+    game?.countdownStartedAt &&
+      counters.startGame &&
+      toast.update(startGameToastId.current, {
+        render: "Starting game in: " + counters.startGame + " seconds",
+      });
+  }, [counters.startGame, game?.countdownStartedAt]);
 
   useEffect(() => {
-    if (game?.gameStartedAt) {
+    initRoom();
+  }, [params.code, user]);
+
+  useEffect(() => {
+    if (game?.stage === "playing") {
       router.push(`/game/${params.code}`);
     }
   }, [game]);
 
   const handleStartGame = async () => {
-    const toastId = toast.loading("Starting game...");
+    startGameToastId.current = toast.loading("Starting game...");
     try {
       await startGame(params.code);
       router.push(`/game/${params.code}`);
@@ -51,7 +63,7 @@ export default function AdminRoomPage({
       console.error(error);
       toast.error("Failed to start game");
     } finally {
-      toast.dismiss(toastId);
+      toast.dismiss(startGameToastId.current);
     }
   };
 

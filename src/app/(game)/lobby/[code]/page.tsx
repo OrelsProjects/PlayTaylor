@@ -22,8 +22,8 @@ const Counter = ({
   code: string;
   onCountdownZero: () => void;
 }) => {
-  const { game } = useAppSelector(state => state.game);
-
+  const { game, counters } = useAppSelector(state => state.game);
+  const { user } = useAppSelector(state => state.auth);
   const { setPreviouslyJoinedGame } = useGame();
   const [count, setCount] = useState(1);
 
@@ -31,10 +31,9 @@ const Counter = ({
     if (newCount === count) return;
     if (!game && !newGame) return;
 
-    console.log("newCount", newCount);
     const validCount =
       newCount === null || newCount === undefined ? 4 : newCount;
-
+    console.log("validCount", validCount);
     setCount(validCount);
 
     const validRoom = (newGame ? newGame : game) as Game;
@@ -47,18 +46,19 @@ const Counter = ({
   };
 
   useEffect(() => {
-    setPreviouslyJoinedGame(code).then(gameSession => {
+    if (!user) return;
+    setPreviouslyJoinedGame(code, user.userId).then(gameSession => {
       if (!gameSession) return;
       const { game: newGame } = gameSession;
-      handleNewCounter(newGame.countdownCurrentTime, newGame);
+      handleNewCounter(counters.startGame, newGame);
     });
-  }, [code]);
+  }, [code, user]);
 
   useEffect(() => {
-    if (game) {
-      handleNewCounter(game.countdownCurrentTime);
+    if (counters) {
+      handleNewCounter(counters.startGame);
     }
-  }, [game]);
+  }, [game, counters]);
 
   const countText = useMemo(() => (count <= 4 ? count : null), [count]);
 

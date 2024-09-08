@@ -13,12 +13,14 @@ import { setUserLogger } from "@/logger";
 import { useSession } from "next-auth/react";
 import AppUser from "@/models/appUser";
 import { useAppDispatch } from "@/lib/hooks/redux";
+import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
 
 export default function AuthProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useCustomRouter();
   const dispatch = useAppDispatch();
   const { user: currentUser } = useSelector(selectAuth);
   const { data: session, status } = useSession();
@@ -48,6 +50,9 @@ export default function AuthProvider({
         },
       };
       dispatch(setUserAction(appUser));
+      if (!user) {
+        router.push("/login");
+      }
     } catch (error: any) {
       console.error(error);
       dispatch(setUserAction(null));

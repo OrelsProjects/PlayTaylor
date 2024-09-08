@@ -13,7 +13,7 @@ export const numberToDifficulty = {
   3: "folklore",
 };
 
-export type QuestionWithTimer = Question & { timer: number };
+export type QuestionWithTimer = Question;
 
 export interface QuestionOption {
   questionId: QuestionId;

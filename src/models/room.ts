@@ -4,12 +4,13 @@
  */
 
 import { Difficulty, Question } from "./question";
-export type QuestionWithTimer = Question & { timer: number };
+export type QuestionWithTimer = Question & { timer?: number };
 
 export default interface Room {
   code: string;
   name: string;
   createdBy: string;
+  isAdmin?: boolean;
   createdAt: number;
   questionsCount: number;
   participantsCount: number;

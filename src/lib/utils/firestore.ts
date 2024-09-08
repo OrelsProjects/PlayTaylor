@@ -1,10 +1,11 @@
-import { Game, UserIdOrName, Participant } from "@/models/game";
+import { Game, UserIdOrName, Participant, Counters } from "@/models/game";
 import Room from "@/models/room";
 import {
   roomConverter,
   gameConverter,
   gameSessionConverter,
   participantConverter,
+  countersConverter,
 } from "@/lib/utils/converters";
 
 /**
@@ -14,6 +15,7 @@ export interface DbGameSession {
   session: {
     room: Room;
     game: Omit<Game, "participants">;
+    counters: Counters;
   };
   participants: {
     [identifier: UserIdOrName]: Participant;
@@ -24,8 +26,14 @@ export interface DbGameSession {
 export const getGameSessionCollection = (db: any) =>
   db().collection("gameSessions");
 
-export const getGameSessionDoc = (db: any, code: string) =>
-  getGameSessionCollection(db).doc(code).withConverter(gameSessionConverter);
+export const getGameSessionDoc = (
+  db: any,
+  code: string,
+  withConverter?: boolean,
+) =>
+  withConverter
+    ? getGameSessionCollection(db).doc(code).withConverter(gameSessionConverter)
+    : getGameSessionCollection(db).doc(code);
 
 export const getRoomDoc = (db: any, code: string) =>
   getGameSessionDoc(db, code)
@@ -38,6 +46,12 @@ export const getGameDoc = (db: any, code: string) =>
     .collection("session")
     .doc("game")
     .withConverter(gameConverter);
+
+export const getCountersDoc = (db: any, code: string) =>
+  getGameSessionDoc(db, code)
+    .collection("session")
+    .doc("counters")
+    .withConverter(countersConverter);
 
 export const getParticipantsCol = (
   db: any,

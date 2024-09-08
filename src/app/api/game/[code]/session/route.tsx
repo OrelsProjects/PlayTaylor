@@ -15,8 +15,9 @@ export async function GET(
   { params }: { params: { code: string } },
 ): Promise<NextResponse<GameSession | { error: string }>> {
   try {
-    const { room, game, participants } = await getGameSession(params.code);
-    
+    const { room, game, participants, counters } = await getGameSession(
+      params.code,
+    );
     if (!room) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
@@ -25,6 +26,7 @@ export async function GET(
       room,
       game,
       participants,
+      counters,
     };
 
     return NextResponse.json(gameSession, { status: 200 });

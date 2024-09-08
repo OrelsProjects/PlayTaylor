@@ -1,7 +1,7 @@
 "use client";
 
-import GoogleLogin from "../../../components/auth/googleLogin";
-import AppleLogin from "../../../components/auth/appleLogin";
+import GoogleLogin from "@/components/auth/googleLogin";
+import AppleLogin from "@/components/auth/appleLogin";
 import { montserratAlternates } from "../../../lib/utils/fontUtils";
 import { cn } from "../../../lib/utils";
 

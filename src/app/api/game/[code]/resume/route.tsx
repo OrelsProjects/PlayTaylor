@@ -16,7 +16,7 @@ export async function POST(
   }
   const { user } = session;
   try {
-    const isOwner = isOwnerOfRoom(user.userId, params.code);
+    const isOwner = await isOwnerOfRoom(user.userId, params.code);
     if (!isOwner) {
       return NextResponse.json(
         { error: "You are not authorized to resume the game" },

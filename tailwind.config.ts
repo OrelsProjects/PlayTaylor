@@ -13,6 +13,7 @@ const config = {
   theme: {
     screens: {
       xs: "376px",
+      ...defaultTheme.screens,
     },
     container: {
       center: true,

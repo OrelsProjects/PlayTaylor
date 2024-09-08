@@ -1,7 +1,7 @@
 import axios from "axios";
 import Room, { CreateRoom } from "@/models/room";
 import { onSnapshot } from "firebase/firestore";
-import { useAppDispatch } from "@/lib/hooks/redux";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks/redux";
 import {
   setGameDifficulty,
   setGameName,
@@ -17,12 +17,13 @@ import { GameSession } from "@/models/game";
 export type Unsubscribe = () => void;
 
 export default function useRoom() {
+  const { user } = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
 
   async function createRoom(room: CreateRoom): Promise<string> {
     try {
       const response = await axios.post<GameSession>("/api/game/create", room);
-      dispatch(setRoom(response.data.room));
+      dispatch(setRoom({ ...response.data.room, userId: user?.userId || "" }));
       return response.data.room.code;
     } catch (error) {
       console.error(error);
@@ -33,7 +34,14 @@ export default function useRoom() {
   async function setPreviouslyCreatedRoom(code: string) {
     try {
       const room = await getRoom(code);
-      dispatch(setRoom({ ...room, code, questions: room.questions || [] }));
+      dispatch(
+        setRoom({
+          ...room,
+          code,
+          questions: room.questions || [],
+          userId: user?.userId || "",
+        }),
+      );
     } catch (error: any) {
       Logger.error(error);
       throw error;
@@ -41,7 +49,7 @@ export default function useRoom() {
   }
 
   const updateRoom = (room: Room) => {
-    dispatch(setRoom(room));
+    dispatch(setRoom({ ...room, userId: user?.userId || "" }));
   };
 
   const updateGameName = (name: string) => {
@@ -72,7 +80,7 @@ export default function useRoom() {
 
   const listenDefaults = {
     onChange: (newRoom: Room) => {
-      dispatch(setRoom(newRoom));
+      dispatch(setRoom({ ...newRoom, userId: user?.userId || "" }));
     },
   };
 
@@ -87,7 +95,6 @@ export default function useRoom() {
       unsubscribe = onSnapshot(
         roomRef,
         snapshot => {
-          console.log("Room snapshot", snapshot.data());
           onChange(snapshot.data() as Room);
         },
         (error: any) => {

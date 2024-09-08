@@ -65,23 +65,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
-    // const { name, participants, difficulty, questionsCount } =
-    //   initGameFromLocal();
-    // setName(name || "");
-    // setParticipants(participants || 2);
-    // setDifficulty(difficulty || "debut");
-    // setQuestionsCount(questionsCount || undefined);
-  }, [name]);
-
-  useEffect(() => {
     const paramsStage = params.stage?.[0] as Stage;
-    // const lastStage = readLastStageFromLocal();
-    // if (lastStage && paramsStage && lastStage !== paramsStage) {
-    //   setStage(lastStage);
-    //   router.push(`/admin/room/create/${lastStage}`);
-    //   deleteLastStageFromLocal();
-    //   return;
-    // }
     if (paramsStage) {
       setStage(paramsStage);
     } else {
@@ -200,6 +184,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
         <StageComponent title="Department's name" key="name">
           <Input
             value={name}
+            autoFocus
             onChange={e => handleNameChange(e)}
             placeholder="Eras tour 2024"
             className="bg-white !py-6"
@@ -219,6 +204,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
             onChange={e => handleParticipantChange(e)}
             placeholder="Between 2-10"
             type="number"
+            autoFocus
             className="bg-white !py-6"
             max={10}
             min={2}
@@ -244,6 +230,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
             onChange={e => handleQuestionsCountChange(e)}
             placeholder="Between 1-100"
             type="number"
+            autoFocus
             className="bg-white !py-6"
             max={1}
             min={100}
