@@ -72,7 +72,7 @@ export default function ResultsPage({ params }: { params: { code: string } }) {
   );
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 overflow-auto">
+    <div className="w-full h-full flex flex-col gap-4 overflow-auto bg-background-gradient">
       <Top3Component
         items={top3Participants}
         onTopShown={() => setShowOthers(true)}
@@ -91,9 +91,9 @@ export default function ResultsPage({ params }: { params: { code: string } }) {
             {top3Participants.map((participant, index) => (
               <Card
                 key={`${participant.name}-${index}`}
-                className="flex flex-row items-center justify-start gap-2 bg-background shadow-md py-4 px-6"
+                className="flex flex-row items-center justify-start gap-2 bg-background shadow-md py-4 px-4 border-none"
               >
-                <p className="font-bold text-secondary">{index + 1}</p>
+                <p className="font-medium text-secondary">{index + 1}</p>
                 <Image
                   src={participant.image}
                   alt={`ranking image for ${participant.name}`}
@@ -102,7 +102,7 @@ export default function ResultsPage({ params }: { params: { code: string } }) {
                     "!relative rounded-full flex-shrink-0 !h-8 !w-8 object-cover",
                   )}
                 />
-                <p className="font-semibold text-secondary">
+                <p className="font-nomral text-secondary line-clamp-2">
                   {participant.name}
                 </p>
               </Card>

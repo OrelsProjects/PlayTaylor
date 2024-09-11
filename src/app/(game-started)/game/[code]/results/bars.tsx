@@ -57,7 +57,7 @@ const BarComponent = ({
         })}
       />
       <p
-        className={cn("text-secondary font-medium", {
+        className={cn("text-secondary font-medium text-center line-clamp-2", {
           "font-semibold": bar.rank === 1,
         })}
       >

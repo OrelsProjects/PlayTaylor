@@ -60,8 +60,8 @@ export default function BackgroundProvider({
 
   return (
     <motion.div
-      className={cn("bg-[hsla(277, 100%, 99%, 1)]", className)}
-      animate={controls}
+      className={cn("bg-background-gradient", className)}
+      // animate={controls}
     >
       {children}
     </motion.div>

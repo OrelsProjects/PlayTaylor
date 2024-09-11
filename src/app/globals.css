@@ -61,37 +61,6 @@
     --players-in-row: 2;
     --players-in-row-mobile: 2;
   }
-
-  /* .battery-save {
-    --primary: 0 0 98%;
-    --primary-foreground: 0 0 27%;
-    --foreground: 0 0 98%;
-    --background: 20 14.3% 4.1%;
-  } */
-
-  .blossom {
-    --primary: 282 41% 72%;
-    --primary-foreground: 0 0 98%;
-    --background: 282 33% 92%;
-    --muted-foreground: 0 0% 58%;
-    --card: 0 0% 98%;
-  }
-
-  .sun {
-    --primary: 40 65% 62%;
-    --primary-foreground: 0 0 98%;
-    --background: 40 100% 94%;
-    --muted-foreground: 0 0% 58%;
-    --card: 0 0% 98%;
-  }
-
-  .midnight {
-    --primary: 224 48% 15%;
-    --primary-foreground: 0 0 98%;
-    --background: 219 45% 68%;
-    --muted-foreground: 0 0% 98%;
-    --card: 0 0% 98%;
-  }
 }
 
 @layer base {
@@ -110,6 +79,10 @@
 
   h3 {
     @apply title-tertiary text-primary;
+  }
+
+  .background-gradient {
+    @apply bg-gradient-to-tl from-[hsla(288,78%,93%,1)] via-[hsla(288,28%,93%,1)] to-[hsla(276,100%,99%,1)];
   }
 
   .title-main {

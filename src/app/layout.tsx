@@ -94,7 +94,7 @@ export default function Layout({ children }: RootLayoutProps) {
                   <LoggersProvider />
                   <GameListenerProvider />
                   <ShowGameDataProvider />
-                  <BackgroundProvider className="w-full h-svh flex flex-col">
+                  <BackgroundProvider className="w-full h-svh flex flex-col background-gradient">
                     {children}
                   </BackgroundProvider>
                   <SpeedInsights />
