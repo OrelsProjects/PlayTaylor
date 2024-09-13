@@ -30,7 +30,7 @@ export default function AdminLayout({
   return (
     <AuthProvider>
       <div className="w-full h-full flex flex-col items-center justify-start pt-10 relative">
-        <div className="w-full h-fit mx-auto flex flex-col justify-center items-center gap-6">
+        <div className="w-full h-fit min-h-28 mx-auto flex flex-col justify-center items-center gap-6">
           {gameName && <RoomNameComponent name={gameName} />}
           <div className="flex flex-row gap-2">
             {(participantsCount || 0) > 0 && (
@@ -42,14 +42,14 @@ export default function AdminLayout({
             )}
           </div>
           {showCode && (
-            <div className="w-fit p-0.5 gradient-purple rounded-xl">
-              <div className="w-fit px-[70px] py-10 bg-background text-[32px] leading-10 rounded-md">
+            <div className="w-fit p-0.5 rounded-xl shadow-sm">
+              <div className="w-fit px-[70px] py-5 bg-background text-[32px] text-secondary leading-10 rounded-md">
                 Pin: {code}
               </div>
             </div>
           )}
         </div>
-        <div className="h-fit w-full px-[55px]">{children}</div>
+        <div className="h-full w-full px-[55px]">{children}</div>
       </div>
     </AuthProvider>
   );

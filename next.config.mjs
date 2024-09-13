@@ -26,6 +26,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "giphy.com",
       },
+      {
+        protocol: "https",
+        hostname: "dt3z6lywr2d0m.cloudfront.net",
+      },
     ],
   },
 };

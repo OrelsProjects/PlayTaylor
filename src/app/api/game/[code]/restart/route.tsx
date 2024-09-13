@@ -39,6 +39,7 @@ export async function POST(
       const newGame: Game = {
         stage: "countdown",
         currentQuestion: undefined,
+        
         countdownStartedAt: START_GAME_COUNTDOWN,
       };
 

@@ -68,7 +68,7 @@ export default function AdminRoomPage({
   };
 
   return (
-    <div className="w-full h-full flex flex-col gap-8 justify-center items-center mt-11">
+    <div className="w-full h-full flex flex-col gap-8 justify-start items-center pt-20">
       <ParticipantsComponent />
       <Button
         onClick={() => {

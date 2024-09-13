@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { BsFillPauseFill } from "react-icons/bs";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { Button } from "@/components/ui/button";
@@ -60,6 +60,17 @@ export const GameStateButton = () => {
     }
   };
 
+  const ButtonIcon = useCallback(() => {
+    switch (type) {
+      case "pause":
+        return <FaPlay className="w-7 h-7" />;
+      case "restart":
+        return <FaRedoAlt className="w-7 h-7 transform rotate-180" />;
+      default:
+        return <BsFillPauseFill className="w-7 h-7" />;
+    }
+  }, [type]);
+
   return (
     canShowButton && (
       <div className="flex flex-col justify-center items-center gap-2">
@@ -69,15 +80,7 @@ export const GameStateButton = () => {
           loadingClassName="w-7 h-7"
           onClick={handleButtonClick}
         >
-          {type === "pause" ? (
-            isPaused(game?.stage) ? (
-              <FaPlay className="w-7 h-7" />
-            ) : (
-              <BsFillPauseFill className="w-7 h-7" />
-            )
-          ) : (
-            <FaRedoAlt className="w-7 h-7 transform rotate-180" />
-          )}
+          {<ButtonIcon />}
         </Button>
         {type === "restart" && (
           <p className="text-accent font-medium">Begin again</p>

@@ -287,14 +287,10 @@ async function endGame(code: string) {
 
 async function updateQuestionNumber(game: Game, room: Room) {
   const currentQuestionId = game.currentQuestion?.id;
-  const questionIndex = room.questions.findIndex(
+  let questionIndex = room.questions.findIndex(
     question => question.id === currentQuestionId,
   );
-
-  if (questionIndex === -1) {
-    throw new Error("Question not found");
-  }
-
+  // If -1, it means the game was restarted
   const nextQuestionIndex = questionIndex + 1;
   const nextQuestion = room.questions[nextQuestionIndex];
 

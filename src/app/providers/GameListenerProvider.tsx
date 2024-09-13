@@ -5,10 +5,10 @@ import useRoom from "@/lib/hooks/useRoom";
 import { useAppSelector } from "@/lib/hooks/redux";
 import useGame from "@/lib/hooks/useGame";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 
 export default function GameListenerProvider() {
-  const router = useCustomRouter();
+  const pathname = usePathname();
   const params = useParams();
   const { room } = useAppSelector(state => state.room);
   const { listenToRoomChanges, updateRoom } = useRoom();
@@ -80,7 +80,7 @@ export default function GameListenerProvider() {
   useEffect(() => {
     if (
       shouldListen &&
-      room.isAdmin &&
+      (room.isAdmin || pathname.includes("waiting")) &&
       !unsubscribeParticipants.current &&
       code
     ) {

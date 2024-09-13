@@ -8,6 +8,7 @@ import {
   participantDocServer,
   participantsColServer,
 } from "@/app/api/_db/firestoreServer";
+import { albumNamesArray } from "@/lib/utils/albumsPictures";
 
 export async function POST(
   req: NextRequest,
@@ -50,6 +51,16 @@ export async function POST(
         newParticipant = existingParticipant;
       }
     } else {
+      // New participant
+
+      const usedAlbums = participants.map((p: any) => p.albumSelected);
+      const availableAlbums = albumNamesArray.filter(
+        album => !usedAlbums.includes(album),
+      );
+
+      const albumSelected =
+        availableAlbums[Math.floor(Math.random() * availableAlbums.length)];
+
       const { userId } = session.user;
       const timestamp = Date.now();
 
@@ -59,6 +70,7 @@ export async function POST(
         joinedAt: timestamp,
         userId,
         leftAt: null,
+        albumSelected,
       };
 
       await participantsColServer(params.code).doc(userId).set(newParticipant);

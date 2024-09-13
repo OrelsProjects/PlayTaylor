@@ -303,6 +303,7 @@ export default function useGame() {
     loadingGameState.current = true;
     try {
       await axios.post(`/api/game/${code}/restart`);
+      await startGame(code);
     } catch (error: any) {
       Logger.error(error);
       throw error;

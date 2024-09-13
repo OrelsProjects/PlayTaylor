@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
+import CustomLink from "../../../../../components/customLink";
 
 const Butterfly = ({ number }: { number: number }) => (
   <div className="w-10 h-[30px] relative flex flex-shrink-0 mt-1">
@@ -52,13 +53,10 @@ export default function RoomPage() {
         <InfoComponent number={4} text="Big screen or mobile" />
       </div>
       <div className="w-full flex justify-center items-center ">
-        <Button
-          onClick={() => {
-            router.push("/admin/room/create");
-          }}
-          className="w-full"
-        >
-          Got it, let&apos;s continue
+        <Button className="w-full" asChild>
+          <CustomLink href="/" className="w-full">
+            Got it, let&apos;s continue
+          </CustomLink>
         </Button>
       </div>
     </div>

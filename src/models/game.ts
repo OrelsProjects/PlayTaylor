@@ -3,6 +3,7 @@
  * The data here is dynamic and changes based on the game state and the actions of the participants.
  */
 
+import { AlbumName } from "../lib/utils/albumsPictures";
 import { Question, QuestionOption } from "./question";
 import Room from "./room";
 
@@ -64,6 +65,7 @@ export interface Participant {
   userId: string;
   leftAt?: number | null;
   questionResponses?: QuestionOption[];
+  albumSelected?: AlbumName;
 }
 
 // Game Session
