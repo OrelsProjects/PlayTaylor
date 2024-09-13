@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useAppSelector } from "@/lib/hooks/redux";
 import { cn } from "@/lib/utils";
 import { montserratAlternates } from "@/lib/utils/fontUtils";
 import { motion } from "framer-motion";
@@ -10,19 +11,21 @@ import { Difficulty } from "@/models/question";
 import useRoom from "@/lib/hooks/useRoom";
 import { Logger } from "@/logger";
 import { Stage } from "@/lib/hooks/_utils";
-import { useAppSelector } from "@/lib/hooks/redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import DifficultyComponent from "./difficultyComponent";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
+import { FiEdit as Edit } from "react-icons/fi";
 
 const StageComponent = ({
   title,
   subtitle,
   children,
+  className,
 }: {
-  title: string;
+  title?: string;
   subtitle?: string;
+  className?: string;
   children: React.ReactNode;
 }) => {
   return (
@@ -30,38 +33,70 @@ const StageComponent = ({
       initial={{ x: 100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: -100, opacity: 0 }}
-      className="w-full flex flex-col gap-4"
+      className={cn("w-full flex flex-col gap-4", className)}
     >
-      <span
-        className={cn(
-          "text-[40px] leading-10 text-center",
-          montserratAlternates.className,
-        )}
-      >
-        {title}
-      </span>
+      {title && (
+        <span
+          className={cn(
+            "text-[40px] leading-10 text-center",
+            montserratAlternates.className,
+          )}
+        >
+          {title}
+        </span>
+      )}
       {subtitle && <p className="text-center">{subtitle}</p>}
       {children}
     </motion.div>
   );
 };
 
+const EditBox = ({
+  onEdit,
+  title,
+  value,
+}: {
+  onEdit: () => void;
+  title: string;
+  value: string;
+}) => (
+  <div className="h-fitw-full p-7 flex flex-row justify-between items-start rounded-lg bg-background">
+    <div className="h-full flex flex-col items-start justify-center gap-2">
+      <p className="leading-3 text-xl">{title}</p>
+      <p className="text-primary-gradient font-bold text-xl">{value}</p>
+    </div>
+    <Button
+      className="h-5 w-5 p-4 gradient-purple rounded-bl-none"
+      onClick={onEdit}
+    >
+      <Edit />
+    </Button>
+  </div>
+);
+
 export default function RoomPage({ params }: { params: { stage: string } }) {
   const router = useCustomRouter();
   const pathname = usePathname();
-  const { room } = useAppSelector(state => state.room);
+  const { room, wasInConfirm } = useAppSelector(state => state.room);
   const {
     updateDifficulty,
     updateGameName,
     updateParticipants,
+    updateWasInConfirm,
     updateQuestionsCount,
     createRoom,
   } = useRoom();
   const [stage, setStage] = useState<Stage>("name");
-  const [name, setName] = useState<string | undefined>();
-  const [participants, setParticipants] = useState<number>(2);
-  const [difficulty, setDifficulty] = useState<Difficulty>("debut");
-  const [questionsCount, setQuestionsCount] = useState<number | undefined>();
+  const [name, setName] = useState<string | undefined>(room.name);
+  const [participants, setParticipants] = useState<number>(
+    room.participantsCount || 2,
+  );
+  const [difficulty, setDifficulty] = useState<Difficulty>(
+    room.difficulty || "debut",
+  );
+  const [questionsCount, setQuestionsCount] = useState<number | undefined>(
+    room.questionsCount,
+  );
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
@@ -104,18 +139,30 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
   };
   const nextStage = async () => {
     let newStage = stage;
-    if (stage === "name") {
-      newStage = "participants";
-    } else if (stage === "participants") {
-      newStage = "difficulty";
-    } else if (stage === "difficulty") {
-      newStage = "question";
-    } else if (stage === "question") {
-      await handleCreateRoom();
-      return;
+
+    if (wasInConfirm) {
+      newStage = "confirm";
+    } else {
+      switch (stage) {
+        case "name":
+          newStage = "participants";
+          break;
+        case "participants":
+          newStage = "difficulty";
+          break;
+        case "difficulty":
+          newStage = "question";
+          break;
+        case "question":
+          newStage = "confirm";
+          updateWasInConfirm(true);
+          break;
+        case "confirm":
+          await handleCreateRoom();
+          return;
+      }
     }
     router.push(`/admin/room/create/${newStage}`);
-    // writeStageToLocal(newStage);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,12 +225,19 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
     nextStage();
   };
 
+  const handleEdit = (stage: Stage) => {
+    setStage(stage);
+    updateWasInConfirm(true);
+    router.push(`/admin/room/create/${stage}`);
+  };
+
   return (
     <div className="h-full w-full flex flex-col gap-4 items-center justify-center">
       {stage === "name" ? (
         <StageComponent title="Department's name" key="name">
           <Input
             value={name}
+            defaultValue={room.name}
             autoFocus
             onChange={e => handleNameChange(e)}
             placeholder="Eras tour 2024"
@@ -201,6 +255,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
         >
           <Input
             value={participants}
+            defaultValue={room.participantsCount}
             onChange={e => handleParticipantChange(e)}
             placeholder="Between 2-10"
             type="number"
@@ -219,7 +274,7 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
           />
           <Button onClick={() => handleDifficultySet()}>Next</Button>
         </StageComponent>
-      ) : (
+      ) : stage === "question" ? (
         <StageComponent
           title="Questions"
           subtitle="How many questions in the game"
@@ -241,8 +296,51 @@ export default function RoomPage({ params }: { params: { stage: string } }) {
             }}
             disabled={isCreating}
           >
-            Create room
+            Next
           </Button>
+        </StageComponent>
+      ) : (
+        <StageComponent className="h-full w-full flex flex-col gap-6">
+          <div className="pb-6 border-b border-foreground/15">
+            <p className="font-medium text-accent text-2xl leading-10 text-center px-6">
+              Your department details
+            </p>
+          </div>
+          <div className="flex flex-col gap-5 px-6 text-sm">
+            <p className="">
+              If you&apos;d like to change anything, simply press the box.
+              <br /> If all is well, press Move on.
+            </p>
+            <EditBox
+              onEdit={() => handleEdit("name")}
+              title="Department's name"
+              value={name || ""}
+            />
+            <EditBox
+              onEdit={() => handleEdit("participants")}
+              title="Number Of Participants"
+              value={`${room.participantsCount}` || ""}
+            />
+            <EditBox
+              onEdit={() => handleEdit("difficulty")}
+              title="Difficulty Level"
+              value={room.difficulty || ""}
+            />
+            <EditBox
+              onEdit={() => handleEdit("question")}
+              title="Number Of Questions"
+              value={`${room.questionsCount}` || ""}
+            />
+            <Button
+              className="mt-2 font-semibold text-sm py-[14px]"
+              onClick={() => {
+                handleCreateRoom();
+              }}
+              isLoading={isCreating}
+            >
+              Move on
+            </Button>
+          </div>
         </StageComponent>
       )}
     </div>

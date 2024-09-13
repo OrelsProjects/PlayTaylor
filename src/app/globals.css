@@ -109,4 +109,8 @@
   .gradient-purple-to-b-80 {
     @apply bg-gradient-to-b from-[hsla(239,86%,74%,0.8)] to-[hsla(252,88%,74%,0.8)];
   }
+
+  .text-primary-gradient {
+    @apply gradient-purple bg-clip-text text-transparent;
+  }
 }

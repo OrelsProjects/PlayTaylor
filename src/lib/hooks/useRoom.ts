@@ -8,6 +8,7 @@ import {
   setParticipantsCount,
   setQuestionsCount,
   setRoom,
+  setWasInConfirm,
 } from "@/lib/features/room/roomSlice";
 import { Logger } from "@/logger";
 import { Difficulty } from "@/models/question";
@@ -68,6 +69,10 @@ export default function useRoom() {
     dispatch(setQuestionsCount(count));
   };
 
+  const updateWasInConfirm = (wasInConfirm: boolean) => {
+    dispatch(setWasInConfirm(wasInConfirm));
+  };
+
   async function getRoom(code: string): Promise<Room> {
     try {
       const response = await axios.get<Room>(`/api/game/${code}`);
@@ -114,6 +119,7 @@ export default function useRoom() {
     updateRoom,
     updateGameName,
     updateParticipants,
+    updateWasInConfirm,
     updateQuestionsCount,
     updateDifficulty,
     listenToRoomChanges,

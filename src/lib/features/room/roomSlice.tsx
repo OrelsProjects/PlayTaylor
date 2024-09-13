@@ -8,6 +8,7 @@ export interface RoomState {
     difficulty?: Difficulty;
     questionsCount?: number;
   };
+  wasInConfirm: boolean;
 }
 
 export const initialState: RoomState = {
@@ -20,6 +21,7 @@ export const initialState: RoomState = {
     createdAt: 0,
     questions: [],
   },
+  wasInConfirm: false,
 };
 
 const roomSlice = createSlice({
@@ -75,6 +77,9 @@ const roomSlice = createSlice({
       };
       state.room;
     },
+    setWasInConfirm: (state, action: PayloadAction<boolean>) => {
+      state.wasInConfirm = action.payload;
+    },
   },
 });
 
@@ -85,6 +90,7 @@ export const {
   setGameDifficulty,
   setQuestionsCount,
   setCode,
+  setWasInConfirm,
   setQuestions,
   addQuestion,
   removeQuestion,

@@ -16,7 +16,7 @@ export default function RoomNameComponent({
         montserratAlternates.className,
         type === "compact"
           ? "text-base font-medium text-secondary"
-          : "gradient-purple bg-clip-text text-transparent",
+          : "text-primary-gradient",
       )}
     >
       {name}

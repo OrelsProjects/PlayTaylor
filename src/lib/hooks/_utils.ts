@@ -1,4 +1,9 @@
-export type Stage = "name" | "participants" | "difficulty" | "question";
+export type Stage =
+  | "name"
+  | "participants"
+  | "difficulty"
+  | "question"
+  | "confirm";
 
 export const LOCAL_STORAGE_PREFIX = "play_tayor";
 
