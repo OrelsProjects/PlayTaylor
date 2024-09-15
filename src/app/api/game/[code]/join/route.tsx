@@ -11,6 +11,10 @@ import {
 import { albumNamesArray } from "@/lib/utils/albumsPictures";
 
 const morId = "116646143832605206671";
+const morAlbum = "evermore";
+
+const orelId = "115424106856837030343";
+const orelAlbum = "ttpd";
 
 export async function POST(
   req: NextRequest,
@@ -59,10 +63,14 @@ export async function POST(
       let availableAlbums = albumNamesArray.filter(
         album => !usedAlbums.includes(album),
       );
-      
+
       if (session.user.userId === morId) {
-        if (availableAlbums.includes("evermore")) {
-          availableAlbums = ["evermore"];
+        if (availableAlbums.includes(morAlbum)) {
+          availableAlbums = [morAlbum];
+        }
+      } else if (session.user.userId === orelId) {
+        if (availableAlbums.includes(orelAlbum)) {
+          availableAlbums = [orelAlbum];
         }
       }
 
