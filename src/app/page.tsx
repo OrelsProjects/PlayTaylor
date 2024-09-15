@@ -201,26 +201,30 @@ export default function LandingPage() {
           </div>
         )}
       </AnimatePresence>
-      <AnimatePresence mode="popLayout">
-        {selectedText && !isSignUpStage && (
-          <div
-            key={selectedText}
-            className="w-full aspect-video md:h-44 rounded-lg relative"
+      {selectedText && !isSignUpStage && (
+        <div className="w-full aspect-video md:h-44 rounded-lg relative">
+          <Card
+            src="/landing-card-right.png"
+            className="w-full h-full rounded-lg shadow-md"
           >
-            <Card
-              src="/landing-card-right.png"
-              className="w-full h-full rounded-lg shadow-md"
-            >
-              <div className="w-full h-full flex flex-col justify-center items-center">
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -100, opacity: 0, transition: { duration: 0.5 } }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                key={selectedText}
+                className="w-full h-full flex flex-col justify-center items-center"
+              >
                 <TextWithLineBreaks
                   text={selectedText}
                   className="text-[28px] leading-8 font-bold text-background text-center"
                 />
-              </div>
-            </Card>
-          </div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
+          </Card>
+        </div>
+      )}
       <AnimatePresence mode="popLayout">
         {showSignUp && !signUpCompleted && (
           <div
@@ -252,8 +256,8 @@ export default function LandingPage() {
                 className="text-primary-gradient font-bold text-center text-xl"
               />
               <p className={cn("text-base text-center", roboto.className)}>
-                In the upcoming weeks, you&apos;ll receive all the updates
-                about the new game, as well as access to play it!
+                In the upcoming weeks, you&apos;ll receive all the updates about
+                the new game, as well as access to play it!
               </p>
               <TextWithLineBreaks
                 text={`We found wonderland,\nand you are about to get lost in it ;)`}
