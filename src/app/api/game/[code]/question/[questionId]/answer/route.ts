@@ -8,6 +8,7 @@ import {
 } from "@/app/api/_db/firestoreServer";
 import { AnsweredTooLateError } from "@/models/errors/AnsweredTooLateError";
 import { QuestionOption } from "@/models/question";
+import { CURRENT_QUESTION_TIME } from "@/models/game";
 
 export async function POST(
   req: NextRequest,
@@ -32,13 +33,17 @@ export async function POST(
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    const { game, participants } = gameSession;
+    const { game, participants, counters } = gameSession;
 
     if (game.stage !== "playing" && game.stage !== "paused") {
       return NextResponse.json(
         { error: AnsweredTooLateError },
         { status: 400 },
       );
+    }
+
+    if (game.stage === "paused") {
+      return NextResponse.json({ error: "Game is paused" }, { status: 400 });
     }
 
     const participant = participants?.find(
@@ -57,6 +62,10 @@ export async function POST(
     if (questionResponses.some(r => r.questionId === params.questionId)) {
       return NextResponse.json({ error: "Already answered" }, { status: 400 });
     }
+
+    const timeToAnswer = CURRENT_QUESTION_TIME - (counters.currentQuestion || CURRENT_QUESTION_TIME);
+    response.timeToAnswer = timeToAnswer;
+    
     questionResponses.push(response);
     // update participant in index participantIndex
     const participantRef = participantDocServer(

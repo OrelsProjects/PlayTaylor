@@ -34,7 +34,6 @@ import {
   participantsColClient,
 } from "@/lib/utils/firestoreClient";
 import { NoParticipantsError } from "@/models/errors/NoParticipantsError";
-import Room from "@/models/room";
 
 export type Unsubscribe = () => void;
 
@@ -174,9 +173,12 @@ export default function useGame() {
 
     dispatch(addQuestionResponse({ response })); // optimistic update
     try {
+      const responseWithAnsweredAt: Partial<QuestionOption> = {
+        ...response,
+        answeredAt: Date.now(),
+      };
       await axios.post(`/api/game/${code}/question/${questionId}/answer`, {
-        response: { ...response, answerAt: Date.now() },
-        questionId,
+        response: { ...responseWithAnsweredAt },
       });
       return;
     } catch (error: any) {

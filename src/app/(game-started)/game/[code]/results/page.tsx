@@ -7,6 +7,7 @@ import { useAppSelector } from "@/lib/hooks/redux";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { calculateFinalScore } from "./utils";
 
 const items = [
   {
@@ -45,7 +46,7 @@ export default function ResultsPage({ params }: { params: { code: string } }) {
           );
           return {
             ...participant,
-            points: correctResponses?.length || 0,
+            points: calculateFinalScore(correctResponses || []),
           };
         })
         .sort((a, b) => b.points - a.points)
@@ -61,13 +62,6 @@ export default function ResultsPage({ params }: { params: { code: string } }) {
 
   const top3Participants = useMemo(
     () => rankedParticipants.slice(0, 3),
-    [participants],
-  );
-
-  // these are the rest of the participants. The top 3 are already displayed
-  const restOfParticipants = useMemo(
-    () => rankedParticipants.slice(3),
-
     [participants],
   );
 
@@ -102,7 +96,9 @@ export default function ResultsPage({ params }: { params: { code: string } }) {
                     "!relative rounded-full flex-shrink-0 !h-8 !w-8 object-cover",
                   )}
                 />
-                <p className="text-sm font-nomral text-secondary line-clamp-2">{participant.name}</p>
+                <p className="text-sm font-nomral text-secondary line-clamp-2">
+                  {participant.name}
+                </p>
               </Card>
             ))}
           </motion.div>

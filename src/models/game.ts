@@ -3,9 +3,9 @@
  * The data here is dynamic and changes based on the game state and the actions of the participants.
  */
 
-import { AlbumName } from "../lib/utils/albumsPictures";
-import { Question, QuestionOption } from "./question";
-import Room from "./room";
+import { AlbumName } from "@/lib/utils/albumsPictures";
+import { Question, QuestionOption } from "@/models/question";
+import Room from "@/models/room";
 
 export const START_GAME_COUNTDOWN = 5; // 5 seconds
 export const CURRENT_QUESTION_TIME = 20; // 20 seconds

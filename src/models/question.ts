@@ -21,6 +21,7 @@ export interface QuestionOption {
   correct: boolean;
   position: number;
   answeredAt?: number;
+  timeToAnswer?: number;
 }
 
 export interface Question {
