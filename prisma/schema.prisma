@@ -104,15 +104,22 @@ model Question {
 
 model QuestionResponse {
   id         String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String?  @db.ObjectId
+  userId     String? @db.ObjectId
   questionId String  @db.ObjectId
 
-  answeredAt DateTime @default(now())
-  response         QuestionOption @relation(fields: [questionOptionId], references: [id]) // answers by user
+  answeredAt DateTime       @default(now())
+  response   QuestionOption @relation(fields: [questionOptionId], references: [id]) // answers by user
 
-  question         Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  user             AppUser?        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  questionOptionId String         @db.ObjectId
+  question         Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user             AppUser? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionOptionId String   @db.ObjectId
 
   @@map("questionResponse")
+}
+
+model InterestedUser {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  email String @unique
+
+  @@map("interestedUser")
 }

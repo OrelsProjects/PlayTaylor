@@ -15,6 +15,7 @@ import LoggersProvider from "@/app/providers/LoggersProvider";
 import GameListenerProvider from "@/app/providers/GameListenerProvider";
 import Loading from "@/components/ui/loading";
 import ShowGameDataProvider from "@/app/providers/ShowGameDataProvider";
+import { montserratAlternates } from "../lib/utils/fontUtils";
 
 const APP_NAME = "Play Taylor";
 const APP_DEFAULT_TITLE = "Play Taylor";
@@ -80,7 +81,7 @@ export default function Layout({ children }: RootLayoutProps) {
           crossOrigin="anonymous"
         ></Script>
       </head>
-      <body className="!overscroll-none">
+      <body>
         <Suspense
           fallback={
             <Loading spinnerClassName="absolute top-1/2 left-1/2 h-10 w-10" />

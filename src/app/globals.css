@@ -60,6 +60,9 @@
 
     --players-in-row: 2;
     --players-in-row-mobile: 2;
+
+    --answers-in-row-landing: 2;
+    --answers-in-row-landing-mobile: 2;
   }
 }
 
