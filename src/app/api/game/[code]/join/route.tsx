@@ -10,6 +10,8 @@ import {
 } from "@/app/api/_db/firestoreServer";
 import { albumNamesArray } from "@/lib/utils/albumsPictures";
 
+const morId = "116646143832605206671";
+
 export async function POST(
   req: NextRequest,
   { params }: { params: { code: string } },
@@ -54,9 +56,15 @@ export async function POST(
       // New participant
 
       const usedAlbums = participants.map((p: any) => p.albumSelected);
-      const availableAlbums = albumNamesArray.filter(
+      let availableAlbums = albumNamesArray.filter(
         album => !usedAlbums.includes(album),
       );
+      
+      if (session.user.userId === morId) {
+        if (availableAlbums.includes("evermore")) {
+          availableAlbums = ["evermore"];
+        }
+      }
 
       const albumSelected =
         availableAlbums[Math.floor(Math.random() * availableAlbums.length)];
