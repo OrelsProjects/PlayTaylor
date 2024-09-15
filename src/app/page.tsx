@@ -252,7 +252,7 @@ export default function LandingPage() {
                 className="text-primary-gradient font-bold text-center text-xl"
               />
               <p className={cn("text-base text-center", roboto.className)}>
-                In the upcoming weeks, you&apos;ll receive an all the updates
+                In the upcoming weeks, you&apos;ll receive all the updates
                 about the new game, as well as access to play it!
               </p>
               <TextWithLineBreaks
