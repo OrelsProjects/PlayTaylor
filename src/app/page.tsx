@@ -6,6 +6,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import {
+  slideAnimationProps,
   selectedTextCorrect,
   selectedTextIncorrect,
   selectedTextFlow,
@@ -44,11 +45,8 @@ const Card = ({
   children: React.ReactNode;
 }) => (
   <motion.div
-    // slide left opacity
-    initial={{ x: 100, opacity: 0 }}
-    animate={{ x: 0, opacity: 1 }}
-    exit={{ x: -100, opacity: 0, transition: { duration: 0.5 } }}
-    transition={{ duration: 0.5, ease: "easeInOut" }}
+    // slide animation
+    {...slideAnimationProps}
     className={cn(
       "w-full h-full relative flex justify-center items-center z-10",
       { "bg-background rounded-lg": !src },
@@ -160,7 +158,7 @@ export default function LandingPage() {
   return (
     <div
       className={cn(
-        "w-full h-full flex flex-col justify-start items-center px-6 py-6 md:px-20 md:py-20 relative",
+        "w-full h-full flex flex-col justify-start items-center px-6 py-6 md:px-80 md:py-20 relative",
         montserratAlternates.className,
       )}
     >
@@ -179,10 +177,10 @@ export default function LandingPage() {
               src="/landing-card-left-mobile.png"
               className="w-full h-full shadow-md rounded-lg flex flex-row justify-start items-center"
             >
-              <div className="w-full h-full flex flex-col md:flex-row md:justify-start items-center py-6 px-8 md:px-14 gap-8 md:gap-32">
+              <div className="w-full h-full flex flex-col md:flex-row md:justify-between items-center py-6 px-8 md:px-14 gap-8 md:gap-32">
                 <TextWithLineBreaks
                   text={question}
-                  className="text-[28px] leading-8 font-bold text-background text-center"
+                  className="text-[28px] md:text-[40px] leading-8 md:leading-[56px] font-bold text-background text-center"
                 />
                 <div className="w-fit h-fit grid grid-cols-[repeat(var(--answers-in-row-landing-mobile),minmax(0,1fr))] md:grid-cols-[repeat(var(--answers-in-row-landing),minmax(0,1fr))] gap-4">
                   {answers.map(({ answer, isCorrect }) => (
@@ -201,30 +199,33 @@ export default function LandingPage() {
           </div>
         )}
       </AnimatePresence>
-      {selectedText && !isSignUpStage && (
-        <div className="w-full aspect-video md:h-44 rounded-lg relative">
-          <Card
-            src="/landing-card-right.png"
-            className="w-full h-full rounded-lg shadow-md"
+      <AnimatePresence mode="popLayout">
+        {selectedText && !isSignUpStage && (
+          <motion.div
+            {...slideAnimationProps}
+            key={"selected-text-card"}
+            className="w-full aspect-video md:h-44 rounded-lg relative"
           >
-            <AnimatePresence mode="popLayout">
-              <motion.div
-                initial={{ x: 100, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -100, opacity: 0, transition: { duration: 0.5 } }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-                key={selectedText}
-                className="w-full h-full flex flex-col justify-center items-center"
-              >
-                <TextWithLineBreaks
-                  text={selectedText}
-                  className="text-[28px] leading-8 font-bold text-background text-center"
-                />
-              </motion.div>
-            </AnimatePresence>
-          </Card>
-        </div>
-      )}
+            <Card
+              src="/landing-card-right.png"
+              className="w-full h-full rounded-lg shadow-md"
+            >
+              <AnimatePresence mode="popLayout">
+                <motion.div
+                  {...slideAnimationProps}
+                  key={selectedText}
+                  className="w-full h-full flex flex-col justify-center items-center"
+                >
+                  <TextWithLineBreaks
+                    text={selectedText}
+                    className="text-[28px] leading-8 font-bold text-background text-center"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence mode="popLayout">
         {showSignUp && !signUpCompleted && (
           <div

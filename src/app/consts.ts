@@ -1,3 +1,10 @@
+export const slideAnimationProps = {
+  initial: { x: 100, opacity: 0 },
+  animate: { x: 0, opacity: 1 },
+  exit: { x: -100, opacity: 0, transition: { duration: 0.5 } },
+  transition: { duration: 0.5, ease: "easeInOut" },
+};
+
 export const question =
   "Who has Taylor Swift endorsed\n for the upcoming election?";
 export const answers: { answer: string; isCorrect: boolean }[] = [
