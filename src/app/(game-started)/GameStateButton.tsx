@@ -9,28 +9,31 @@ import useGame from "@/lib/hooks/useGame";
 import { canShowPauseButton, isPaused } from "@/models/game";
 import { toast } from "react-toastify";
 
-export type GameStateButtonType = "pause" | "restart";
+export type GameStateButtonType = "pause" | "resume" | "restart";
 
 export const GameStateButton = () => {
   const { pauseGame, resumeGame, loadingGameState, restartGame } = useGame();
   const { game } = useAppSelector(state => state.game);
   const { room } = useAppSelector(state => state.room);
 
-  useEffect(() => {
-    console.log("loadingGameState", loadingGameState);
-  }, [loadingGameState]);
-
   const code = useMemo(() => {
     return room?.code || "";
   }, [game]);
 
-  const type = useMemo(() => {
-    return game?.stage === "game-ended" ? "restart" : "pause";
+  const type = useMemo((): GameStateButtonType => {
+    const stage = game?.stage;
+    console.log("stage", stage);
+    if (!stage || stage === "paused") {
+      return "pause";
+    } else if (stage === "game-ended") {
+      return "restart";
+    }
+    return "resume";
   }, [game]);
 
   const canShowButton = useMemo(() => {
     if (!room.isAdmin) return false;
-    if (type === "pause") {
+    if (type === "pause" || type === "resume") {
       return canShowPauseButton(game?.stage);
     } else if (type === "restart") {
       return game?.stage === "game-ended";
@@ -61,11 +64,14 @@ export const GameStateButton = () => {
   };
 
   const ButtonIcon = useCallback(() => {
+    console.log("type", type);
     switch (type) {
       case "pause":
         return <FaPlay className="w-7 h-7" />;
       case "restart":
         return <FaRedoAlt className="w-7 h-7 transform rotate-180" />;
+      case "resume":
+        return <BsFillPauseFill className="w-7 h-7" />;
       default:
         return <BsFillPauseFill className="w-7 h-7" />;
     }

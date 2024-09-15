@@ -6,6 +6,7 @@ import {
   SHOW_LEADERBOARD_TIME,
   Counters,
   GameSession,
+  Participant,
 } from "@/models/game";
 import { GamePausedError } from "@/models/errors/GamePausedError";
 import Room from "@/models/room";
@@ -14,8 +15,10 @@ import {
   gameDocServer,
   gameSessionDocServer,
   getGameSession,
+  participantsColServer,
 } from "@/app/api/_db/firestoreServer";
 import { CountersDoNotExistError } from "@/models/errors/CountersDoNotExistError";
+import loggerServer from "../../../../../../loggerServer";
 
 type GameRef = FirebaseFirestore.DocumentReference<Game, any>;
 
@@ -67,8 +70,11 @@ export async function runLogic(
  * Start countdown of 20 seconds for the current question.
  * If the current stage was "paused", then resume the countdown from the time it was paused.
  * Otherwise, start the countdown from 20 seconds.
+ * MUST reset the timer to 0 before resolve() is called.
  */
 async function startQuestionCountdown(roomCode: string) {
+  let didAllParticipantAnswerQuestion = false;
+
   await new Promise<void>((resolve, reject) => {
     // interval logic
     const interval = setInterval(() => {
@@ -82,12 +88,30 @@ async function startQuestionCountdown(roomCode: string) {
             return;
           }
           const currentStage = newGame.stage;
+          const currentQuestion = newGame.currentQuestion;
 
           if (currentStage === "paused") {
             clearInterval(interval);
             reject(new GamePausedError());
             return;
           }
+
+          participantsColServer(roomCode)
+            .get()
+            .then((participants: any) => {
+              const participantsData = participants.docs.map(
+                (doc: any) => doc.data() as Participant,
+              ) as Participant[];
+              didAllParticipantAnswerQuestion = participantsData.every(
+                participant =>
+                  participant.questionResponses?.some(
+                    response => response.questionId === currentQuestion?.id,
+                  ),
+              );
+            })
+            .catch((error: any) => {
+              loggerServer.error(error.message, error);
+            });
           countersDocServer(roomCode)
             .get()
             .then((doc: any) => {
@@ -108,6 +132,11 @@ async function startQuestionCountdown(roomCode: string) {
               if (questionTimer < 0) {
                 resolve();
               }
+
+              if (didAllParticipantAnswerQuestion) {
+                questionTimer = 0;
+              }
+
               const newCounters: Counters = {
                 ...counters,
                 currentQuestion: questionTimer,
