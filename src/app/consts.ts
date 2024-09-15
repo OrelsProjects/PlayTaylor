@@ -1,7 +1,3 @@
-import { text } from "stream/consumers";
-
-export const TIME_BETWEEN_TEXT = 3500;
-
 export const question =
   "Who has Taylor Swift endorsed\n for the upcoming election?";
 export const answers: { answer: string; isCorrect: boolean }[] = [

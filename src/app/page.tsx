@@ -11,7 +11,6 @@ import {
   selectedTextFlow,
   question,
   answers,
-  TIME_BETWEEN_TEXT,
 } from "./consts";
 import { Input } from "../components/ui/input";
 import { useFormik } from "formik";
