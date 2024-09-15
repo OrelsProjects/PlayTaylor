@@ -7,10 +7,12 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     email = body.email;
+    const now = new Date();
 
     await prisma.interestedUser.create({
       data: {
         email,
+        signedUpAt: now,
       },
     });
     return NextResponse.json({}, { status: 201 });

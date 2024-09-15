@@ -9,13 +9,11 @@ import AuthProvider from "@/app/providers/AuthProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import TopLoaderProvider from "@/app/providers/TopLoaderProvider";
-import Script from "next/script";
 import BackgroundProvider from "@/app/providers/BackgroundProvider";
 import LoggersProvider from "@/app/providers/LoggersProvider";
 import GameListenerProvider from "@/app/providers/GameListenerProvider";
 import Loading from "@/components/ui/loading";
 import ShowGameDataProvider from "@/app/providers/ShowGameDataProvider";
-import { montserratAlternates } from "../lib/utils/fontUtils";
 
 const APP_NAME = "Play Taylor";
 const APP_DEFAULT_TITLE = "Play Taylor";
@@ -75,11 +73,11 @@ export default function Layout({ children }: RootLayoutProps) {
         <meta property="og:image:height" content="<generated>" />
         <meta name="google-adsense-account" content="ca-pub-5564324340797928" />
 
-        <Script
+        {/* <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5564324340797928"
           crossOrigin="anonymous"
-        ></Script>
+        ></Script> */}
       </head>
       <body>
         <Suspense
