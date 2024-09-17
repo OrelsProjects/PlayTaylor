@@ -23,6 +23,8 @@ export function useCustomRouter() {
     // HACK: If relative URL given, stick the current host on the string passed to URL()
     // as the constructor throws an error if URL without a host is given
     try {
+      if (typeof window === "undefined")
+        throw new Error("Window is not defined");
       const url = new URL(
         href.includes("http") ? href : window.location.host + href,
       );

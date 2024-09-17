@@ -76,11 +76,11 @@ const SignUpCompleted = () => (
         className="text-primary-gradient font-bold text-center text-xl"
       />
       <p className={cn("text-base text-center", roboto.className)}>
-        In the upcoming weeks, you&apos;ll receive all the updates about the new
+        In the upcoming weeks, you&aposll receive all the updates about the new
         game, as well as access to play it!
       </p>
       <TextWithLineBreaks
-        text={`We found wonderland,\nand you are about to get lost in it ;)`}
+        text={`We found wonderland,\nand you are about to get lost in it )`}
         className={cn("text-base font-medium text-center", roboto.className)}
       />
     </Card>
@@ -157,7 +157,7 @@ const MainCard = ({
   selectedText: string | null;
   isSignUpStage: boolean;
   showSignUp: boolean;
-  // signUpCompleted: boolean;
+  // signUpCompleted: boolean
   loadingSignUp: boolean;
   handleAnswer: (isCorrect: boolean) => void;
   onSignupCompleted: (email: string) => Promise<void>;
@@ -357,7 +357,7 @@ export default function LandingPage() {
       i = i % selectedTextFlow.length;
       setSelectedText(selectedTextFlow[i].text);
       i++;
-      // }, 400000);
+      // }, 400000)
     }, selectedTextFlow[i].duration);
   };
 
@@ -371,7 +371,7 @@ export default function LandingPage() {
       await new Promise(resolve => setTimeout(resolve, 3000));
     } catch (error) {
     } finally {
-      // setSignUpCompleted(true);
+      // setSignUpCompleted(true)
       setLoadingSignUp(false);
     }
   };

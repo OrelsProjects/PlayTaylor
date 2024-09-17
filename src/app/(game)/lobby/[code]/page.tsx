@@ -33,7 +33,6 @@ const Counter = ({
 
     const validCount =
       newCount === null || newCount === undefined ? 4 : newCount;
-    console.log("validCount", validCount);
     setCount(validCount);
 
     const validRoom = (newGame ? newGame : game) as Game;

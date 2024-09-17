@@ -22,7 +22,7 @@ export const GameStateButton = () => {
 
   const type = useMemo((): GameStateButtonType => {
     const stage = game?.stage;
-    console.log("stage", stage);
+
     if (!stage || stage === "paused") {
       return "pause";
     } else if (stage === "game-ended") {
@@ -64,7 +64,6 @@ export const GameStateButton = () => {
   };
 
   const ButtonIcon = useCallback(() => {
-    console.log("type", type);
     switch (type) {
       case "pause":
         return <FaPlay className="w-7 h-7" />;

@@ -24,14 +24,14 @@ export default function ContentLayout({
   return (
     <main className={cn(className)}>
       <NotificationsProvider />
-      <HeightProvider>
-        <AuthProvider>
-          <ContentProvider>
-            <TopLoaderProvider />
-            <AnimationProvider>{children}</AnimationProvider>
-          </ContentProvider>
-        </AuthProvider>
-      </HeightProvider>
+      {/* <HeightProvider> */}
+      <AuthProvider>
+        <ContentProvider>
+          <TopLoaderProvider />
+          <AnimationProvider>{children}</AnimationProvider>
+        </ContentProvider>
+      </AuthProvider>
+      {/* </HeightProvider> */}
     </main>
   );
 }

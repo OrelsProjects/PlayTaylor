@@ -16,13 +16,16 @@ export default function HeightProvider({
   const [width, setWidth] = React.useState<number>(0);
 
   useEffect(() => {
-    const handleResize = () => {
-      setHeight(window.innerHeight);
-      setWidth(window.innerWidth);
-    };
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
+    // if window is not defined, return
+    if (typeof window !== "undefined") {
+      const handleResize = () => {
+        setHeight(window.innerHeight);
+        setWidth(window.innerWidth);
+      };
+      window.addEventListener("resize", handleResize);
+      handleResize();
+      return () => window.removeEventListener("resize", handleResize);
+    }
   }, [window.innerHeight, window.innerWidth, window]);
 
   return (

@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCustomRouter } from "@/lib/hooks/useCustomRouter";
-import CustomLink from "../../../../../components/customLink";
+import CustomLink from "@/components/customLink";
 
 const Butterfly = ({ number }: { number: number }) => (
   <div className="w-10 h-[30px] relative flex flex-shrink-0 mt-1">

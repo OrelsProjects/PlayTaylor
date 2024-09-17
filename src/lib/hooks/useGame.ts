@@ -325,7 +325,6 @@ export default function useGame() {
       unsubscribe = onSnapshot(
         roomRef,
         snapshot => {
-          console.log("Game snapshot", snapshot.data());
           onChange(snapshot.data() as Game);
         },
         (error: any) => {
@@ -372,7 +371,6 @@ export default function useGame() {
       unsubscribe = onSnapshot(
         countersRef,
         snapshot => {
-          console.log("Counters snapshot", snapshot.data());
           onChange(snapshot.data() as Counters);
         },
         (error: any) => {
