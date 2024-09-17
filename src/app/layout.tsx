@@ -88,17 +88,15 @@ export default function Layout({ children }: RootLayoutProps) {
           <StoreProvider>
             <SessionWrapper>
               <ThemeProvider>
-                <AuthProvider>
-                  <TopLoaderProvider />
-                  <LoggersProvider />
-                  <GameListenerProvider />
-                  <ShowGameDataProvider />
-                  <BackgroundProvider className="w-full h-svh flex flex-col background-gradient">
-                    {children}
-                  </BackgroundProvider>
-                  <SpeedInsights />
-                  <Analytics />
-                </AuthProvider>
+                <TopLoaderProvider />
+                <LoggersProvider />
+                <GameListenerProvider />
+                <ShowGameDataProvider />
+                <BackgroundProvider className="w-full h-svh flex flex-col background-gradient">
+                  {children}
+                </BackgroundProvider>
+                <SpeedInsights />
+                <Analytics />
               </ThemeProvider>
             </SessionWrapper>
           </StoreProvider>

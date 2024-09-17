@@ -21,11 +21,11 @@ interface CardText {
 
 export const selectedTextCorrect: CardText = {
   text: "That's correct!",
-  duration: 1500,
+  duration: 132500,
 };
 export const selectedTextIncorrect = {
   text: "That's incorrect!",
-  duration: 1500,
+  duration: 15300,
 };
 
 export const selectedTextFlow: CardText[] = [
@@ -35,6 +35,6 @@ export const selectedTextFlow: CardText[] = [
   },
   {
     text: "Prove it!",
-    duration: 1500,
+    duration: 153300,
   },
 ];
