@@ -12,6 +12,7 @@ import {
   selectedTextFlow,
   question,
   answers,
+  sectionText,
 } from "./consts";
 import { Input } from "../components/ui/input";
 import { useFormik } from "formik";
@@ -76,7 +77,7 @@ const SignUpCompleted = () => (
         className="text-primary-gradient font-bold text-center text-xl"
       />
       <p className={cn("text-base text-center", roboto.className)}>
-        In the upcoming weeks, you&aposll receive all the updates about the new
+        In the upcoming weeks, you&apos;ll receive all the updates about the new
         game, as well as access to play it!
       </p>
       <TextWithLineBreaks
@@ -165,13 +166,13 @@ const MainCard = ({
   const [didSignUpComplete, setDidSignUpComplete] = useState(false);
 
   return (
-    <div className="w-full h-fit flex">
+    <div className="w-full h-full md:max-h-[360px] flex">
       <AnimatePresence mode="popLayout">
         {!selectedText && !isSignUpStage && (
           <div
             key="no-selected-text"
             className={cn(
-              "w-full max-h-[550px] md:h-[300px] rounded-lg relative",
+              "w-full max-h-[550px] md:h-[360px] rounded-lg relative",
               {
                 "absolute inset-0": selectedText,
               },
@@ -179,14 +180,19 @@ const MainCard = ({
           >
             <Card
               src="/landing-card-left-mobile.png"
-              className="w-fit h-fit shadow-md rounded-lg flex flex-row justify-start items-center"
+              className="w-full h-fit shadow-md rounded-lg flex flex-row justify-start items-center"
             >
               <div className="w-full h-full flex flex-col md:flex-row md:justify-between items-center py-6 px-8 md:px-14 gap-8 md:gap-32">
-                <TextWithLineBreaks
-                  text={question}
-                  className="text-[28px] md:text-[40px] leading-8 md:leading-[56px] font-bold text-background text-center"
-                />
-                <div className="w-fit h-fit grid grid-cols-[repeat(var(--answers-in-row-landing-mobile),minmax(0,1fr))] md:grid-cols-[repeat(var(--answers-in-row-landing),minmax(0,1fr))] gap-4">
+                <div className="w-fit h-full flex flex-col gap-2.5">
+                  <TextWithLineBreaks
+                    text={question}
+                    className="text-[28px] md:text-[40px] leading-8 md:leading-[56px] font-bold text-background text-start"
+                  />
+                  <p className="text-background font-semibold">
+                    100 Swifties have already answered!
+                  </p>
+                </div>
+                <div className="w-full md:w-fit h-fit grid grid-cols-[repeat(var(--answers-in-row-landing-mobile),minmax(0,1fr))] md:grid-cols-[repeat(var(--answers-in-row-landing),minmax(0,1fr))] gap-4">
                   {answers.map(({ answer, isCorrect }) => (
                     <Button
                       key={answer}
@@ -253,26 +259,20 @@ const Section = ({
   title,
   body,
   image,
+  className,
 }: {
   title: string;
   body: string;
+  className?: string;
   image?: {
     src: string;
     alt: string;
   };
 }) => (
-  <div className="w-full h-fit flex flex-col gap-6">
+  <div className={cn("w-full h-fit flex flex-col gap-6", className)}>
     <div className="w-full h-fit flex flex-col gap-4">
-      <h3 className="font-bold text-xl text-foreground">
-        {/* All you have to do is play! */}
-        {title}
-      </h3>
-      <p className="font-medium">
-        {/* A new Trivia game that is all about our favourite artist! Gather your
-        friends for an unforgettable night, and find out who knows best about
-        our beloved blondie, and her music!! */}
-        {body}
-      </p>
+      <h3 className="font-bold text-xl text-foreground">{title}</h3>
+      <p className="font-medium">{body}</p>
     </div>
 
     {image && (
@@ -379,7 +379,7 @@ export default function LandingPage() {
   return (
     <div
       className={cn(
-        "w-full h-full flex flex-col justify-start items-center px-6 py-6 md:px-80 md:py-20 relative gap-6 overflow-auto",
+        "w-full h-full flex flex-col justify-start items-center px-6 py-6 md:px-20 md:py-20 relative gap-6 overflow-auto bg-background",
         montserratAlternates.className,
       )}
     >
@@ -392,24 +392,36 @@ export default function LandingPage() {
         handleAnswer={handleAnswer}
         onSignupCompleted={onSignupCompleted}
       />
-      <Section
-        title="All you have to do is play!"
-        body="A new Trivia game that is all about our favourite artist! Gather your friends for an unforgettable night, and find out who knows best about our beloved blondie, and her music!!"
-        image={{
-          src: "/Manuscript.png",
-          alt: "Manuscript",
-        }}
-      />
-      <Section
-        title="Are you going to the Eras Tour ? We've got you covered!"
-        body="Whether you're in the VIP line early in the morning or waiting inside the stadium for the show to start, just pull out your phone and play Taylor!"
-        image={{ src: "/taylor-muscle.png", alt: "Taylor Swift" }}
-      />
-      <Section
-        title="Having a Tay Tay themed night?"
-        body="Add some fun competition to see who’s the top Swiftie and knows it all.  Just play Taylor!"
-        // image={{ src: "/taylor-muscle.png", alt: "Taylor Swift" }}
-      />
+      {sectionText.map(({ title, body, src, alt }) => (
+        <Section
+          key={title}
+          title={title}
+          body={body}
+          className="md:hidden"
+          image={
+            src && alt
+              ? {
+                  src,
+                  alt,
+                }
+              : undefined
+          }
+        />
+      ))}
+      <div className="hidden md:flex flex-row gap-[54px]">
+        <div className="flex flex-col gap-10 flex-shrink">
+          {sectionText.map(({ title, body }) => (
+            <Section key={title} title={title} body={body} />
+          ))}
+        </div>
+        <Image
+          src="/taylor-cat.png"
+          alt="taylor-cat"
+          width={300}
+          height={300}
+          className=" rounded-2xl"
+        />
+      </div>
       <BottomSignUpCard
         loadingSignUp={loadingSignUp}
         onSignupCompleted={onSignupCompleted}

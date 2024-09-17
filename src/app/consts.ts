@@ -38,3 +38,22 @@ export const selectedTextFlow: CardText[] = [
     duration: 153300,
   },
 ];
+
+export const sectionText = [
+  {
+    title: "All you have to do is play!",
+    body: "A new Trivia game that is all about our favourite artist! Gather your friends for an unforgettable night, and find out who knows best about our beloved blondie, and her music!!",
+    src: "/taylor-muscle.png",
+    alt: "taylor-muscle",
+  },
+  {
+    title: "Are you going to the Eras Tour ? We've got you covered!",
+    body: "Whether you're in the VIP line early in the morning or waiting inside the stadium for the show to start, just pull out your phone and play Taylor!",
+    src: "/taylor-cat.png",
+    alt: "taylor-cat",
+  },
+  {
+    title: "Having a Tay Tay themed night?",
+    body: "Add some fun competition to see who’s the top Swiftie and knows it all.  Just play Taylor!",
+  },
+];
