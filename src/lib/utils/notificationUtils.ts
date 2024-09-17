@@ -6,7 +6,8 @@ export const canUseNotifications = () => {
 };
 
 export const isMobilePhone = () => {
-  if (navigator) {
+  // check if navigator is available
+  if (typeof navigator !== "undefined") {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent,
     );
