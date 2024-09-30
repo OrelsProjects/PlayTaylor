@@ -368,7 +368,6 @@ export default function LandingPage() {
     setLoadingSignUp(true);
     try {
       await axios.post("api/sign-interested-user", { email });
-      await new Promise(resolve => setTimeout(resolve, 3000));
     } catch (error) {
     } finally {
       // setSignUpCompleted(true)
