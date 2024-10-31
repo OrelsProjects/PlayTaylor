@@ -36,7 +36,7 @@ export const selectedTextFlow: CardText[] = [
   },
   {
     text: "Prove it!",
-    duration: 153300,
+    duration: 1500, 
   },
 ];
 

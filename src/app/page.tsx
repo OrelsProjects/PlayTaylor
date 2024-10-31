@@ -59,7 +59,7 @@ const Card = ({
   <motion.div
     {...slideAnimationProps}
     className={cn(
-      "w-full h-full md:min-h-[224px] relative flex justify-center items-center z-10",
+      "w-full h-fit min-h-[264px] relative flex justify-center items-center z-10",
       { "bg-background rounded-lg": !src },
       className,
     )}
@@ -339,7 +339,7 @@ const BottomSignUpCard = ({
         <Card
           key="sign-up-completed-bottom"
           src="/landing-card-right.png"
-          className="w-full h-fit flex flex-col justify-center items-center gap-6"
+          className="w-full h-fit flex flex-col justify-center items-center gap-6 px-5 py-6"
         >
           <TextWithLineBreaks
             text={`<strong>It’s nice to have a friend!</strong> \nShare the game with your fellow Swifties! 🎉`}
@@ -351,7 +351,7 @@ const BottomSignUpCard = ({
         <Card
           key="sign-up-bottom"
           src="/landing-card-right.png"
-          className="w-full h-fit flex flex-col justify-center items-center gap-6"
+          className="w-full h-fit flex flex-col justify-center items-center gap-6 px-5 py-6"
         >
           <TextWithLineBreaks
             text={`Think you’ve got what it takes to shine shine shine?\n Then sign up and <strong>play play play!</strong>`}
