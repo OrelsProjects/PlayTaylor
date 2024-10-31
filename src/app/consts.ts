@@ -5,13 +5,20 @@ export const slideAnimationProps = {
   transition: { duration: 0.5, ease: "easeInOut" },
 };
 
+export const slideFromTopAnimationProps = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0, transition: { duration: 0.5 } },
+  transition: { duration: 0.9, ease: "easeInOut", delay: 0.5 },
+};
+
 export const question =
-  "Who has Taylor Swift endorsed\n for the upcoming election?";
+  "In which city did Taylor Swift\ncall Sabrina Carpenter on the\n phone on stage?";
 export const answers: { answer: string; isCorrect: boolean }[] = [
-  { answer: "Jill Stein", isCorrect: false },
-  { answer: "Cornel West", isCorrect: false },
-  { answer: "Donald Trump", isCorrect: false },
-  { answer: "Kamala Harris", isCorrect: true },
+  { answer: "New Orleans", isCorrect: true },
+  { answer: "London", isCorrect: false },
+  { answer: "Indianapolis", isCorrect: false },
+  { answer: "Miami", isCorrect: false },
 ];
 
 interface CardText {
@@ -19,14 +26,8 @@ interface CardText {
   duration: number;
 }
 
-export const selectedTextCorrect: CardText = {
-  text: "That's correct!",
-  duration: 132500,
-};
-export const selectedTextIncorrect = {
-  text: "That's incorrect!",
-  duration: 15300,
-};
+export const selectedTextCorrect = "That's correct!";
+export const selectedTextIncorrect = "That's incorrect!";
 
 export const selectedTextFlow: CardText[] = [
   {
@@ -43,8 +44,8 @@ export const sectionText = [
   {
     title: "All you have to do is play!",
     body: "A new Trivia game that is all about our favourite artist! Gather your friends for an unforgettable night, and find out who knows best about our beloved blondie, and her music!!",
-    src: "/taylor-muscle.png",
-    alt: "taylor-muscle",
+    src: "/taylor-sabrina.png",
+    alt: "taylor and sabrina carpenter",
   },
   {
     title: "Are you going to the Eras Tour ? We've got you covered!",

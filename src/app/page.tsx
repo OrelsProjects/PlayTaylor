@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "../lib/utils";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../components/ui/button";
+import { GiQueenCrown as Crown } from "react-icons/gi";
+
 import {
   slideAnimationProps,
   selectedTextCorrect,
@@ -13,11 +15,20 @@ import {
   question,
   answers,
   sectionText,
+  slideFromTopAnimationProps,
 } from "./consts";
 import { Input } from "../components/ui/input";
 import { useFormik } from "formik";
 import { montserratAlternates, roboto } from "../lib/utils/fontUtils";
 import axios from "axios";
+import { toast } from "react-toastify";
+import Loading from "../components/ui/loading";
+import { Skeleton } from "../components/ui/skeleton";
+
+interface InterestedUsersCount {
+  loading: boolean;
+  data: { count: number };
+}
 
 const TextWithLineBreaks = ({
   text,
@@ -46,10 +57,9 @@ const Card = ({
   children: React.ReactNode;
 }) => (
   <motion.div
-    // slide animation
     {...slideAnimationProps}
     className={cn(
-      "w-full h-full min-h-[224px] relative flex justify-center items-center z-10 py-6 px-3",
+      "w-full h-full md:min-h-[224px] relative flex justify-center items-center z-10",
       { "bg-background rounded-lg": !src },
       className,
     )}
@@ -67,9 +77,10 @@ const Card = ({
 );
 
 const SignUpCompleted = () => (
-  <div
+  <motion.div
+    {...slideAnimationProps}
     key={"completed-sign-up"}
-    className="w-full aspect-video md:h-44 rounded-lg relative"
+    className="w-full md:h-full rounded-lg relative shadow-lg"
   >
     <Card className="w-full h-fit flex flex-col justify-center items-center gap-6 py-6 px-8">
       <TextWithLineBreaks
@@ -81,18 +92,19 @@ const SignUpCompleted = () => (
         game, as well as access to play it!
       </p>
       <TextWithLineBreaks
-        text={`We found wonderland,\nand you are about to get lost in it )`}
+        text={`We found wonderland,\nand you are about to get lost in it :)`}
         className={cn("text-base font-medium text-center", roboto.className)}
       />
     </Card>
-  </div>
+  </motion.div>
 );
 
 const SignUpForm: React.FC<{
+  isSignUpCompleted: boolean;
   onSignupCompleted: (email: string) => Promise<void>;
   loading: boolean;
-}> = ({ onSignupCompleted, loading }) => {
-  const [signUpCompleted, setSignUpCompleted] = useState(false);
+}> = ({ isSignUpCompleted, onSignupCompleted, loading }) => {
+  const [signUpCompleted, setSignUpCompleted] = useState(isSignUpCompleted);
 
   const formik = useFormik({
     initialValues: {
@@ -102,47 +114,54 @@ const SignUpForm: React.FC<{
       if (!values.email) {
         formik.setFieldError("email", "Email is required");
       } else {
-        onSignupCompleted(values.email).finally(() => {
-          setSignUpCompleted(true);
-          setTimeout(() => {
-            setSignUpCompleted(false);
-          }, 20000);
-        });
+        onSignupCompleted(values.email)
+          .then(() => {
+            setSignUpCompleted(true);
+          })
+          .catch(() => {
+            toast.error("Something went wrong.. try again? 💪");
+          });
       }
     },
   });
-
+  // iin order to make the next animation appear on top of the previous one, we need to use the AnimatePresence component from Framer Motion. This component will handle the animations of the children components, and it will make sure that only one child is rendered at a time. This way, we can switch between the sign-up form and the sign-up completed message with a smooth animation.
   return (
-    <AnimatePresence mode="popLayout">
-      {signUpCompleted ? (
-        <SignUpCompleted key="sign-up-completed" />
-      ) : (
-        <Card className="w-full h-fit flex flex-col justify-center items-center gap-8 py-6 px-8">
-          <TextWithLineBreaks
-            text={`Sign up now to get access to the new\n Taylor Swift Trivia game!`}
-            className="text-primary-gradient font-bold text-center"
-          />
-          <form
+    <>
+      <AnimatePresence mode="popLayout">
+        {signUpCompleted && <SignUpCompleted key="sign-up-completed" />}
+      </AnimatePresence>
+      {!signUpCompleted && (
+        <AnimatePresence mode="popLayout">
+          <Card
             key="sign-up-form"
-            className="w-full h-full flex flex-col gap-3"
-            onSubmit={formik.handleSubmit}
+            className="w-full h-fit flex flex-col justify-center items-center gap-8 py-6 px-8 border border-foreground/20"
           >
-            <Input
-              type="email"
-              name="email"
-              placeholder="taytay@gmail.com"
-              error={formik.errors.email}
-              required
-              value={formik.values.email}
-              onChange={formik.handleChange}
+            <TextWithLineBreaks
+              text={`Sign up now to get access to the new\n Taylor Swift Trivia game!`}
+              className="text-primary-gradient font-bold text-center"
             />
-            <Button type="submit" isLoading={loading}>
-              I am ready for it
-            </Button>
-          </form>
-        </Card>
+            <form
+              key="sign-up-form"
+              className="w-full h-full flex flex-col gap-3"
+              onSubmit={formik.handleSubmit}
+            >
+              <Input
+                type="email"
+                name="email"
+                placeholder="taytay@gmail.com"
+                error={formik.errors.email}
+                required
+                value={formik.values.email}
+                onChange={formik.handleChange}
+              />
+              <Button type="submit" isLoading={loading}>
+                I am ready for it
+              </Button>
+            </form>
+          </Card>
+        </AnimatePresence>
       )}
-    </AnimatePresence>
+    </>
   );
 };
 
@@ -150,47 +169,61 @@ const MainCard = ({
   selectedText,
   isSignUpStage,
   showSignUp,
-  // signUpCompleted,
+  signUpCompleted,
   loadingSignUp,
   handleAnswer,
+  interestedUsersCount,
   onSignupCompleted,
 }: {
   selectedText: string | null;
   isSignUpStage: boolean;
   showSignUp: boolean;
-  // signUpCompleted: boolean
+  signUpCompleted: boolean;
   loadingSignUp: boolean;
+  interestedUsersCount: InterestedUsersCount;
   handleAnswer: (isCorrect: boolean) => void;
   onSignupCompleted: (email: string) => Promise<void>;
 }) => {
-  const [didSignUpComplete, setDidSignUpComplete] = useState(false);
+  const interestedCount = useMemo(() => {
+    if (interestedUsersCount.data.count > 100) {
+      return 100 + interestedUsersCount.data.count;
+    } else {
+      return 100 + interestedUsersCount.data.count;
+    }
+  }, [interestedUsersCount.data.count]);
 
   return (
-    <div className="w-full h-full md:max-h-[360px] flex">
+    <div className="w-full h-fit md:max-h-[320px] flex">
       <AnimatePresence mode="popLayout">
         {!selectedText && !isSignUpStage && (
           <div
             key="no-selected-text"
-            className={cn(
-              "w-full max-h-[550px] md:h-[360px] rounded-lg relative",
-              {
-                "absolute inset-0": selectedText,
-              },
-            )}
+            className={cn("w-full h-fit md:h-[320px] rounded-lg relative", {
+              "absolute inset-0": selectedText,
+            })}
           >
             <Card
               src="/landing-card-left-mobile.png"
-              className="w-full h-fit shadow-md rounded-lg flex flex-row justify-start items-center"
+              className="w-full h-fit shadow-md rounded-lg flex flex-row justify-center items-center"
             >
-              <div className="w-full h-full flex flex-col md:flex-row md:justify-between items-center py-6 px-8 md:px-14 gap-8 md:gap-32">
-                <div className="w-fit h-full flex flex-col gap-2.5">
+              <div className="w-full h-full flex flex-col md:flex-row justify-between items-center py-8 px-5 md:px-14 gap-8 md:gap-32">
+                <div className="w-fit max-w-full md:max-w-[60%] h-full flex flex-col gap-2.5">
                   <TextWithLineBreaks
                     text={question}
-                    className="text-[28px] md:text-[40px] leading-8 md:leading-[56px] font-bold text-background text-start"
+                    className="text-[28px] md:text-[40px] leading-9 md:leading-[56px] font-bold text-background text-start"
                   />
-                  <p className="text-background font-semibold">
-                    100 Swifties have already answered!
-                  </p>
+                  <div className="w-full h-fit flex flex-row gap-2">
+                    {interestedUsersCount.loading ? (
+                      <Skeleton className="w-80 h-6 bg-background/25" />
+                    ) : (
+                      <>
+                        <Crown className="fill-background h-6 w-6" />
+                        <p className="text-background font-semibold">
+                          {interestedCount} Swifties have already answered!
+                        </p>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="w-full md:w-fit h-fit grid grid-cols-[repeat(var(--answers-in-row-landing-mobile),minmax(0,1fr))] md:grid-cols-[repeat(var(--answers-in-row-landing),minmax(0,1fr))] gap-4">
                   {answers.map(({ answer, isCorrect }) => (
@@ -214,7 +247,7 @@ const MainCard = ({
           <motion.div
             {...slideAnimationProps}
             key={"selected-text-card"}
-            className="w-full aspect-video md:h-44 rounded-lg relative"
+            className="w-full aspect-video md:aspect-auto md:h-fit rounded-lg relative"
           >
             <Card
               src="/landing-card-right.png"
@@ -240,9 +273,10 @@ const MainCard = ({
         {showSignUp && (
           <div
             key={selectedText}
-            className="w-full aspect-video md:h-44 rounded-lg relative"
+            className="w-full aspect-video md:aspect-auto md:h-fit rounded-lg relative"
           >
             <SignUpForm
+              isSignUpCompleted={signUpCompleted}
               onSignupCompleted={(email: string) => {
                 return onSignupCompleted(email);
               }}
@@ -269,7 +303,7 @@ const Section = ({
     alt: string;
   };
 }) => (
-  <div className={cn("w-full h-fit flex flex-col gap-6", className)}>
+  <motion.div className={cn("w-full h-fit flex flex-col gap-6", className)}>
     <div className="w-full h-fit flex flex-col gap-4">
       <h3 className="font-bold text-xl text-foreground">{title}</h3>
       <p className="font-medium">{body}</p>
@@ -277,46 +311,57 @@ const Section = ({
 
     {image && (
       <Image
-        // src="/Manuscript.png"
         src={image.src}
         alt={image.alt}
         fill
-        className="!relative !w-full !h-[152px] object-cover object-top rounded-2xl"
+        className="!relative !w-full !h-[152px] object-cover rounded-2xl"
       />
     )}
-  </div>
+  </motion.div>
 );
 
 const BottomSignUpCard = ({
   loadingSignUp,
+  signUpCompleted,
+  onShareLink,
   onSignupCompleted,
 }: {
   loadingSignUp: boolean;
+  signUpCompleted: boolean;
+  onShareLink: () => void;
   onSignupCompleted: (email: string) => Promise<void>;
 }) => {
   const [showSignUp, setShowSignUp] = React.useState(false);
 
   return (
     <AnimatePresence mode="popLayout">
-      {!showSignUp ? (
+      {signUpCompleted ? (
         <Card
+          key="sign-up-completed-bottom"
           src="/landing-card-right.png"
           className="w-full h-fit flex flex-col justify-center items-center gap-6"
         >
-          {/* <motion.div
-              {...slideAnimationProps}
-              key="sign-up-button"
-              className="w-full h-fit flex flex-col justify-center items-center gap-6 py-6 px-8"
-            > */}
           <TextWithLineBreaks
-            text={`Think you’ve got what it takes to shine shine shine? Then sign up and play play play!`}
-            className="text-background font-medium text-center"
+            text={`<strong>It’s nice to have a friend!</strong> \nShare the game with your fellow Swifties! 🎉`}
+            className="text-background text-2xl md:text-4xl font-medium text-center"
+          />
+          <Button onClick={() => onShareLink()}>Share link</Button>
+        </Card>
+      ) : !showSignUp ? (
+        <Card
+          key="sign-up-bottom"
+          src="/landing-card-right.png"
+          className="w-full h-fit flex flex-col justify-center items-center gap-6"
+        >
+          <TextWithLineBreaks
+            text={`Think you’ve got what it takes to shine shine shine?\n Then sign up and <strong>play play play!</strong>`}
+            className="text-background text-2xl md:text-4xl font-medium text-center"
           />
           <Button onClick={() => setShowSignUp(true)}>Sign Up</Button>
-          {/* </motion.div> */}
         </Card>
       ) : (
         <SignUpForm
+          isSignUpCompleted={signUpCompleted}
           onSignupCompleted={(email: string) => {
             return onSignupCompleted(email);
           }}
@@ -331,14 +376,47 @@ export default function LandingPage() {
   const [selectedText, setSelectedText] = React.useState<string | null>(null);
   const [showSignUp, setShowSignUp] = React.useState(false);
   const [loadingSignUp, setLoadingSignUp] = React.useState(false);
+  const [signUpCompleted, setSignUpCompleted] = React.useState(false);
+  const interestedUsersCountLoading = useRef(false);
+  const [interestedUsersCount, setInterestedUsersCount] =
+    React.useState<InterestedUsersCount>({
+      loading: false,
+      data: { count: 0 },
+    });
 
   const selectedTextInterval = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    if (interestedUsersCountLoading.current) return;
+    interestedUsersCountLoading.current = true;
+    axios
+      .get("api/interested-user")
+      .then(({ data }) => {
+        setInterestedUsersCount({
+          loading: false,
+          data: {
+            count: data.count,
+          },
+        });
+      })
+      .catch(() => {
+        setInterestedUsersCount({
+          loading: false,
+          data: {
+            count: 0,
+          },
+        });
+      })
+      .finally(() => {
+        interestedUsersCountLoading.current = false;
+      });
+  }, []);
+
   const handleAnswer = (isCorrect: boolean) => {
     if (isCorrect) {
-      setSelectedText(selectedTextCorrect.text);
+      setSelectedText(selectedTextCorrect);
     } else {
-      setSelectedText(selectedTextIncorrect.text);
+      setSelectedText(selectedTextIncorrect);
     }
     // start flow, change text every 2 seconds
     let i = 0;
@@ -367,28 +445,47 @@ export default function LandingPage() {
     if (loadingSignUp) return;
     setLoadingSignUp(true);
     try {
-      await axios.post("api/sign-interested-user", { email });
+      await axios.post("api/interested-user", { email });
+      setSignUpCompleted(true);
     } catch (error) {
+      toast.error("Something went wrong.. try again? 💪");
     } finally {
-      // setSignUpCompleted(true)
       setLoadingSignUp(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (navigator?.share) {
+      try {
+        await navigator.share({
+          title: "Check out this app!",
+          text: "I found this amazing app!",
+          url: window.location.href, // or any URL you want to share
+        });
+        console.log("Content shared successfully");
+      } catch (error) {
+        console.error("Error sharing", error);
+      }
+    } else {
+      console.log("Web Share API is not supported in this browser.");
     }
   };
 
   return (
     <div
       className={cn(
-        "w-full h-full flex flex-col justify-start items-center px-6 py-6 md:px-20 md:py-20 relative gap-6 overflow-auto bg-background",
+        "w-full h-full flex flex-col justify-start items-center px-5 py-6 md:px-20 xl:px-40 md:py-20 relative gap-6 overflow-auto bg-background",
         montserratAlternates.className,
       )}
     >
       <MainCard
+        signUpCompleted={signUpCompleted}
         selectedText={selectedText}
         isSignUpStage={isSignUpStage}
         showSignUp={showSignUp}
-        // signUpCompleted={signUpCompleted}
         loadingSignUp={loadingSignUp}
         handleAnswer={handleAnswer}
+        interestedUsersCount={interestedUsersCount}
         onSignupCompleted={onSignupCompleted}
       />
       {sectionText.map(({ title, body, src, alt }) => (
@@ -407,23 +504,28 @@ export default function LandingPage() {
           }
         />
       ))}
-      <div className="hidden md:flex flex-row gap-[54px]">
+      <motion.div
+        {...slideFromTopAnimationProps}
+        className="hidden md:flex flex-row gap-[54px]"
+      >
         <div className="flex flex-col gap-10 flex-shrink">
           {sectionText.map(({ title, body }) => (
             <Section key={title} title={title} body={body} />
           ))}
         </div>
         <Image
-          src="/taylor-cat.png"
-          alt="taylor-cat"
+          src="/taylor-sabrina.png"
+          alt="landing-page-taylor"
           width={300}
           height={300}
           className=" rounded-2xl"
         />
-      </div>
+      </motion.div>
       <BottomSignUpCard
+        onShareLink={() => handleShare()}
         loadingSignUp={loadingSignUp}
         onSignupCompleted={onSignupCompleted}
+        signUpCompleted={signUpCompleted}
       />
     </div>
   );

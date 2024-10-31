@@ -17,11 +17,27 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({}, { status: 201 });
   } catch (error: any) {
-    // if duplicate, return 200
     if (error.code === "P2002") {
       return NextResponse.json({}, { status: 200 });
     }
-    loggerServer.error("Error in sign-interested-user route", email, {
+    loggerServer.error("Error signing new user", email, {
+      data: { error },
+    });
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 },
+    );
+  }
+}
+
+// write a get function that returns all the interested users in objecT: {count: number}, like the function above
+
+export async function GET() {
+  try {
+    const count = await prisma.interestedUser.count();
+    return NextResponse.json({ count }, { status: 200 });
+  } catch (error: any) {
+    loggerServer.error("Error in getting interested users", "system", {
       data: { error },
     });
     return NextResponse.json(
