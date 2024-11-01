@@ -25,6 +25,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Skeleton } from "../components/ui/skeleton";
 import { isMobilePhone } from "../lib/utils/notificationUtils";
+import { EventTracker } from "../eventTracker";
 
 const MAX_TRIES = 1;
 
@@ -566,6 +567,7 @@ export default function LandingPage() {
     if (loadingSignUp) return;
     setLoadingSignUp(true);
     try {
+      EventTracker.track("sign_up", { email });
       await axios.post("api/interested-user", { email });
       setSignUpCompleted(true);
     } catch (error) {
