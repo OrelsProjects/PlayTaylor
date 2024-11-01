@@ -568,6 +568,7 @@ export default function LandingPage() {
     setLoadingSignUp(true);
     try {
       EventTracker.track("sign_up", { email });
+      console.log("sign_up", { email });
       await axios.post("api/interested-user", { email });
       setSignUpCompleted(true);
     } catch (error) {
