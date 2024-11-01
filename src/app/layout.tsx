@@ -97,6 +97,7 @@ export default function Layout({ children }: RootLayoutProps) {
                     pauseOnHover={false}
                   />
                 </div>
+                <LoggersProvider />
                 <BackgroundProvider className="w-full h-svh flex flex-col background-gradient">
                   {children}
                 </BackgroundProvider>
