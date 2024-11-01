@@ -601,7 +601,7 @@ export default function LandingPage() {
   return (
     <div
       className={cn(
-        "w-full h-full flex flex-col gap-12 md:gap-10 px-5 md:px-20 xl:px-40 relative overflow-auto bg-background scrollbar-hide",
+        "w-full h-full flex flex-col gap-6 md:gap-10 px-5 md:px-20 xl:px-40 relative overflow-auto bg-background scrollbar-hide",
         montserratAlternates.className,
       )}
     >
