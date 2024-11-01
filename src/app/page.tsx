@@ -80,7 +80,7 @@ const Card = ({
 );
 
 const SignUpCompleted = ({
-  variant,
+  variant = "top",
   onShare,
 }: {
   variant?: "top" | "bottom";
@@ -118,7 +118,7 @@ const SignUpCompleted = ({
           <div className="h-full flex flex-col justify-between items-center gap-3 md:gap-12">
             <TextWithLineBreaks
               text={`<strong>It’s nice to have a friend!</strong>\n Share the game with your fellow Swifties! 🎉`}
-              className="text-center text-2xl md:text-[2.5rem] md:leading-[3rem] text-background"
+              className="text-center text-2xl md:text-[2.5rem] md:leading-[3rem] text-foreground"
             />
             <Button onClick={onShare}>Share link</Button>
           </div>
@@ -175,8 +175,8 @@ const SignUpForm: React.FC<{
             className="w-full h-fit flex flex-col justify-center items-center gap-8 py-6 px-8 border border-foreground/20"
           >
             <TextWithLineBreaks
-              text={`Sign up now to get access to the new\n Taylor Swift Trivia game!`}
-              className="text-primary-gradient font-bold text-center"
+              text={`Sign up now to get access to the new\nTaylor Swift Trivia game!`}
+              className="text-primary-gradient text-sm font-semibold text-center"
             />
             <form
               key="sign-up-form"
