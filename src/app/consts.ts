@@ -57,8 +57,8 @@ export const sectionText = [
   {
     title: "Are you going to the Eras Tour ? We've got you covered!",
     body: "Whether you're in the VIP line early in the morning or waiting inside the stadium for the show to start, just pull out your phone and play Taylor!",
-    src: "/taylor-cat.png",
-    alt: "taylor-cat",
+    src: "/taylor-muscle.png",
+    alt: "taylor-muscle",
   },
   {
     title: "Having a Tay Tay themed night?",
