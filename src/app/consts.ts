@@ -29,6 +29,13 @@ interface CardText {
 export const selectedTextCorrect = "That's correct!";
 export const selectedTextIncorrect = "That's incorrect!";
 
+export const triesLeftTextFlow: CardText[] = [
+  {
+    text: "The past is the past\nhere's one more chance",
+    duration: 3000,
+  },
+];
+
 export const selectedTextFlow: CardText[] = [
   {
     text: "Think you are a\n Taylor Swift\n Mastermind?",
@@ -36,7 +43,7 @@ export const selectedTextFlow: CardText[] = [
   },
   {
     text: "Prove it!",
-    duration: 1500, 
+    duration: 1500,
   },
 ];
 

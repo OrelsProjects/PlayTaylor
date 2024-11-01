@@ -88,6 +88,16 @@
     @apply bg-gradient-to-tl from-[hsla(288,78%,93%,1)] via-[hsla(288,28%,93%,1)] to-[hsla(276,100%,99%,1)];
   }
 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-visible {
+    -ms-overflow-style: auto;
+    scrollbar-width: auto;
+  }
+
   .title-main {
     @apply font-bold text-[40px] leading-[50px];
   }

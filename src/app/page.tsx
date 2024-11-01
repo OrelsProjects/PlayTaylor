@@ -16,14 +16,17 @@ import {
   answers,
   sectionText,
   slideFromTopAnimationProps,
+  triesLeftTextFlow,
 } from "./consts";
 import { Input } from "../components/ui/input";
 import { useFormik } from "formik";
 import { montserratAlternates, roboto } from "../lib/utils/fontUtils";
 import axios from "axios";
 import { toast } from "react-toastify";
-import Loading from "../components/ui/loading";
 import { Skeleton } from "../components/ui/skeleton";
+import { isMobilePhone } from "../lib/utils/notificationUtils";
+
+const MAX_TRIES = 1;
 
 interface InterestedUsersCount {
   loading: boolean;
@@ -76,34 +79,63 @@ const Card = ({
   </motion.div>
 );
 
-const SignUpCompleted = () => (
-  <motion.div
-    {...slideAnimationProps}
-    key={"completed-sign-up"}
-    className="w-full md:h-full rounded-lg relative shadow-lg"
-  >
-    <Card className="w-full h-fit flex flex-col justify-center items-center gap-6 py-6 px-8">
-      <TextWithLineBreaks
-        text={`It is Enchanting to meet you!`}
-        className="text-primary-gradient font-bold text-center text-xl"
-      />
-      <p className={cn("text-base text-center", roboto.className)}>
-        In the upcoming weeks, you&apos;ll receive all the updates about the new
-        game, as well as access to play it!
-      </p>
-      <TextWithLineBreaks
-        text={`We found wonderland,\nand you are about to get lost in it :)`}
-        className={cn("text-base font-medium text-center", roboto.className)}
-      />
-    </Card>
-  </motion.div>
-);
+const SignUpCompleted = ({
+  variant,
+  onShare,
+}: {
+  variant?: "top" | "bottom";
+  onShare?: () => void;
+}) => {
+  return (
+    <motion.div
+      {...slideAnimationProps}
+      key={"completed-sign-up"}
+      className="w-full md:h-full rounded-lg relative shadow-lg"
+    >
+      <Card
+        src={variant === "bottom" ? "/landing-card-right.png" : undefined}
+        className="w-full h-fit flex flex-col justify-center items-center gap-6 py-6 px-8"
+      >
+        {variant === "top" ? (
+          <>
+            <TextWithLineBreaks
+              text={`It is Enchanting to meet you!`}
+              className="text-primary-gradient font-bold text-center text-xl"
+            />
+            <p className={cn("text-base text-center", roboto.className)}>
+              In the upcoming weeks, you&apos;ll receive all the updates about
+              the new game, as well as access to play it!
+            </p>
+            <TextWithLineBreaks
+              text={`We found wonderland,\nand you are about to get lost in it :)`}
+              className={cn(
+                "text-base font-medium text-center",
+                roboto.className,
+              )}
+            />
+          </>
+        ) : (
+          <div className="h-full flex flex-col justify-between items-center gap-3 md:gap-12">
+            <TextWithLineBreaks
+              text={`<strong>It’s nice to have a friend!</strong>\n Share the game with your fellow Swifties! 🎉`}
+              className="text-center text-2xl md:text-[2.5rem] md:leading-[3rem] text-background"
+            />
+            <Button onClick={onShare}>Share link</Button>
+          </div>
+        )}
+      </Card>
+    </motion.div>
+  );
+};
 
 const SignUpForm: React.FC<{
+  variant?: "top" | "bottom";
   isSignUpCompleted: boolean;
   onSignupCompleted: (email: string) => Promise<void>;
+  onShare?: () => void;
   loading: boolean;
-}> = ({ isSignUpCompleted, onSignupCompleted, loading }) => {
+  src?: string;
+}> = ({ isSignUpCompleted, onSignupCompleted, loading, variant, onShare }) => {
   const [signUpCompleted, setSignUpCompleted] = useState(isSignUpCompleted);
 
   const formik = useFormik({
@@ -128,7 +160,13 @@ const SignUpForm: React.FC<{
   return (
     <>
       <AnimatePresence mode="popLayout">
-        {signUpCompleted && <SignUpCompleted key="sign-up-completed" />}
+        {signUpCompleted && (
+          <SignUpCompleted
+            onShare={onShare}
+            variant={variant}
+            key="sign-up-completed"
+          />
+        )}
       </AnimatePresence>
       {!signUpCompleted && (
         <AnimatePresence mode="popLayout">
@@ -146,6 +184,7 @@ const SignUpForm: React.FC<{
               onSubmit={formik.handleSubmit}
             >
               <Input
+                label="Drop your email now"
                 type="email"
                 name="email"
                 placeholder="taytay@gmail.com"
@@ -153,8 +192,17 @@ const SignUpForm: React.FC<{
                 required
                 value={formik.values.email}
                 onChange={formik.handleChange}
+                className="h-11 md:h-16"
+                button={{
+                  buttonText: "I am ready for it",
+                  onButtonClick: formik.handleSubmit,
+                }}
               />
-              <Button type="submit" isLoading={loading}>
+              <Button
+                className="flex md:hidden"
+                type="submit"
+                isLoading={loading}
+              >
                 I am ready for it
               </Button>
             </form>
@@ -162,6 +210,40 @@ const SignUpForm: React.FC<{
         </AnimatePresence>
       )}
     </>
+  );
+};
+
+const Header = ({
+  onSignUp,
+  onShare,
+}: {
+  onSignUp?: () => void;
+  onShare?: () => void;
+}) => {
+  return (
+    <div className="sticky top-0 h-fit w-full bg-background flex flex-row justify-start items-center py-6 z-50 gap-10">
+      <div className="w-fit h-fit flex flex-row items-center gap-1.5">
+        <Image src="/logo.png" alt="logo" width={42} height={42} />
+        <p className="text-primary text-center select-none">PlayTaylor</p>
+      </div>
+
+      <div className="w-fit h-fit hidden md:flex flex-row items-center gap-8">
+        <Button
+          variant="link"
+          className="text-xl text-foreground sm:hover:no-underline"
+          onClick={onSignUp}
+        >
+          Sign Up
+        </Button>
+        <Button
+          className="text-xl text-foreground sm:hover:no-underline"
+          variant="link"
+          onClick={onShare}
+        >
+          Share
+        </Button>
+      </div>
+    </div>
   );
 };
 
@@ -325,65 +407,89 @@ const BottomSignUpCard = ({
   signUpCompleted,
   onShareLink,
   onSignupCompleted,
+  forceShowSignUp,
 }: {
   loadingSignUp: boolean;
   signUpCompleted: boolean;
   onShareLink: () => void;
   onSignupCompleted: (email: string) => Promise<void>;
+  forceShowSignUp?: boolean;
 }) => {
-  const [showSignUp, setShowSignUp] = React.useState(false);
+  const [showSignUp, setShowSignUp] = React.useState(forceShowSignUp);
+
+  useEffect(() => {
+    if (forceShowSignUp) {
+      setShowSignUp(true);
+    }
+  }, [forceShowSignUp]);
 
   return (
-    <AnimatePresence mode="popLayout">
-      {signUpCompleted ? (
-        <Card
-          key="sign-up-completed-bottom"
-          src="/landing-card-right.png"
-          className="w-full h-fit flex flex-col justify-center items-center gap-6 px-5 py-6"
-        >
-          <TextWithLineBreaks
-            text={`<strong>It’s nice to have a friend!</strong> \nShare the game with your fellow Swifties! 🎉`}
-            className="text-background text-2xl md:text-4xl font-medium text-center"
-          />
-          <Button onClick={() => onShareLink()}>Share link</Button>
-        </Card>
-      ) : !showSignUp ? (
-        <Card
-          key="sign-up-bottom"
-          src="/landing-card-right.png"
-          className="w-full h-fit flex flex-col justify-center items-center gap-6 px-5 py-6"
-        >
-          <TextWithLineBreaks
-            text={`Think you’ve got what it takes to shine shine shine?\n Then sign up and <strong>play play play!</strong>`}
-            className="text-background text-2xl md:text-4xl font-medium text-center"
-          />
-          <Button onClick={() => setShowSignUp(true)}>Sign Up</Button>
-        </Card>
-      ) : (
-        <SignUpForm
-          isSignUpCompleted={signUpCompleted}
-          onSignupCompleted={(email: string) => {
-            return onSignupCompleted(email);
-          }}
-          loading={loadingSignUp}
-        />
-      )}
-    </AnimatePresence>
+    <div className="w-full h-fit md:max-h-[320px] flex">
+      <AnimatePresence mode="popLayout">
+        {!forceShowSignUp && signUpCompleted && !signUpCompleted && (
+          <Card
+            key="sign-up-completed-bottom"
+            src="/landing-card-right.png"
+            className="w-full h-fit flex flex-col justify-center items-center gap-6 px-5 py-6"
+          >
+            <TextWithLineBreaks
+              text={`<strong>It’s nice to have a friend!</strong> \nShare the game with your fellow Swifties! 🎉`}
+              className="text-background text-2xl md:text-4xl font-medium text-center"
+            />
+            <Button onClick={() => onShareLink()}>Share link</Button>
+          </Card>
+        )}
+      </AnimatePresence>
+      <AnimatePresence mode="popLayout">
+        {!signUpCompleted && !showSignUp ? (
+          <Card
+            key="sign-up-bottom"
+            src="/landing-card-right.png"
+            className="w-full h-fit flex flex-col justify-center items-center gap-6 px-5 py-6"
+          >
+            <TextWithLineBreaks
+              text={`Think you’ve got what it takes to shine shine shine?\n Then sign up and <strong>play play play!</strong>`}
+              className="text-background text-2xl md:text-4xl font-medium text-center"
+            />
+            <Button onClick={() => setShowSignUp(true)}>Sign Up</Button>
+          </Card>
+        ) : (
+          <Card
+            key="sign-up-bottom"
+            src="/landing-card-right.png"
+            className="w-full h-fit flex flex-col justify-center items-center gap-6"
+          >
+            <SignUpForm
+              variant="bottom"
+              onShare={onShareLink}
+              isSignUpCompleted={signUpCompleted}
+              onSignupCompleted={(email: string) => {
+                return onSignupCompleted(email);
+              }}
+              loading={loadingSignUp}
+            />
+          </Card>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
 export default function LandingPage() {
   const [selectedText, setSelectedText] = React.useState<string | null>(null);
   const [showSignUp, setShowSignUp] = React.useState(false);
+  const [showSignUpBottomOnly, setShowSignUpBottomOnly] = React.useState(false);
   const [loadingSignUp, setLoadingSignUp] = React.useState(false);
   const [signUpCompleted, setSignUpCompleted] = React.useState(false);
-  const interestedUsersCountLoading = useRef(false);
+  const [tries, setTries] = useState(0);
   const [interestedUsersCount, setInterestedUsersCount] =
     React.useState<InterestedUsersCount>({
       loading: false,
       data: { count: 0 },
     });
 
+  const interestedUsersCountLoading = useRef(false);
+  const bottomSignUpCardRef = useRef<HTMLDivElement | null>(null);
   const selectedTextInterval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -418,25 +524,40 @@ export default function LandingPage() {
     } else {
       setSelectedText(selectedTextIncorrect);
     }
+
+    if (selectedTextInterval.current) {
+      clearInterval(selectedTextInterval.current);
+      selectedTextInterval.current = null;
+    }
+
     // start flow, change text every 2 seconds
     let i = 0;
-
-    selectedTextInterval.current = setInterval(() => {
-      if (i === selectedTextFlow.length) {
-        if (selectedTextInterval.current) {
-          clearInterval(selectedTextInterval.current);
-          selectedTextInterval.current = null;
+    const newTries = tries + 1;
+    if (isCorrect || newTries > MAX_TRIES) {
+      selectedTextInterval.current = setInterval(() => {
+        if (i === selectedTextFlow.length) {
+          setSelectedText(null);
+          setShowSignUp(true);
+          if (selectedTextInterval.current) {
+            clearInterval(selectedTextInterval.current);
+            selectedTextInterval.current = null;
+          }
+          return;
         }
-        setSelectedText(null);
-        setShowSignUp(true);
-        return;
-      }
 
-      i = i % selectedTextFlow.length;
-      setSelectedText(selectedTextFlow[i].text);
-      i++;
-      // }, 400000)
-    }, selectedTextFlow[i].duration);
+        i = i % selectedTextFlow.length;
+        setSelectedText(selectedTextFlow[i].text);
+        i++;
+      }, selectedTextFlow[i].duration);
+    } else {
+      setTimeout(() => {
+        setSelectedText(triesLeftTextFlow[0].text);
+        setTimeout(() => {
+          setSelectedText(null);
+        }, triesLeftTextFlow[0].duration);
+      }, 2000);
+    }
+    setTries(newTries);
   };
 
   const isSignUpStage = useMemo(() => showSignUp, [showSignUp]);
@@ -455,78 +576,104 @@ export default function LandingPage() {
   };
 
   const handleShare = async () => {
-    if (navigator?.share) {
-      try {
-        await navigator.share({
-          title: "Check out this app!",
-          text: "I found this amazing app!",
-          url: window.location.href, // or any URL you want to share
-        });
-        console.log("Content shared successfully");
-      } catch (error) {
-        console.error("Error sharing", error);
+    const url = process.env.NEXT_PUBLIC_APP_URL as string;
+    if (navigator) {
+      if (navigator.share && isMobilePhone()) {
+        try {
+          await navigator.share({
+            title: "Check out this app!",
+            text: "I found this amazing app!",
+            url: url,
+          });
+          console.log("Content shared successfully");
+        } catch (error) {
+          console.error("Error sharing", error);
+        }
+      } else {
+        navigator.clipboard.writeText(url);
+        toast("Link copied to clipboard! 🎉");
       }
     } else {
-      console.log("Web Share API is not supported in this browser.");
+      toast.error("Something went wrong.. try again? 💪");
     }
   };
 
   return (
     <div
       className={cn(
-        "w-full h-full flex flex-col justify-start items-center px-5 py-6 md:px-20 xl:px-40 md:py-20 relative gap-6 overflow-auto bg-background",
+        "w-full h-full flex flex-col gap-12 md:gap-10 px-5 md:px-20 xl:px-40 relative overflow-auto bg-background scrollbar-hide",
         montserratAlternates.className,
       )}
     >
-      <MainCard
-        signUpCompleted={signUpCompleted}
-        selectedText={selectedText}
-        isSignUpStage={isSignUpStage}
-        showSignUp={showSignUp}
-        loadingSignUp={loadingSignUp}
-        handleAnswer={handleAnswer}
-        interestedUsersCount={interestedUsersCount}
-        onSignupCompleted={onSignupCompleted}
+      <Header
+        onSignUp={() => {
+          // scroll to the bottom sign up card smoothly
+          bottomSignUpCardRef.current?.scrollIntoView({
+            behavior: "smooth",
+          });
+          setShowSignUpBottomOnly(true);
+        }}
+        onShare={handleShare}
       />
-      {sectionText.map(({ title, body, src, alt }) => (
-        <Section
-          key={title}
-          title={title}
-          body={body}
-          className="md:hidden"
-          image={
-            src && alt
-              ? {
-                  src,
-                  alt,
-                }
-              : undefined
-          }
-        />
-      ))}
-      <motion.div
-        {...slideFromTopAnimationProps}
-        className="hidden md:flex flex-row gap-[54px]"
+      <div
+        className={cn(
+          "w-full h-full flex flex-col justify-start items-center relative gap-6 pb-6 md:pb-20",
+          montserratAlternates.className,
+        )}
       >
-        <div className="flex flex-col gap-10 flex-shrink">
-          {sectionText.map(({ title, body }) => (
-            <Section key={title} title={title} body={body} />
-          ))}
-        </div>
-        <Image
-          src="/taylor-sabrina.png"
-          alt="landing-page-taylor"
-          width={300}
-          height={300}
-          className=" rounded-2xl"
+        <MainCard
+          signUpCompleted={signUpCompleted}
+          selectedText={selectedText}
+          isSignUpStage={isSignUpStage}
+          showSignUp={showSignUp}
+          loadingSignUp={loadingSignUp}
+          handleAnswer={handleAnswer}
+          interestedUsersCount={interestedUsersCount}
+          onSignupCompleted={onSignupCompleted}
         />
-      </motion.div>
-      <BottomSignUpCard
-        onShareLink={() => handleShare()}
-        loadingSignUp={loadingSignUp}
-        onSignupCompleted={onSignupCompleted}
-        signUpCompleted={signUpCompleted}
-      />
+        {sectionText.map(({ title, body, src, alt }) => (
+          <Section
+            key={title}
+            title={title}
+            body={body}
+            className="md:hidden"
+            image={
+              src && alt
+                ? {
+                    src,
+                    alt,
+                  }
+                : undefined
+            }
+          />
+        ))}
+        <motion.div
+          {...slideFromTopAnimationProps}
+          className="hidden md:flex flex-row gap-[54px]"
+        >
+          <div className="flex flex-col gap-10 flex-shrink">
+            {sectionText.map(({ title, body }) => (
+              <Section key={title} title={title} body={body} />
+            ))}
+          </div>
+          <Image
+            src="/taylor-sabrina.png"
+            alt="landing-page-taylor"
+            width={300}
+            height={300}
+            className=" rounded-2xl"
+          />
+        </motion.div>
+        <div className="w-full h-fit pb-10 md:pb-20" ref={bottomSignUpCardRef}>
+          <BottomSignUpCard
+            onShareLink={() => handleShare()}
+            forceShowSignUp={showSignUpBottomOnly}
+            loadingSignUp={loadingSignUp}
+            onSignupCompleted={onSignupCompleted}
+            signUpCompleted={signUpCompleted}
+          />
+        </div>
+      </div>
     </div>
   );
 }
