@@ -118,7 +118,7 @@ const SignUpCompleted = ({
           <div className="h-full flex flex-col justify-between items-center gap-3 md:gap-12">
             <TextWithLineBreaks
               text={`<strong>It’s nice to have a friend!</strong>\n Share the game with your fellow Swifties! 🎉`}
-              className="text-center text-2xl md:text-[2.5rem] md:leading-[3rem] text-foreground"
+              className="text-center text-2xl md:text-[2.5rem] md:leading-[3rem] text-background"
             />
             <Button onClick={onShare}>Share link</Button>
           </div>
